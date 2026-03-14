@@ -1,5 +1,6 @@
 package com.codex.flashsale.controller;
 
+import com.codex.flashsale.api.OpsAlertResponse;
 import com.codex.flashsale.api.OutboxBacklogResponse;
 import com.codex.flashsale.api.OutboxRetryResponse;
 import com.codex.flashsale.api.ReconciliationDriftResponse;
@@ -28,6 +29,11 @@ public class OpsController {
     @GetMapping("/outbox/backlog")
     public OutboxBacklogResponse getOutboxBacklog() {
         return opsApplicationService.getOutboxBacklog();
+    }
+
+    @GetMapping("/alerts")
+    public List<OpsAlertResponse> getAlerts() {
+        return opsApplicationService.getAlerts();
     }
 
     @PostMapping("/outbox/{eventId}/retry")

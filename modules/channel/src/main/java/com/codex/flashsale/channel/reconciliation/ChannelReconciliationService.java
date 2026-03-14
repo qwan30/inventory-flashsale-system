@@ -24,8 +24,8 @@ public class ChannelReconciliationService {
         this.timeProvider = timeProvider;
     }
 
-    public InventoryReconciliationRun startRun() {
-        return runRepository.saveAndFlush(new InventoryReconciliationRun(UUID.randomUUID().toString()));
+    public InventoryReconciliationRun startRun(ReconciliationTriggerType triggerType) {
+        return runRepository.saveAndFlush(new InventoryReconciliationRun(UUID.randomUUID().toString(), triggerType));
     }
 
     public InventoryReconciliationRun completeRun(
@@ -36,6 +36,12 @@ public class ChannelReconciliationService {
     ) {
         InventoryReconciliationRun run = getRequiredRun(runId);
         run.complete(scannedSkuCount, scannedSnapshotCount, openDriftCount, timeProvider.now());
+        return runRepository.saveAndFlush(run);
+    }
+
+    public InventoryReconciliationRun failRun(String runId, String failureMessage) {
+        InventoryReconciliationRun run = getRequiredRun(runId);
+        run.fail(failureMessage, timeProvider.now());
         return runRepository.saveAndFlush(run);
     }
 
@@ -50,7 +56,11 @@ public class ChannelReconciliationService {
             int observedReservedQty,
             int observedSoldQty
     ) {
-        return driftRepository.saveAndFlush(new InventoryReconciliationDrift(
+        InventoryReconciliationDrift drift = driftRepository.findByStatusAndChannelAndSku(
+                ReconciliationDriftStatus.OPEN,
+                channel,
+                sku
+        ).orElseGet(() -> new InventoryReconciliationDrift(
                 UUID.randomUUID().toString(),
                 runId,
                 channel,
@@ -62,10 +72,28 @@ public class ChannelReconciliationService {
                 observedReservedQty,
                 observedSoldQty
         ));
+        drift.refresh(
+                runId,
+                centralAvailableQty,
+                centralReservedQty,
+                centralSoldQty,
+                observedAvailableQty,
+                observedReservedQty,
+                observedSoldQty
+        );
+        return driftRepository.saveAndFlush(drift);
     }
 
     public List<InventoryReconciliationDrift> listOpenDrifts() {
         return driftRepository.findByStatusOrderByCreatedAtDesc(ReconciliationDriftStatus.OPEN);
+    }
+
+    public long countOpenDrifts() {
+        return driftRepository.countByStatus(ReconciliationDriftStatus.OPEN);
+    }
+
+    public java.util.Optional<InventoryReconciliationRun> findLatestRun(ReconciliationTriggerType triggerType) {
+        return runRepository.findTopByTriggerTypeOrderByCreatedAtDesc(triggerType);
     }
 
     public InventoryReconciliationDrift resolveDrift(String driftId, String resolutionNote) {

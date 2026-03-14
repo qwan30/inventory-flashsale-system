@@ -22,7 +22,7 @@ Export each run into a durable JSON artifact so future sessions can compare resu
 Recommended command pattern:
 
 ```powershell
-k6 run --summary-export testing/k6/artifacts/<scenario>-<timestamp>.json testing/k6/<scenario>.js
+.\testing\k6\Run-BenchmarkSuite.ps1 -BaseUrl http://localhost:8080
 ```
 
 Each artifact should preserve at least:
@@ -33,3 +33,4 @@ Each artifact should preserve at least:
 - conflict or retry rate inferred from status codes
 - oversell evidence from business assertions outside K6 when relevant
 - backlog growth or reconciliation run counts for ops scenarios
+- manifest metadata including git commit, scenario list, base URL, and key runtime config inputs

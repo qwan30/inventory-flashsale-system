@@ -27,10 +27,13 @@ Current implemented signals include:
 - reservation counters and latency timer
 - health and metrics endpoints
 - durable outbox status fields
+- channel sync backlog gauges
+- reconciliation run success and failure counters plus reconciliation duration timer
+- in-app ops alerts for backlog, drift, stale snapshot, and scheduled reconciliation failure
 
 Current gap:
 
-- richer benchmark reporting and backlog monitoring still need expansion
+- richer benchmark evidence storage and external observability still need expansion
 
 ## Performance Targets
 

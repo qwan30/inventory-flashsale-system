@@ -52,8 +52,32 @@ Guidance:
 
 - `app.outbox.publish-batch-size`
 - default `50`
+- `app.outbox.retry-delay`
+- default `10s`
+- `app.outbox.max-attempts`
+- default `5`
 - `app.kafka.topic`
 - default `inventory-flashsale.events`
+
+### Channel Sync Rules
+
+- `app.channel.sync-batch-size`
+- default `50`
+- `app.channel.retry-delay`
+- default `15s`
+- `app.channel.max-attempts`
+- default `3`
+
+### Alert Rules
+
+- `app.alerts.outbox-failed-threshold`
+- default `10`
+- `app.alerts.channel-sync-failed-threshold`
+- default `10`
+- `app.alerts.reconciliation-open-drift-threshold`
+- default `5`
+- `app.alerts.channel-snapshot-staleness`
+- default `5m`
 
 ### Scheduler Rules
 
@@ -61,6 +85,10 @@ Guidance:
 - default `30s`
 - `app.scheduler.outbox-delay`
 - default `5s`
+- `app.scheduler.channel-sync-delay`
+- default `10s`
+- `app.scheduler.reconciliation-delay`
+- default `60s`
 
 Guidance:
 
@@ -93,6 +121,4 @@ Guidance:
 Not yet formalized:
 
 - benchmark-specific config profiles
-- reconciliation job configuration
-- outbox retry policy configuration
 - explicit operator-run config matrix for high-load validation

@@ -27,12 +27,13 @@ Current responsibilities:
 - provide mock sync adapters for `WEB`, `APP`, and `SHOPEE`
 - persist outbound channel sync attempts and channel inventory snapshots
 - store reconciliation runs and reconciliation drifts
+- support scheduled reconciliation inputs and staleness evaluation
 
 Current gap:
 
 - no real marketplace transport or credentialed connector
 - inbound facts are derived from persisted snapshots, not pulled from external systems
-- alerting and scheduled reconciliation are not yet implemented
+- alerting is exposed through the app only, not an external observability stack
 
 Target extension direction:
 

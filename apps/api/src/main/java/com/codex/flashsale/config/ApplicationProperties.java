@@ -10,6 +10,7 @@ public class ApplicationProperties {
     private final Lock lock = new Lock();
     private final Outbox outbox = new Outbox();
     private final Channel channel = new Channel();
+    private final Alerts alerts = new Alerts();
     private final Scheduler scheduler = new Scheduler();
     private final Kafka kafka = new Kafka();
 
@@ -27,6 +28,10 @@ public class ApplicationProperties {
 
     public Channel getChannel() {
         return channel;
+    }
+
+    public Alerts getAlerts() {
+        return alerts;
     }
 
     public Scheduler getScheduler() {
@@ -130,10 +135,50 @@ public class ApplicationProperties {
         }
     }
 
+    public static class Alerts {
+        private long outboxFailedThreshold = 10;
+        private long channelSyncFailedThreshold = 10;
+        private long reconciliationOpenDriftThreshold = 5;
+        private Duration channelSnapshotStaleness = Duration.ofMinutes(5);
+
+        public long getOutboxFailedThreshold() {
+            return outboxFailedThreshold;
+        }
+
+        public void setOutboxFailedThreshold(long outboxFailedThreshold) {
+            this.outboxFailedThreshold = outboxFailedThreshold;
+        }
+
+        public long getChannelSyncFailedThreshold() {
+            return channelSyncFailedThreshold;
+        }
+
+        public void setChannelSyncFailedThreshold(long channelSyncFailedThreshold) {
+            this.channelSyncFailedThreshold = channelSyncFailedThreshold;
+        }
+
+        public long getReconciliationOpenDriftThreshold() {
+            return reconciliationOpenDriftThreshold;
+        }
+
+        public void setReconciliationOpenDriftThreshold(long reconciliationOpenDriftThreshold) {
+            this.reconciliationOpenDriftThreshold = reconciliationOpenDriftThreshold;
+        }
+
+        public Duration getChannelSnapshotStaleness() {
+            return channelSnapshotStaleness;
+        }
+
+        public void setChannelSnapshotStaleness(Duration channelSnapshotStaleness) {
+            this.channelSnapshotStaleness = channelSnapshotStaleness;
+        }
+    }
+
     public static class Scheduler {
         private Duration expiredReservationDelay = Duration.ofSeconds(30);
         private Duration outboxDelay = Duration.ofSeconds(5);
         private Duration channelSyncDelay = Duration.ofSeconds(10);
+        private Duration reconciliationDelay = Duration.ofSeconds(60);
 
         public Duration getExpiredReservationDelay() {
             return expiredReservationDelay;
@@ -157,6 +202,14 @@ public class ApplicationProperties {
 
         public void setChannelSyncDelay(Duration channelSyncDelay) {
             this.channelSyncDelay = channelSyncDelay;
+        }
+
+        public Duration getReconciliationDelay() {
+            return reconciliationDelay;
+        }
+
+        public void setReconciliationDelay(Duration reconciliationDelay) {
+            this.reconciliationDelay = reconciliationDelay;
         }
     }
 

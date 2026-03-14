@@ -55,15 +55,36 @@ Outcome:
 
 - the system retains a per-channel snapshot that reconciliation can compare against central inventory
 
+### Inventory Reconciliation Sweep
+
+Current task:
+
+- periodically create a reconciliation run inside the monolith
+- compare central inventory to persisted channel snapshots
+- refresh or create open drift records without auto-resolving them
+
+Current implementation:
+
+- `ReconciliationScheduler`
+
+Outcome:
+
+- reconciliation evidence is captured continuously and unresolved drifts remain operator-visible
+
+### In-App Alert Evaluation
+
+Current task:
+
+- evaluate current operational breaches from outbox backlog, channel sync backlog, open drifts, stale snapshots, and scheduled reconciliation failures
+- expose those conditions through an ops API and metrics
+
+Current implementation:
+
+- `OpsAlertService`
+
 ## Planned Operational Automations
 
 These are planned ideas only, not implemented tasks.
-
-### Inventory Reconciliation Sweep
-
-Target purpose:
-
-- compare central inventory truth with channel-side facts and surface mismatches on a schedule instead of operator-triggered API calls
 
 ### Benchmark Report Generation
 
@@ -75,7 +96,7 @@ Target purpose:
 
 Target purpose:
 
-- alert when outbox failures, lock contention, or reconciliation mismatch rates exceed acceptable thresholds
+- push app-level operational breaches into an external alerting stack or notification channel
 
 ## Notes
 

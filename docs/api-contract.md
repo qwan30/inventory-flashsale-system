@@ -135,8 +135,6 @@ Purpose:
 
 Headers:
 
-- optional `X-Idempotency-Key`
-- optional `X-Correlation-Id`
 - optional `X-Correlation-Id`
 
 Success response:
@@ -167,6 +165,7 @@ Purpose:
 
 Headers:
 
+- optional `X-Idempotency-Key`
 - optional `X-Correlation-Id`
 
 Request body:
@@ -197,6 +196,28 @@ Current failure classes:
 - `400` validation error
 - `404` order not found
 - `409` invalid transition, or a keyed transition was already processed with a different key
+
+### `GET /api/v1/ops/alerts`
+
+Purpose:
+
+- inspect current app-level operational alert conditions
+
+Success response:
+
+```json
+[
+  {
+    "code": "OUTBOX_FAILED_BACKLOG",
+    "severity": "WARN",
+    "status": "INACTIVE",
+    "message": "Failed outbox backlog breached threshold",
+    "currentValue": "0",
+    "threshold": "10",
+    "observedAt": "2026-03-15T00:00:00Z"
+  }
+]
+```
 
 ### `GET /api/v1/ops/outbox/backlog`
 
@@ -248,9 +269,12 @@ Success response:
 ```json
 {
   "runId": "string",
+  "triggerType": "MANUAL",
+  "status": "COMPLETED",
   "scannedSkuCount": 1,
   "scannedSnapshotCount": 3,
   "openDriftCount": 0,
+  "failureMessage": null,
   "completedAt": "2026-03-15T00:00:00Z"
 }
 ```

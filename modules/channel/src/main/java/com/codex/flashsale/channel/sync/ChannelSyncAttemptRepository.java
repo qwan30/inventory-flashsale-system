@@ -20,4 +20,10 @@ public interface ChannelSyncAttemptRepository extends JpaRepository<ChannelSyncA
     long countByStatus(ChannelSyncStatus status);
 
     boolean existsByOutboxEventIdAndChannel(String outboxEventId, SalesChannel channel);
+
+    long countByStatusAndFailureTypeAndNextAttemptAtLessThanEqual(
+            ChannelSyncStatus status,
+            ChannelSyncFailureType failureType,
+            Instant nextAttemptAt
+    );
 }

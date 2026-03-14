@@ -2,6 +2,15 @@
 
 Use this folder for implementation-phase records that are worth keeping after coding starts.
 
+Current high-signal records:
+
+- `2026-03-15-phase-1-hardening-slice.md`
+  Phase 1 correctness hardening around outbox retry, metrics, and reservation edge-case coverage.
+- `2026-03-15-wave-1-3-monolith-foundation.md`
+  Monolith-first foundation for persisted mutation idempotency, channel sync, reconciliation, ops remediation, and expanded integration tests.
+- `2026-03-15-ops-closure-slice.md`
+  Scheduled reconciliation, app-level ops alerts, and K6 artifact capture conventions.
+
 Good content:
 
 - delivery notes

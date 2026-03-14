@@ -122,3 +122,22 @@ Allowed transitions:
 
 - detected mismatch -> `OPEN`
 - operator resolution -> `RESOLVED`
+
+## Reconciliation Run State Machine
+
+Current states:
+
+- `RUNNING`
+- `COMPLETED`
+- `FAILED`
+
+Allowed transitions:
+
+- new manual or scheduled run -> `RUNNING`
+- successful scan completion -> `COMPLETED`
+- orchestration failure during scan -> `FAILED`
+
+Current notes:
+
+- `trigger_type` distinguishes `MANUAL` and `SCHEDULED`
+- only the latest scheduled run failure should activate the scheduler-failure alert surface

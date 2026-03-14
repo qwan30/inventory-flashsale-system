@@ -37,6 +37,8 @@ The current repository already implements:
 - backward-compatible idempotency persistence for release and order status mutations
 - channel sync attempts and persisted channel inventory snapshots
 - operator remediation APIs for outbox retry and reconciliation drift management
+- scheduled reconciliation runs inside the monolith
+- in-app operational alert evaluation for backlog, drift, stale snapshots, and scheduled-run failure
 
 ## Target Requirement Summary
 
@@ -57,8 +59,10 @@ Current implemented capabilities include:
 - explicit reservation, order, and campaign states
 - durable outbox rows for business events
 - scheduled reservation expiry, outbox publish, and channel sync publish
+- scheduled reconciliation evidence capture without auto-correction
 - persisted release and order-status idempotency replay
 - channel snapshot reconciliation runs and drift resolution APIs
+- ops alert surface for operational breaches and scheduler failure visibility
 - error responses with correlation ID support
 
 See:
@@ -72,8 +76,8 @@ See:
 The current repository does not yet fully implement the target omnichannel vision:
 
 - channel integrations are still mock transports, not real marketplace connectors
-- reconciliation exists as an operator-triggered workflow, but not yet as a scheduled automated sweep with alerting
-- load testing is broader than smoke-only, but still not yet a durable staged benchmark program with stored evidence
+- alerting exists only as an in-app operational surface, not an external observability stack
+- load testing now has a committed runner and artifact convention, but still not yet a durable library of checked-in benchmark evidence
 - no read replicas, order partitioning, or service decomposition are implemented
 - no real admin or operator-facing UI exists in this repository
 

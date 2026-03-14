@@ -89,6 +89,27 @@ public class InventoryReconciliationDrift extends AuditTimestamps {
         this.resolvedAt = resolvedAt;
     }
 
+    public void refresh(
+            String runId,
+            int centralAvailableQty,
+            int centralReservedQty,
+            int centralSoldQty,
+            int observedAvailableQty,
+            int observedReservedQty,
+            int observedSoldQty
+    ) {
+        this.runId = runId;
+        this.centralAvailableQty = centralAvailableQty;
+        this.centralReservedQty = centralReservedQty;
+        this.centralSoldQty = centralSoldQty;
+        this.observedAvailableQty = observedAvailableQty;
+        this.observedReservedQty = observedReservedQty;
+        this.observedSoldQty = observedSoldQty;
+        this.status = ReconciliationDriftStatus.OPEN;
+        this.resolutionNote = null;
+        this.resolvedAt = null;
+    }
+
     public String getId() {
         return id;
     }

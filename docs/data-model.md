@@ -164,18 +164,22 @@ Important fields:
 Important constraints:
 
 - unique `(channel, sku)`
+- index on `synced_at` for staleness scans
 
 ### `inventory_reconciliation_run`
 
 Purpose:
 
-- record each operator-triggered reconciliation pass
+- record each manual or scheduled reconciliation pass
 
 Important fields:
 
+- `trigger_type`
 - `scanned_sku_count`
 - `scanned_snapshot_count`
 - `open_drift_count`
+- `status`
+- `failure_message`
 - `completed_at`
 
 ### `inventory_reconciliation_drift`
@@ -213,6 +217,8 @@ Important fields:
 - outbox status: `PENDING`, `PUBLISHED`, `FAILED`
 - channel sync status: `PENDING`, `SYNCED`, `FAILED`
 - channel sync failure type: `TRANSIENT`, `PERMANENT`
+- reconciliation run trigger type: `MANUAL`, `SCHEDULED`
+- reconciliation run status: `RUNNING`, `COMPLETED`, `FAILED`
 - reconciliation drift status: `OPEN`, `RESOLVED`
 - sales channel: `WEB`, `APP`, `SHOPEE`
 

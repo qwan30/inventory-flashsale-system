@@ -22,7 +22,8 @@ Read in this order for broad project work:
 14. `docs/configuration-rules.md`
 15. `docs/automation-tasks.md`
 16. `docs/ui-roles.md`
-17. The newest relevant file in `docs/05_history/`
+17. The newest relevant file in `docs/03_implementation/`
+18. The newest relevant file in `docs/05_history/`
 
 ## Structure
 
@@ -60,6 +61,12 @@ Read in this order for broad project work:
   Roadmaps, milestone plans, and execution-ready plans.
 - `docs/03_implementation/`
   Implementation notes, rollout notes, migration notes, and significant delivery records.
+- `docs/03_implementation/2026-03-15-phase-1-hardening-slice.md`
+  Focused Phase 1 hardening delivery for outbox retry, metrics, and reservation edge cases.
+- `docs/03_implementation/2026-03-15-wave-1-3-monolith-foundation.md`
+  Broader monolith-first delivery covering persisted idempotency, channel sync, ops remediation, and reconciliation foundation.
+- `docs/03_implementation/2026-03-15-ops-closure-slice.md`
+  Operational closure for scheduled reconciliation, alert evaluation, and repeatable benchmark artifact generation.
 - `docs/04_audit_remediation/`
   Risk audits, bug investigations, remediation plans, and postmortems.
 - `docs/05_history/`

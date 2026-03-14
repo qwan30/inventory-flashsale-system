@@ -2,6 +2,8 @@ package com.codex.flashsale.channel.sync;
 
 import com.codex.flashsale.channel.SalesChannel;
 import com.codex.flashsale.common.time.TimeProvider;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
@@ -25,6 +27,7 @@ public class ChannelSyncService {
     private final int syncBatchSize;
     private final Duration retryDelay;
     private final int maxAttempts;
+    private final MeterRegistry meterRegistry;
 
     public ChannelSyncService(
             ChannelSyncAttemptRepository attemptRepository,
@@ -34,7 +37,8 @@ public class ChannelSyncService {
             TimeProvider timeProvider,
             @Value("${app.channel.sync-batch-size:50}") int syncBatchSize,
             @Value("${app.channel.retry-delay:15s}") Duration retryDelay,
-            @Value("${app.channel.max-attempts:3}") int maxAttempts
+            @Value("${app.channel.max-attempts:3}") int maxAttempts,
+            MeterRegistry meterRegistry
     ) {
         this.attemptRepository = attemptRepository;
         this.snapshotRepository = snapshotRepository;
@@ -45,6 +49,11 @@ public class ChannelSyncService {
         this.syncBatchSize = syncBatchSize;
         this.retryDelay = retryDelay;
         this.maxAttempts = maxAttempts;
+        this.meterRegistry = meterRegistry;
+        Gauge.builder("channel.sync.backlog.failed", this, value -> value.countFailedAttempts())
+                .register(meterRegistry);
+        Gauge.builder("channel.sync.backlog.retryable", this, value -> value.countRetryableFailedAttempts())
+                .register(meterRegistry);
     }
 
     public void scheduleSync(
@@ -113,6 +122,18 @@ public class ChannelSyncService {
 
     public long countFailedAttempts() {
         return attemptRepository.countByStatus(ChannelSyncStatus.FAILED);
+    }
+
+    public long countRetryableFailedAttempts() {
+        return attemptRepository.countByStatusAndFailureTypeAndNextAttemptAtLessThanEqual(
+                ChannelSyncStatus.FAILED,
+                ChannelSyncFailureType.TRANSIENT,
+                timeProvider.now()
+        );
+    }
+
+    public long countStaleSnapshots(Duration stalenessWindow) {
+        return snapshotRepository.countBySyncedAtBefore(timeProvider.now().minus(stalenessWindow));
     }
 
     private void publishAttempt(ChannelSyncAttempt attempt) {

@@ -60,10 +60,16 @@ app:
     sync-batch-size: 50
     retry-delay: 15s
     max-attempts: 3
+  alerts:
+    outbox-failed-threshold: 10
+    channel-sync-failed-threshold: 10
+    reconciliation-open-drift-threshold: 5
+    channel-snapshot-staleness: 5m
   scheduler:
     expired-reservation-delay: 30s
     outbox-delay: 5s
     channel-sync-delay: 10s
+    reconciliation-delay: 60s
   kafka:
     topic: inventory-flashsale.events
 
