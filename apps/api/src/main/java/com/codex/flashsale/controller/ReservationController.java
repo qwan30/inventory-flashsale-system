@@ -45,8 +45,10 @@ public class ReservationController {
     }
 
     @PostMapping("/reservations/{reservationId}/release")
-    public ReleaseReservationResponse releaseReservation(@PathVariable String reservationId) {
-        return reservationApplicationService.release(reservationId);
+    public ReleaseReservationResponse releaseReservation(
+            @PathVariable String reservationId,
+            @RequestHeader(name = HeaderNames.IDEMPOTENCY_KEY, required = false) String idempotencyKey
+    ) {
+        return reservationApplicationService.release(reservationId, idempotencyKey);
     }
 }
-

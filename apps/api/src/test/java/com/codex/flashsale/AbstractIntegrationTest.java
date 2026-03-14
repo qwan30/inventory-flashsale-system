@@ -3,6 +3,11 @@ package com.codex.flashsale;
 import com.codex.flashsale.flashsale.CampaignStatus;
 import com.codex.flashsale.flashsale.FlashSaleCampaign;
 import com.codex.flashsale.flashsale.FlashSaleCampaignRepository;
+import com.codex.flashsale.channel.reconciliation.InventoryReconciliationDriftRepository;
+import com.codex.flashsale.channel.reconciliation.InventoryReconciliationRunRepository;
+import com.codex.flashsale.channel.sync.ChannelInventorySnapshotRepository;
+import com.codex.flashsale.channel.sync.ChannelSyncAttemptRepository;
+import com.codex.flashsale.idempotency.OperationIdempotencyRepository;
 import com.codex.flashsale.inventory.InventoryItem;
 import com.codex.flashsale.inventory.InventoryItemRepository;
 import com.codex.flashsale.inventory.StockReservationRepository;
@@ -53,6 +58,21 @@ abstract class AbstractIntegrationTest {
     @Autowired
     protected OutboxEventRepository outboxEventRepository;
 
+    @Autowired
+    protected OperationIdempotencyRepository operationIdempotencyRepository;
+
+    @Autowired
+    protected ChannelSyncAttemptRepository channelSyncAttemptRepository;
+
+    @Autowired
+    protected ChannelInventorySnapshotRepository channelInventorySnapshotRepository;
+
+    @Autowired
+    protected InventoryReconciliationRunRepository inventoryReconciliationRunRepository;
+
+    @Autowired
+    protected InventoryReconciliationDriftRepository inventoryReconciliationDriftRepository;
+
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", MYSQL::getJdbcUrl);
@@ -64,6 +84,11 @@ abstract class AbstractIntegrationTest {
     }
 
     protected void resetDatabase(int availableQty, int quota, Instant startsAt, Instant endsAt, CampaignStatus status) {
+        inventoryReconciliationDriftRepository.deleteAll();
+        inventoryReconciliationRunRepository.deleteAll();
+        channelInventorySnapshotRepository.deleteAll();
+        channelSyncAttemptRepository.deleteAll();
+        operationIdempotencyRepository.deleteAll();
         orderHeaderRepository.deleteAll();
         stockReservationRepository.deleteAll();
         flashSaleCampaignRepository.deleteAll();

@@ -9,6 +9,7 @@ public class ApplicationProperties {
     private final Reservation reservation = new Reservation();
     private final Lock lock = new Lock();
     private final Outbox outbox = new Outbox();
+    private final Channel channel = new Channel();
     private final Scheduler scheduler = new Scheduler();
     private final Kafka kafka = new Kafka();
 
@@ -22,6 +23,10 @@ public class ApplicationProperties {
 
     public Outbox getOutbox() {
         return outbox;
+    }
+
+    public Channel getChannel() {
+        return channel;
     }
 
     public Scheduler getScheduler() {
@@ -95,9 +100,40 @@ public class ApplicationProperties {
         }
     }
 
+    public static class Channel {
+        private int syncBatchSize = 50;
+        private Duration retryDelay = Duration.ofSeconds(15);
+        private int maxAttempts = 3;
+
+        public int getSyncBatchSize() {
+            return syncBatchSize;
+        }
+
+        public void setSyncBatchSize(int syncBatchSize) {
+            this.syncBatchSize = syncBatchSize;
+        }
+
+        public Duration getRetryDelay() {
+            return retryDelay;
+        }
+
+        public void setRetryDelay(Duration retryDelay) {
+            this.retryDelay = retryDelay;
+        }
+
+        public int getMaxAttempts() {
+            return maxAttempts;
+        }
+
+        public void setMaxAttempts(int maxAttempts) {
+            this.maxAttempts = maxAttempts;
+        }
+    }
+
     public static class Scheduler {
         private Duration expiredReservationDelay = Duration.ofSeconds(30);
         private Duration outboxDelay = Duration.ofSeconds(5);
+        private Duration channelSyncDelay = Duration.ofSeconds(10);
 
         public Duration getExpiredReservationDelay() {
             return expiredReservationDelay;
@@ -113,6 +149,14 @@ public class ApplicationProperties {
 
         public void setOutboxDelay(Duration outboxDelay) {
             this.outboxDelay = outboxDelay;
+        }
+
+        public Duration getChannelSyncDelay() {
+            return channelSyncDelay;
+        }
+
+        public void setChannelSyncDelay(Duration channelSyncDelay) {
+            this.channelSyncDelay = channelSyncDelay;
         }
     }
 

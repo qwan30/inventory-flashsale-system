@@ -54,6 +54,8 @@ Current rules:
 
 - confirmed reservations cannot be released
 - repeated release or expiry is idempotent
+- release accepts optional `X-Idempotency-Key`; same-key duplicates replay the stored response
+- release with a different idempotency key after a keyed release is a conflict
 - expiry reuses the stock-return semantics of release
 - release and expiry both return reserved stock to available stock
 
@@ -64,6 +66,8 @@ Current rules:
 - orders are created in `PENDING`
 - valid transitions are only `PENDING -> PAID -> SHIPPED`
 - repeating the same status is allowed as a no-op
+- order status update accepts optional `X-Idempotency-Key`; same-key duplicates replay the stored transition response
+- a different idempotency key for an already applied keyed transition is a conflict
 - invalid transitions are rejected as conflicts
 
 ## Eventing Rules
@@ -75,15 +79,16 @@ Current rules:
 - reservation confirmation records `order.created`
 - order status updates record order lifecycle events
 - outbox rows are durable before publish is attempted
+- inventory-affecting outbox events also schedule channel sync attempts for all supported channels
+- failed outbox rows may be reset to `PENDING` by scheduler retry or manual ops retry
 
 Current gap:
 
-- publish failure handling exists, but automated retry semantics are still limited
+- channel transports are still mock implementations rather than real external connectors
 
 ## Target Future Rules
 
 Target future rules not yet implemented:
 
-- reconciliation rules for central inventory versus channel-side state
-- channel sync failure classification and remediation policy
-- operator workflow rules for manual correction or replay
+- alerting rules for drift and backlog thresholds
+- connector-specific retry and credential policies for real marketplaces

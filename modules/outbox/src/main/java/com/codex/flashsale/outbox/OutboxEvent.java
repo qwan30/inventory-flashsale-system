@@ -81,6 +81,7 @@ public class OutboxEvent extends AuditTimestamps {
 
     public void resetForRetry() {
         this.status = OutboxStatus.PENDING;
+        this.lastError = null;
         this.nextAttemptAt = null;
     }
 

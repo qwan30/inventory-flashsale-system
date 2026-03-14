@@ -94,10 +94,105 @@ Important fields:
 - `attempts`
 - `published_at`
 - `last_error`
+- `next_attempt_at`
 
 Important indexes:
 
 - index on `(status, created_at)` for pending event batch selection
+- index on `(status, next_attempt_at, created_at)` for retry scans
+
+### `operation_idempotency`
+
+Purpose:
+
+- persist replayable responses for keyed release and order-status mutations
+
+Important fields:
+
+- `operation_type`
+- `resource_id`
+- `operation_value`
+- `idempotency_key`
+- `response_payload`
+
+Important constraints:
+
+- unique `(operation_type, resource_id, idempotency_key)`
+- unique `(operation_type, resource_id, operation_value)`
+
+### `channel_sync_attempt`
+
+Purpose:
+
+- persist outbound channel sync work derived from local outbox events
+
+Important fields:
+
+- `outbox_event_id`
+- `channel`
+- `sku`
+- `event_type`
+- `payload`
+- `available_qty`
+- `reserved_qty`
+- `sold_qty`
+- `status`
+- `failure_type`
+- `attempts`
+- `next_attempt_at`
+
+Important constraints:
+
+- unique `(outbox_event_id, channel)`
+
+### `channel_inventory_snapshot`
+
+Purpose:
+
+- persist the last known synced inventory fact per channel and SKU
+
+Important fields:
+
+- `channel`
+- `sku`
+- `available_qty`
+- `reserved_qty`
+- `sold_qty`
+- `source_outbox_event_id`
+- `synced_at`
+
+Important constraints:
+
+- unique `(channel, sku)`
+
+### `inventory_reconciliation_run`
+
+Purpose:
+
+- record each operator-triggered reconciliation pass
+
+Important fields:
+
+- `scanned_sku_count`
+- `scanned_snapshot_count`
+- `open_drift_count`
+- `completed_at`
+
+### `inventory_reconciliation_drift`
+
+Purpose:
+
+- persist mismatches between central inventory and channel snapshots
+
+Important fields:
+
+- `run_id`
+- `channel`
+- `sku`
+- central and observed quantity columns
+- `status`
+- `resolution_note`
+- `resolved_at`
 
 ## Current Entity Relationships
 
@@ -106,6 +201,9 @@ Important indexes:
 - one `flash_sale_campaign` may have many reservations
 - one `stock_reservation` may produce one `order_header`
 - all reservation and order lifecycle changes may produce many `outbox_event` rows
+- one outbox event may produce many `channel_sync_attempt` rows, one per target channel
+- one channel and SKU pair has one latest `channel_inventory_snapshot`
+- one reconciliation run may produce many reconciliation drifts
 
 ## Current Enums And State-Carrying Fields
 
@@ -113,15 +211,16 @@ Important indexes:
 - campaign status: `DRAFT`, `ACTIVE`, `ENDED`
 - order status: `PENDING`, `PAID`, `SHIPPED`
 - outbox status: `PENDING`, `PUBLISHED`, `FAILED`
+- channel sync status: `PENDING`, `SYNCED`, `FAILED`
+- channel sync failure type: `TRANSIENT`, `PERMANENT`
+- reconciliation drift status: `OPEN`, `RESOLVED`
 - sales channel: `WEB`, `APP`, `SHOPEE`
 
 ## Target Data Model Gaps
 
 Not yet implemented but likely future additions:
 
-- reconciliation result records
-- channel sync audit trail
-- explicit retry scheduling metadata for failed outbox rows
+- connector-specific credential or cursor state
 - order partitioning strategy or archive model
 
 These are target-only ideas and are not part of the current schema.

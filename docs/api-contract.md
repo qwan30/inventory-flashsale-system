@@ -98,6 +98,7 @@ Purpose:
 
 Headers:
 
+- optional `X-Idempotency-Key`
 - optional `X-Correlation-Id`
 
 Success response:
@@ -123,7 +124,7 @@ Response shape:
 Current failure classes:
 
 - `404` reservation or inventory not found
-- `409` confirmed reservation cannot be released
+- `409` confirmed reservation cannot be released, or a keyed release was already processed with a different key
 - `423` resource lock timeout
 
 ### `GET /api/v1/inventory/{sku}`
@@ -134,6 +135,8 @@ Purpose:
 
 Headers:
 
+- optional `X-Idempotency-Key`
+- optional `X-Correlation-Id`
 - optional `X-Correlation-Id`
 
 Success response:
@@ -193,7 +196,115 @@ Current failure classes:
 
 - `400` validation error
 - `404` order not found
-- `409` invalid transition
+- `409` invalid transition, or a keyed transition was already processed with a different key
+
+### `GET /api/v1/ops/outbox/backlog`
+
+Purpose:
+
+- inspect current outbox backlog counts
+
+Success response:
+
+```json
+{
+  "pendingCount": 1,
+  "failedCount": 0,
+  "retryableFailedCount": 0
+}
+```
+
+### `POST /api/v1/ops/outbox/{eventId}/retry`
+
+Purpose:
+
+- reset a failed outbox event to `PENDING` for replay
+
+Success response:
+
+```json
+{
+  "eventId": "string",
+  "status": "PENDING",
+  "attempts": 2,
+  "nextAttemptAt": null,
+  "lastError": null
+}
+```
+
+Current failure classes:
+
+- `404` outbox event not found
+- `409` published outbox event cannot be retried
+
+### `POST /api/v1/ops/reconciliation/runs`
+
+Purpose:
+
+- run reconciliation against persisted channel snapshots immediately
+
+Success response:
+
+```json
+{
+  "runId": "string",
+  "scannedSkuCount": 1,
+  "scannedSnapshotCount": 3,
+  "openDriftCount": 0,
+  "completedAt": "2026-03-15T00:00:00Z"
+}
+```
+
+### `GET /api/v1/ops/reconciliation/drifts`
+
+Purpose:
+
+- list currently open reconciliation drifts
+
+Success response:
+
+```json
+[
+  {
+    "driftId": "string",
+    "runId": "string",
+    "channel": "WEB",
+    "sku": "SKU-DEMO-001",
+    "centralInventory": {
+      "availableQty": 98,
+      "reservedQty": 2,
+      "soldQty": 0
+    },
+    "observedInventory": {
+      "availableQty": 99,
+      "reservedQty": 1,
+      "soldQty": 0
+    },
+    "status": "OPEN",
+    "resolutionNote": null,
+    "resolvedAt": null
+  }
+]
+```
+
+### `POST /api/v1/ops/reconciliation/{driftId}/resolve`
+
+Purpose:
+
+- mark a reconciliation drift as resolved with an operator note
+
+Request body:
+
+```json
+{
+  "resolutionNote": "Snapshot stale after resync"
+}
+```
+
+Current failure classes:
+
+- `400` validation error
+- `404` drift not found
 
 ## Current Error Envelope
 
@@ -222,6 +333,4 @@ Not yet implemented:
 
 - admin APIs for campaign management
 - omnichannel sync APIs
-- reconciliation APIs
-- outbox retry or operational remediation APIs
 - operator reporting APIs for benchmark or drift analysis

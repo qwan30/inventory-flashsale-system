@@ -33,7 +33,10 @@ The current repository already implements:
 - soft reservation with expiry and release
 - order status progression from `PENDING` to `PAID` to `SHIPPED`
 - Redis-backed SKU locking plus optimistic locking for inventory
-- outbox recording and scheduled Kafka publish
+- outbox recording, retry scheduling, and scheduled Kafka publish
+- backward-compatible idempotency persistence for release and order status mutations
+- channel sync attempts and persisted channel inventory snapshots
+- operator remediation APIs for outbox retry and reconciliation drift management
 
 ## Target Requirement Summary
 
@@ -53,7 +56,9 @@ Current implemented capabilities include:
 - flash sale window and quota checks
 - explicit reservation, order, and campaign states
 - durable outbox rows for business events
-- scheduled reservation expiry and outbox publish
+- scheduled reservation expiry, outbox publish, and channel sync publish
+- persisted release and order-status idempotency replay
+- channel snapshot reconciliation runs and drift resolution APIs
 - error responses with correlation ID support
 
 See:
@@ -66,10 +71,9 @@ See:
 
 The current repository does not yet fully implement the target omnichannel vision:
 
-- channel integrations are still mock adapters and request validators, not real channel sync boundaries
-- there is no full reconciliation workflow for channel drift detection
-- outbox failure handling exists, but retry and remediation semantics are still limited
-- load testing is smoke-level, not yet a staged benchmark program
+- channel integrations are still mock transports, not real marketplace connectors
+- reconciliation exists as an operator-triggered workflow, but not yet as a scheduled automated sweep with alerting
+- load testing is broader than smoke-only, but still not yet a durable staged benchmark program with stored evidence
 - no read replicas, order partitioning, or service decomposition are implemented
 - no real admin or operator-facing UI exists in this repository
 

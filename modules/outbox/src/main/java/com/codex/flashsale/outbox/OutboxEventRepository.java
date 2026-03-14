@@ -16,4 +16,6 @@ public interface OutboxEventRepository extends JpaRepository<OutboxEvent, String
     );
 
     long countByStatus(OutboxStatus status);
+
+    long countByStatusAndNextAttemptAtLessThanEqual(OutboxStatus status, Instant nextAttemptAt);
 }

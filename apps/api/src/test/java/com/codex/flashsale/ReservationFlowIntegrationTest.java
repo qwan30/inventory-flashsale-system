@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.codex.flashsale.api.ConfirmReservationResponse;
 import com.codex.flashsale.api.CreateReservationRequest;
 import com.codex.flashsale.api.OrderResponse;
+import com.codex.flashsale.api.ReleaseReservationResponse;
 import com.codex.flashsale.api.ReservationResponse;
 import com.codex.flashsale.application.OrderApplicationService;
 import com.codex.flashsale.application.ReservationApplicationService;
@@ -41,6 +42,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest(properties = {
         "app.scheduler.expired-reservation-delay=1h",
         "app.scheduler.outbox-delay=1h",
+        "app.scheduler.channel-sync-delay=1h",
         "app.lock.wait-timeout=30s",
         "app.lock.lease-timeout=30s"
 })
@@ -211,8 +213,8 @@ class ReservationFlowIntegrationTest extends AbstractIntegrationTest {
                 "outbox-reserve"
         );
         ConfirmReservationResponse confirmed = reservationApplicationService.confirm(reservation.reservationId(), "outbox-confirm");
-        OrderResponse paid = orderApplicationService.updateStatus(confirmed.orderId(), OrderStatus.PAID);
-        OrderResponse shipped = orderApplicationService.updateStatus(paid.orderId(), OrderStatus.SHIPPED);
+        OrderResponse paid = orderApplicationService.updateStatus(confirmed.orderId(), OrderStatus.PAID, null);
+        OrderResponse shipped = orderApplicationService.updateStatus(paid.orderId(), OrderStatus.SHIPPED, null);
 
         Consumer<String, String> consumer = createConsumer();
         consumer.subscribe(List.of("inventory-flashsale.events"));
@@ -239,6 +241,91 @@ class ReservationFlowIntegrationTest extends AbstractIntegrationTest {
         );
         consumer.close();
         assertThat(shipped.status()).isEqualTo(OrderStatus.SHIPPED);
+    }
+
+    @Test
+    void shouldReplayReleaseResponseForSameIdempotencyKey() {
+        ReservationResponse reservation = reservationApplicationService.reserve(
+                BASE_CAMPAIGN_ID,
+                new CreateReservationRequest(BASE_SKU, SalesChannel.APP, 2),
+                "release-idempotent-reserve"
+        );
+
+        ReleaseReservationResponse firstRelease = reservationApplicationService.release(
+                reservation.reservationId(),
+                "release-key-1"
+        );
+        ReleaseReservationResponse secondRelease = reservationApplicationService.release(
+                reservation.reservationId(),
+                "release-key-1"
+        );
+
+        assertThat(firstRelease).isEqualTo(secondRelease);
+        assertThat(outboxEventRepository.findAll())
+                .extracting(OutboxEvent::getEventType)
+                .containsExactlyInAnyOrder("inventory.reservation.created", "inventory.reservation.released");
+    }
+
+    @Test
+    void shouldRejectDifferentReleaseKeyAfterReservationAlreadyReleased() {
+        ReservationResponse reservation = reservationApplicationService.reserve(
+                BASE_CAMPAIGN_ID,
+                new CreateReservationRequest(BASE_SKU, SalesChannel.APP, 1),
+                "release-conflict-reserve"
+        );
+
+        reservationApplicationService.release(reservation.reservationId(), "release-key-1");
+
+        assertThatThrownBy(() -> reservationApplicationService.release(reservation.reservationId(), "release-key-2"))
+                .isInstanceOf(ConflictException.class)
+                .hasMessageContaining("different idempotency key");
+    }
+
+    @Test
+    void shouldReplayOrderStatusResponseForSameIdempotencyKey() {
+        ReservationResponse reservation = reservationApplicationService.reserve(
+                BASE_CAMPAIGN_ID,
+                new CreateReservationRequest(BASE_SKU, SalesChannel.WEB, 1),
+                "order-idempotent-reserve"
+        );
+        ConfirmReservationResponse confirmed = reservationApplicationService.confirm(
+                reservation.reservationId(),
+                "order-idempotent-confirm"
+        );
+
+        OrderResponse paid = orderApplicationService.updateStatus(confirmed.orderId(), OrderStatus.PAID, "order-paid-key");
+        OrderResponse shipped = orderApplicationService.updateStatus(confirmed.orderId(), OrderStatus.SHIPPED, "order-shipped-key");
+        OrderResponse replayedPaid = orderApplicationService.updateStatus(
+                confirmed.orderId(),
+                OrderStatus.PAID,
+                "order-paid-key"
+        );
+
+        assertThat(paid.status()).isEqualTo(OrderStatus.PAID);
+        assertThat(shipped.status()).isEqualTo(OrderStatus.SHIPPED);
+        assertThat(replayedPaid).isEqualTo(paid);
+    }
+
+    @Test
+    void shouldRejectDifferentIdempotencyKeyForAlreadyAppliedOrderTransition() {
+        ReservationResponse reservation = reservationApplicationService.reserve(
+                BASE_CAMPAIGN_ID,
+                new CreateReservationRequest(BASE_SKU, SalesChannel.WEB, 1),
+                "order-conflict-reserve"
+        );
+        ConfirmReservationResponse confirmed = reservationApplicationService.confirm(
+                reservation.reservationId(),
+                "order-conflict-confirm"
+        );
+
+        orderApplicationService.updateStatus(confirmed.orderId(), OrderStatus.PAID, "order-paid-key");
+
+        assertThatThrownBy(() -> orderApplicationService.updateStatus(
+                confirmed.orderId(),
+                OrderStatus.PAID,
+                "order-paid-other-key"
+        )).isInstanceOf(ConflictException.class)
+                .hasMessageContaining("different idempotency key");
     }
 
     private Consumer<String, String> createConsumer() {

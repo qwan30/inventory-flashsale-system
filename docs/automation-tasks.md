@@ -26,6 +26,7 @@ Outcome:
 Current task:
 
 - periodically load pending outbox rows
+- reset retryable failed rows back to `PENDING`
 - publish them to Kafka
 - mark rows `PUBLISHED` or `FAILED`
 
@@ -37,21 +38,32 @@ Outcome:
 
 - durable domain events are pushed to downstream consumers
 
+### Channel Sync Sweep
+
+Current task:
+
+- periodically load pending channel sync attempts
+- reset retryable transient failures back to `PENDING`
+- publish outbound sync commands through the registered channel adapters
+- persist the latest successful channel inventory snapshot
+
+Current implementation:
+
+- `ChannelSyncScheduler`
+
+Outcome:
+
+- the system retains a per-channel snapshot that reconciliation can compare against central inventory
+
 ## Planned Operational Automations
 
 These are planned ideas only, not implemented tasks.
-
-### Outbox Retry Sweep
-
-Target purpose:
-
-- reset or replay failed outbox rows using a documented retry policy
 
 ### Inventory Reconciliation Sweep
 
 Target purpose:
 
-- compare central inventory truth with channel-side facts and surface mismatches
+- compare central inventory truth with channel-side facts and surface mismatches on a schedule instead of operator-triggered API calls
 
 ### Benchmark Report Generation
 

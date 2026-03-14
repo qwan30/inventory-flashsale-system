@@ -23,6 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest(properties = {
         "app.scheduler.expired-reservation-delay=1h",
         "app.scheduler.outbox-delay=1h",
+        "app.scheduler.channel-sync-delay=1h",
         "app.lock.wait-timeout=30s",
         "app.lock.lease-timeout=30s",
         "app.reservation.ttl=1s"
@@ -56,7 +57,7 @@ class ReservationExpiryIntegrationTest extends AbstractIntegrationTest {
         reservationApplicationService.expireReservation(reservation.reservationId());
 
         InventoryItem inventoryItem = inventoryItemRepository.findById(BASE_SKU).orElseThrow();
-        ReleaseReservationResponse response = reservationApplicationService.release(reservation.reservationId());
+        ReleaseReservationResponse response = reservationApplicationService.release(reservation.reservationId(), null);
 
         assertThat(response.status()).isEqualTo(ReservationStatus.EXPIRED);
         assertThat(inventoryItem.getAvailableQty()).isEqualTo(5);
@@ -92,7 +93,7 @@ class ReservationExpiryIntegrationTest extends AbstractIntegrationTest {
         Thread.sleep(1_250L);
         reservationApplicationService.expireReservation(reservation.reservationId());
         reservationApplicationService.expireReservation(reservation.reservationId());
-        ReleaseReservationResponse releaseResponse = reservationApplicationService.release(reservation.reservationId());
+        ReleaseReservationResponse releaseResponse = reservationApplicationService.release(reservation.reservationId(), null);
 
         InventoryItem inventoryItem = inventoryItemRepository.findById(BASE_SKU).orElseThrow();
 
@@ -110,8 +111,8 @@ class ReservationExpiryIntegrationTest extends AbstractIntegrationTest {
                 "repeat-release"
         );
 
-        ReleaseReservationResponse firstRelease = reservationApplicationService.release(reservation.reservationId());
-        ReleaseReservationResponse secondRelease = reservationApplicationService.release(reservation.reservationId());
+        ReleaseReservationResponse firstRelease = reservationApplicationService.release(reservation.reservationId(), null);
+        ReleaseReservationResponse secondRelease = reservationApplicationService.release(reservation.reservationId(), null);
 
         InventoryItem inventoryItem = inventoryItemRepository.findById(BASE_SKU).orElseThrow();
 

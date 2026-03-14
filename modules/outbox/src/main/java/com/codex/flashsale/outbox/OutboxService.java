@@ -1,5 +1,7 @@
 package com.codex.flashsale.outbox;
 
+import com.codex.flashsale.common.exception.ConflictException;
+import com.codex.flashsale.common.exception.NotFoundException;
 import com.codex.flashsale.common.time.TimeProvider;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -100,6 +102,30 @@ public class OutboxService {
         repository.saveAllAndFlush(retryableEvents);
         retryScheduledCounter.increment(retryableEvents.size());
         return retryableEvents.size();
+    }
+
+    public OutboxEvent retryEvent(String eventId) {
+        OutboxEvent event = repository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("OUTBOX_EVENT_NOT_FOUND", "Outbox event not found: " + eventId));
+        if (event.getStatus() == OutboxStatus.PUBLISHED) {
+            throw new ConflictException("OUTBOX_EVENT_ALREADY_PUBLISHED", "Published outbox event cannot be retried");
+        }
+        if (event.getStatus() == OutboxStatus.FAILED) {
+            event.resetForRetry();
+        }
+        return repository.saveAndFlush(event);
+    }
+
+    public long countPendingBacklog() {
+        return repository.countByStatus(OutboxStatus.PENDING);
+    }
+
+    public long countFailedBacklog() {
+        return repository.countByStatus(OutboxStatus.FAILED);
+    }
+
+    public long countRetryableFailedBacklog() {
+        return repository.countByStatusAndNextAttemptAtLessThanEqual(OutboxStatus.FAILED, timeProvider.now());
     }
 
     public OutboxEvent save(OutboxEvent event) {

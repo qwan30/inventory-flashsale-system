@@ -29,6 +29,7 @@ Idempotent behaviors:
 
 - repeated release on `RELEASED` or `EXPIRED` returns current state
 - repeated confirm with the same confirm idempotency key returns the same order
+- repeated keyed release returns the stored release response
 
 ## Campaign State Machine
 
@@ -63,12 +64,14 @@ Allowed transitions:
 No-op:
 
 - same-state update returns without changing status
+- repeated keyed transition returns the stored transition response
 
 Rejected transitions:
 
 - `PENDING -> SHIPPED`
 - any backward move such as `PAID -> PENDING`
 - any undefined future status transition
+- a different idempotency key for an already applied keyed transition
 
 ## Outbox State Machine
 
@@ -84,6 +87,38 @@ Allowed transitions:
 - successful publish -> `PUBLISHED`
 - failed publish attempt -> `FAILED`
 
-Current gap:
+Implemented retry cycle:
 
-- there is a `resetForRetry()` method, but the current application flow does not yet implement a documented retry cycle that moves failed events back to `PENDING`
+- scheduler and ops retry both move eligible failed events back to `PENDING`
+
+## Channel Sync State Machine
+
+Current states:
+
+- `PENDING`
+- `SYNCED`
+- `FAILED`
+
+Allowed transitions:
+
+- scheduled sync attempt -> `PENDING`
+- successful adapter publish -> `SYNCED`
+- transient or permanent adapter failure -> `FAILED`
+- transient retry reset -> `PENDING`
+
+Current notes:
+
+- transient failures receive `next_attempt_at`
+- permanent failures stay `FAILED` until a future code change adds manual sync retry
+
+## Reconciliation Drift State Machine
+
+Current states:
+
+- `OPEN`
+- `RESOLVED`
+
+Allowed transitions:
+
+- detected mismatch -> `OPEN`
+- operator resolution -> `RESOLVED`

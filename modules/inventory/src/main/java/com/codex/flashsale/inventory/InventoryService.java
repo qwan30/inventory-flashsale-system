@@ -39,6 +39,10 @@ public class InventoryService {
         return inventoryItemRepository.saveAndFlush(inventoryItem);
     }
 
+    public List<InventoryItem> findAllInventoryItems() {
+        return inventoryItemRepository.findAll();
+    }
+
     public StockReservation createReservation(
             String reservationId,
             String sku,
@@ -68,4 +72,3 @@ public class InventoryService {
         return stockReservationRepository.findByStatusAndExpiresAtBefore(ReservationStatus.ACTIVE, now);
     }
 }
-

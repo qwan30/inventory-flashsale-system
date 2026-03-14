@@ -24,13 +24,15 @@ Current responsibilities:
 
 - identify supported sales channels
 - validate reservation requests through channel adapters
-- provide mock channel adapters for `WEB`, `APP`, and `SHOPEE`
+- provide mock sync adapters for `WEB`, `APP`, and `SHOPEE`
+- persist outbound channel sync attempts and channel inventory snapshots
+- store reconciliation runs and reconciliation drifts
 
 Current gap:
 
-- no real marketplace integration
-- no reconciliation logic
-- no inbound or outbound channel synchronization workflow
+- no real marketplace transport or credentialed connector
+- inbound facts are derived from persisted snapshots, not pulled from external systems
+- alerting and scheduled reconciliation are not yet implemented
 
 Target extension direction:
 
@@ -84,10 +86,11 @@ Current responsibilities:
 - event payload serialization
 - scheduled batch publish to Kafka
 - publish status tracking with `PENDING`, `PUBLISHED`, and `FAILED`
+- manual retry reset support for failed events
 
 Current gap:
 
-- failure handling exists, but recovery and retry policy are still minimal
+- failure handling is stronger, but it still lacks alerting and richer operator workflows beyond backlog inspection and retry
 
 Target extension direction:
 
@@ -121,4 +124,4 @@ Current design intent:
 
 Target gap:
 
-- omnichannel synchronization and reconciliation still need a stronger module-level design on top of the existing `channel` boundary
+- external omnichannel transport and alerting still need to mature on top of the implemented `channel` boundary

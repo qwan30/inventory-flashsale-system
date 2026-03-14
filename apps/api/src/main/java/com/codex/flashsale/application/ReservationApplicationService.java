@@ -6,7 +6,9 @@ import com.codex.flashsale.api.InventoryResponse;
 import com.codex.flashsale.api.ReleaseReservationResponse;
 import com.codex.flashsale.api.ReservationResponse;
 import com.codex.flashsale.channel.ChannelService;
+import com.codex.flashsale.channel.SalesChannel;
 import com.codex.flashsale.channel.ReservationValidationRequest;
+import com.codex.flashsale.channel.sync.ChannelSyncService;
 import com.codex.flashsale.common.exception.ConflictException;
 import com.codex.flashsale.common.time.TimeProvider;
 import com.codex.flashsale.config.ApplicationProperties;
@@ -15,6 +17,8 @@ import com.codex.flashsale.events.OrderEventPayload;
 import com.codex.flashsale.events.ReservationEventPayload;
 import com.codex.flashsale.flashsale.FlashSaleCampaign;
 import com.codex.flashsale.flashsale.FlashSaleCampaignService;
+import com.codex.flashsale.idempotency.OperationIdempotencyService;
+import com.codex.flashsale.idempotency.OperationIdempotencyType;
 import com.codex.flashsale.inventory.InventoryItem;
 import com.codex.flashsale.inventory.InventoryService;
 import com.codex.flashsale.inventory.ReservationStatus;
@@ -22,14 +26,17 @@ import com.codex.flashsale.inventory.StockReservation;
 import com.codex.flashsale.order.OrderHeader;
 import com.codex.flashsale.order.OrderService;
 import com.codex.flashsale.order.OrderStatus;
+import com.codex.flashsale.outbox.OutboxEvent;
 import com.codex.flashsale.outbox.OutboxService;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import java.time.Instant;
+import java.util.EnumSet;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -42,6 +49,8 @@ public class ReservationApplicationService {
     private final InventoryService inventoryService;
     private final OrderService orderService;
     private final OutboxService outboxService;
+    private final ChannelSyncService channelSyncService;
+    private final OperationIdempotencyService operationIdempotencyService;
     private final RedisLockManager redisLockManager;
     private final TimeProvider timeProvider;
     private final ApplicationProperties applicationProperties;
@@ -60,6 +69,8 @@ public class ReservationApplicationService {
             InventoryService inventoryService,
             OrderService orderService,
             OutboxService outboxService,
+            ChannelSyncService channelSyncService,
+            OperationIdempotencyService operationIdempotencyService,
             RedisLockManager redisLockManager,
             TimeProvider timeProvider,
             ApplicationProperties applicationProperties,
@@ -71,6 +82,8 @@ public class ReservationApplicationService {
         this.inventoryService = inventoryService;
         this.orderService = orderService;
         this.outboxService = outboxService;
+        this.channelSyncService = channelSyncService;
+        this.operationIdempotencyService = operationIdempotencyService;
         this.redisLockManager = redisLockManager;
         this.timeProvider = timeProvider;
         this.applicationProperties = applicationProperties;
@@ -124,16 +137,44 @@ public class ReservationApplicationService {
         }
     }
 
-    public ReleaseReservationResponse release(String reservationId) {
+    public ReleaseReservationResponse release(String reservationId, String idempotencyKey) {
+        if (hasIdempotencyKey(idempotencyKey)) {
+            ReleaseReservationResponse recordedResponse = findRecordedReleaseResponse(reservationId, idempotencyKey);
+            if (recordedResponse != null) {
+                return recordedResponse;
+            }
+
+            StockReservation existingReservation = inventoryService.getRequiredReservation(reservationId);
+            if (existingReservation.getStatus() == ReservationStatus.RELEASED
+                    || existingReservation.getStatus() == ReservationStatus.EXPIRED
+                    || operationIdempotencyService.hasRecord(
+                    OperationIdempotencyType.RESERVATION_RELEASE,
+                    reservationId,
+                    ReservationStatus.RELEASED.name()
+            )) {
+                throw duplicateReleaseConflict(reservationId);
+            }
+        }
+
         StockReservation reservation = inventoryService.getRequiredReservation(reservationId);
         try {
             return redisLockManager.executeWithLock(
                     inventoryLockKey(reservation.getSku()),
-                    () -> transactionTemplate.execute(status -> releaseInTransaction(reservationId, ReservationStatus.RELEASED))
+                    () -> transactionTemplate.execute(status -> releaseInTransaction(
+                            reservationId,
+                            ReservationStatus.RELEASED,
+                            idempotencyKey
+                    ))
             );
         } catch (ConflictException exception) {
             releaseConflictCounter.increment();
             throw exception;
+        } catch (DataIntegrityViolationException exception) {
+            ReleaseReservationResponse recordedResponse = findRecordedReleaseResponse(reservationId, idempotencyKey);
+            if (recordedResponse != null) {
+                return recordedResponse;
+            }
+            throw duplicateReleaseConflict(reservationId);
         }
     }
 
@@ -143,7 +184,7 @@ public class ReservationApplicationService {
             redisLockManager.executeWithLock(
                     inventoryLockKey(reservation.getSku()),
                     () -> transactionTemplate.execute(status -> {
-                        releaseInTransaction(reservationId, ReservationStatus.EXPIRED);
+                        releaseInTransaction(reservationId, ReservationStatus.EXPIRED, null);
                         return Boolean.TRUE;
                     })
             );
@@ -183,7 +224,7 @@ public class ReservationApplicationService {
                     idempotencyKey,
                     now.plus(applicationProperties.getReservation().getTtl())
             );
-            outboxService.record(
+            OutboxEvent outboxEvent = outboxService.record(
                     "reservation",
                     reservation.getId(),
                     "inventory.reservation.created",
@@ -197,6 +238,7 @@ public class ReservationApplicationService {
                             reservation.getExpiresAt()
                     )
             );
+            scheduleInventorySync(outboxEvent, reservation.getSku(), inventoryItem);
             return toReservationResponse(reservation, inventoryItem, campaign);
         } catch (ObjectOptimisticLockingFailureException exception) {
             throw new ConflictException("INVENTORY_VERSION_CONFLICT", "Inventory version conflict detected for SKU " + request.sku());
@@ -232,16 +274,21 @@ public class ReservationApplicationService {
 
         reservation.confirm(confirmIdempotencyKey, order.getId(), now);
         inventoryService.saveReservation(reservation);
-        outboxService.record(
+        OutboxEvent outboxEvent = outboxService.record(
                 "order",
                 order.getId(),
                 "order.created",
                 new OrderEventPayload(order.getId(), order.getReservationId(), order.getChannel(), order.getStatus())
         );
+        scheduleInventorySync(outboxEvent, reservation.getSku(), inventoryItem);
         return new ConfirmReservationResponse(reservation.getId(), order.getId(), order.getStatus());
     }
 
-    private ReleaseReservationResponse releaseInTransaction(String reservationId, ReservationStatus finalStatus) {
+    private ReleaseReservationResponse releaseInTransaction(
+            String reservationId,
+            ReservationStatus finalStatus,
+            String idempotencyKey
+    ) {
         StockReservation reservation = inventoryService.getRequiredReservation(reservationId);
         if (reservation.getStatus() == ReservationStatus.RELEASED || reservation.getStatus() == ReservationStatus.EXPIRED) {
             return new ReleaseReservationResponse(
@@ -269,7 +316,21 @@ public class ReservationApplicationService {
         if (finalStatus == ReservationStatus.EXPIRED) {
             expiryReleaseCounter.increment();
         }
-        outboxService.record(
+        ReleaseReservationResponse response = new ReleaseReservationResponse(
+                reservation.getId(),
+                reservation.getStatus(),
+                toInventoryResponse(inventoryItem)
+        );
+        if (hasIdempotencyKey(idempotencyKey) && finalStatus == ReservationStatus.RELEASED) {
+            operationIdempotencyService.record(
+                    OperationIdempotencyType.RESERVATION_RELEASE,
+                    reservation.getId(),
+                    finalStatus.name(),
+                    idempotencyKey,
+                    response
+            );
+        }
+        OutboxEvent outboxEvent = outboxService.record(
                 "reservation",
                 reservation.getId(),
                 "inventory.reservation.released",
@@ -279,11 +340,12 @@ public class ReservationApplicationService {
                         reservation.getSku(),
                         reservation.getChannel(),
                         reservation.getQuantity(),
-                        reservation.getStatus(),
-                        reservation.getExpiresAt()
+                            reservation.getStatus(),
+                            reservation.getExpiresAt()
                 )
         );
-        return new ReleaseReservationResponse(reservation.getId(), reservation.getStatus(), toInventoryResponse(inventoryItem));
+        scheduleInventorySync(outboxEvent, reservation.getSku(), inventoryItem);
+        return response;
     }
 
     private ReservationResponse buildReservationResponse(StockReservation reservation) {
@@ -323,5 +385,41 @@ public class ReservationApplicationService {
 
     private String inventoryLockKey(String sku) {
         return "lock:inventory:" + sku;
+    }
+
+    private void scheduleInventorySync(OutboxEvent outboxEvent, String sku, InventoryItem inventoryItem) {
+        channelSyncService.scheduleSync(
+                outboxEvent.getId(),
+                outboxEvent.getEventType(),
+                outboxEvent.getPayload(),
+                EnumSet.allOf(SalesChannel.class),
+                sku,
+                inventoryItem.getAvailableQty(),
+                inventoryItem.getReservedQty(),
+                inventoryItem.getSoldQty()
+        );
+    }
+
+    private ReleaseReservationResponse findRecordedReleaseResponse(String reservationId, String idempotencyKey) {
+        if (!hasIdempotencyKey(idempotencyKey)) {
+            return null;
+        }
+        return operationIdempotencyService.findRecordedResponse(
+                OperationIdempotencyType.RESERVATION_RELEASE,
+                reservationId,
+                idempotencyKey,
+                ReleaseReservationResponse.class
+        ).orElse(null);
+    }
+
+    private ConflictException duplicateReleaseConflict(String reservationId) {
+        return new ConflictException(
+                "RESERVATION_RELEASE_ALREADY_PROCESSED",
+                "Reservation %s already processed release with a different idempotency key".formatted(reservationId)
+        );
+    }
+
+    private boolean hasIdempotencyKey(String idempotencyKey) {
+        return idempotencyKey != null && !idempotencyKey.isBlank();
     }
 }
