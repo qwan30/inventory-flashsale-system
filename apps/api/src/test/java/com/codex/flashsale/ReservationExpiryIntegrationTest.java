@@ -1,12 +1,14 @@
 package com.codex.flashsale;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.codex.flashsale.api.CreateReservationRequest;
 import com.codex.flashsale.api.ReleaseReservationResponse;
 import com.codex.flashsale.api.ReservationResponse;
 import com.codex.flashsale.application.ReservationApplicationService;
 import com.codex.flashsale.channel.SalesChannel;
+import com.codex.flashsale.common.exception.ConflictException;
 import com.codex.flashsale.flashsale.CampaignStatus;
 import com.codex.flashsale.inventory.InventoryItem;
 import com.codex.flashsale.inventory.ReservationStatus;
@@ -60,5 +62,63 @@ class ReservationExpiryIntegrationTest extends AbstractIntegrationTest {
         assertThat(inventoryItem.getAvailableQty()).isEqualTo(5);
         assertThat(inventoryItem.getReservedQty()).isZero();
         assertThat(inventoryItem.getSoldQty()).isZero();
+    }
+
+    @Test
+    void shouldRejectConfirmAfterExpiry() throws Exception {
+        ReservationResponse reservation = reservationApplicationService.reserve(
+                BASE_CAMPAIGN_ID,
+                new CreateReservationRequest(BASE_SKU, SalesChannel.WEB, 1),
+                "confirm-after-expiry"
+        );
+
+        Thread.sleep(1_250L);
+
+        assertThatThrownBy(() -> reservationApplicationService.confirm(
+                reservation.reservationId(),
+                "confirm-expired"
+        )).isInstanceOf(ConflictException.class)
+                .hasMessageContaining("expired");
+    }
+
+    @Test
+    void shouldKeepExpiredStateForRepeatedExpiryAndReleaseCalls() throws Exception {
+        ReservationResponse reservation = reservationApplicationService.reserve(
+                BASE_CAMPAIGN_ID,
+                new CreateReservationRequest(BASE_SKU, SalesChannel.APP, 2),
+                "repeat-expiry"
+        );
+
+        Thread.sleep(1_250L);
+        reservationApplicationService.expireReservation(reservation.reservationId());
+        reservationApplicationService.expireReservation(reservation.reservationId());
+        ReleaseReservationResponse releaseResponse = reservationApplicationService.release(reservation.reservationId());
+
+        InventoryItem inventoryItem = inventoryItemRepository.findById(BASE_SKU).orElseThrow();
+
+        assertThat(releaseResponse.status()).isEqualTo(ReservationStatus.EXPIRED);
+        assertThat(inventoryItem.getAvailableQty()).isEqualTo(5);
+        assertThat(inventoryItem.getReservedQty()).isZero();
+        assertThat(outboxEventRepository.count()).isEqualTo(2);
+    }
+
+    @Test
+    void shouldKeepReleasedStateOnRepeatedReleaseCalls() {
+        ReservationResponse reservation = reservationApplicationService.reserve(
+                BASE_CAMPAIGN_ID,
+                new CreateReservationRequest(BASE_SKU, SalesChannel.APP, 2),
+                "repeat-release"
+        );
+
+        ReleaseReservationResponse firstRelease = reservationApplicationService.release(reservation.reservationId());
+        ReleaseReservationResponse secondRelease = reservationApplicationService.release(reservation.reservationId());
+
+        InventoryItem inventoryItem = inventoryItemRepository.findById(BASE_SKU).orElseThrow();
+
+        assertThat(firstRelease.status()).isEqualTo(ReservationStatus.RELEASED);
+        assertThat(secondRelease.status()).isEqualTo(ReservationStatus.RELEASED);
+        assertThat(inventoryItem.getAvailableQty()).isEqualTo(5);
+        assertThat(inventoryItem.getReservedQty()).isZero();
+        assertThat(outboxEventRepository.count()).isEqualTo(2);
     }
 }

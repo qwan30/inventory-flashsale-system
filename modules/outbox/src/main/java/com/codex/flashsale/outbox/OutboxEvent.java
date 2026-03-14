@@ -8,6 +8,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
+import java.time.Duration;
 import java.time.Instant;
 
 @Entity
@@ -43,6 +44,9 @@ public class OutboxEvent extends AuditTimestamps {
     @Column(name = "last_error")
     private String lastError;
 
+    @Column(name = "next_attempt_at")
+    private Instant nextAttemptAt;
+
     protected OutboxEvent() {
     }
 
@@ -60,17 +64,31 @@ public class OutboxEvent extends AuditTimestamps {
         this.status = OutboxStatus.PUBLISHED;
         this.publishedAt = publishedAt;
         this.lastError = null;
+        this.nextAttemptAt = null;
         this.attempts += 1;
     }
 
-    public void markFailed(String errorMessage) {
+    public void markFailed(String errorMessage, Instant failedAt, Duration retryDelay, int maxAttempts) {
         this.status = OutboxStatus.FAILED;
-        this.lastError = errorMessage;
         this.attempts += 1;
+        this.lastError = truncateErrorMessage(errorMessage);
+        if (attempts >= maxAttempts) {
+            this.nextAttemptAt = null;
+            return;
+        }
+        this.nextAttemptAt = failedAt.plus(retryDelay.multipliedBy(attempts));
     }
 
     public void resetForRetry() {
         this.status = OutboxStatus.PENDING;
+        this.nextAttemptAt = null;
+    }
+
+    private String truncateErrorMessage(String errorMessage) {
+        if (errorMessage == null || errorMessage.isBlank()) {
+            return "Unknown publish failure";
+        }
+        return errorMessage.length() <= 512 ? errorMessage : errorMessage.substring(0, 512);
     }
 
     public String getId() {
@@ -108,5 +126,8 @@ public class OutboxEvent extends AuditTimestamps {
     public String getLastError() {
         return lastError;
     }
-}
 
+    public Instant getNextAttemptAt() {
+        return nextAttemptAt;
+    }
+}

@@ -1,6 +1,9 @@
 package com.codex.flashsale.config;
 
 import com.codex.flashsale.common.exception.BusyResourceException;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.UUID;
@@ -25,10 +28,20 @@ public class RedisLockManager {
 
     private final StringRedisTemplate redisTemplate;
     private final ApplicationProperties applicationProperties;
+    private final Counter lockAcquisitionSuccessCounter;
+    private final Counter lockAcquisitionFailureCounter;
+    private final Timer lockAcquisitionLatency;
 
-    public RedisLockManager(StringRedisTemplate redisTemplate, ApplicationProperties applicationProperties) {
+    public RedisLockManager(
+            StringRedisTemplate redisTemplate,
+            ApplicationProperties applicationProperties,
+            MeterRegistry meterRegistry
+    ) {
         this.redisTemplate = redisTemplate;
         this.applicationProperties = applicationProperties;
+        this.lockAcquisitionSuccessCounter = meterRegistry.counter("inventory.lock.acquisition.success");
+        this.lockAcquisitionFailureCounter = meterRegistry.counter("inventory.lock.acquisition.failure");
+        this.lockAcquisitionLatency = meterRegistry.timer("inventory.lock.acquisition.latency");
     }
 
     public <T> T executeWithLock(String lockKey, Supplier<T> action) {
@@ -36,10 +49,13 @@ public class RedisLockManager {
         Duration leaseTimeout = applicationProperties.getLock().getLeaseTimeout();
         long deadline = System.nanoTime() + waitTimeout.toNanos();
         String token = UUID.randomUUID().toString();
+        Timer.Sample sample = Timer.start();
 
         while (System.nanoTime() < deadline) {
             Boolean acquired = redisTemplate.opsForValue().setIfAbsent(lockKey, token, leaseTimeout);
             if (Boolean.TRUE.equals(acquired)) {
+                sample.stop(lockAcquisitionLatency);
+                lockAcquisitionSuccessCounter.increment();
                 try {
                     return action.get();
                 } finally {
@@ -49,6 +65,8 @@ public class RedisLockManager {
             sleepQuietly();
         }
 
+        sample.stop(lockAcquisitionLatency);
+        lockAcquisitionFailureCounter.increment();
         throw new BusyResourceException("Could not acquire distributed inventory lock for " + lockKey);
     }
 
@@ -61,4 +79,3 @@ public class RedisLockManager {
         }
     }
 }
-

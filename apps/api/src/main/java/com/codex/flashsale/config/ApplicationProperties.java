@@ -67,6 +67,8 @@ public class ApplicationProperties {
 
     public static class Outbox {
         private int publishBatchSize = 50;
+        private Duration retryDelay = Duration.ofSeconds(10);
+        private int maxAttempts = 5;
 
         public int getPublishBatchSize() {
             return publishBatchSize;
@@ -74,6 +76,22 @@ public class ApplicationProperties {
 
         public void setPublishBatchSize(int publishBatchSize) {
             this.publishBatchSize = publishBatchSize;
+        }
+
+        public Duration getRetryDelay() {
+            return retryDelay;
+        }
+
+        public void setRetryDelay(Duration retryDelay) {
+            this.retryDelay = retryDelay;
+        }
+
+        public int getMaxAttempts() {
+            return maxAttempts;
+        }
+
+        public void setMaxAttempts(int maxAttempts) {
+            this.maxAttempts = maxAttempts;
         }
     }
 
@@ -110,4 +128,3 @@ public class ApplicationProperties {
         }
     }
 }
-

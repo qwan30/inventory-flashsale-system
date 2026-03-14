@@ -48,6 +48,10 @@ public class ReservationApplicationService {
     private final TransactionTemplate transactionTemplate;
     private final Counter reserveSuccessCounter;
     private final Counter reserveFailureCounter;
+    private final Counter reserveConflictCounter;
+    private final Counter confirmConflictCounter;
+    private final Counter releaseConflictCounter;
+    private final Counter expiryReleaseCounter;
     private final Timer reserveLatency;
 
     public ReservationApplicationService(
@@ -73,6 +77,10 @@ public class ReservationApplicationService {
         this.transactionTemplate = new TransactionTemplate(transactionManager);
         this.reserveSuccessCounter = meterRegistry.counter("reservation.requests.success");
         this.reserveFailureCounter = meterRegistry.counter("reservation.requests.failure");
+        this.reserveConflictCounter = meterRegistry.counter("reservation.requests.conflict");
+        this.confirmConflictCounter = meterRegistry.counter("reservation.confirm.conflict");
+        this.releaseConflictCounter = meterRegistry.counter("reservation.release.conflict");
+        this.expiryReleaseCounter = meterRegistry.counter("reservation.expiry.release");
         this.reserveLatency = meterRegistry.timer("reservation.requests.latency");
     }
 
@@ -91,6 +99,10 @@ public class ReservationApplicationService {
             );
             reserveSuccessCounter.increment();
             return response;
+        } catch (ConflictException exception) {
+            reserveConflictCounter.increment();
+            reserveFailureCounter.increment();
+            throw exception;
         } catch (RuntimeException exception) {
             reserveFailureCounter.increment();
             throw exception;
@@ -101,29 +113,44 @@ public class ReservationApplicationService {
 
     public ConfirmReservationResponse confirm(String reservationId, String confirmIdempotencyKey) {
         StockReservation reservation = inventoryService.getRequiredReservation(reservationId);
-        return redisLockManager.executeWithLock(
-                inventoryLockKey(reservation.getSku()),
-                () -> transactionTemplate.execute(status -> confirmInTransaction(reservationId, confirmIdempotencyKey))
-        );
+        try {
+            return redisLockManager.executeWithLock(
+                    inventoryLockKey(reservation.getSku()),
+                    () -> transactionTemplate.execute(status -> confirmInTransaction(reservationId, confirmIdempotencyKey))
+            );
+        } catch (ConflictException exception) {
+            confirmConflictCounter.increment();
+            throw exception;
+        }
     }
 
     public ReleaseReservationResponse release(String reservationId) {
         StockReservation reservation = inventoryService.getRequiredReservation(reservationId);
-        return redisLockManager.executeWithLock(
-                inventoryLockKey(reservation.getSku()),
-                () -> transactionTemplate.execute(status -> releaseInTransaction(reservationId, ReservationStatus.RELEASED))
-        );
+        try {
+            return redisLockManager.executeWithLock(
+                    inventoryLockKey(reservation.getSku()),
+                    () -> transactionTemplate.execute(status -> releaseInTransaction(reservationId, ReservationStatus.RELEASED))
+            );
+        } catch (ConflictException exception) {
+            releaseConflictCounter.increment();
+            throw exception;
+        }
     }
 
     public void expireReservation(String reservationId) {
         StockReservation reservation = inventoryService.getRequiredReservation(reservationId);
-        redisLockManager.executeWithLock(
-                inventoryLockKey(reservation.getSku()),
-                () -> transactionTemplate.execute(status -> {
-                    releaseInTransaction(reservationId, ReservationStatus.EXPIRED);
-                    return Boolean.TRUE;
-                })
-        );
+        try {
+            redisLockManager.executeWithLock(
+                    inventoryLockKey(reservation.getSku()),
+                    () -> transactionTemplate.execute(status -> {
+                        releaseInTransaction(reservationId, ReservationStatus.EXPIRED);
+                        return Boolean.TRUE;
+                    })
+            );
+        } catch (ConflictException exception) {
+            releaseConflictCounter.increment();
+            throw exception;
+        }
     }
 
     private ReservationResponse reserveInTransaction(
@@ -239,6 +266,9 @@ public class ReservationApplicationService {
 
         reservation.release(finalStatus);
         inventoryService.saveReservation(reservation);
+        if (finalStatus == ReservationStatus.EXPIRED) {
+            expiryReleaseCounter.increment();
+        }
         outboxService.record(
                 "reservation",
                 reservation.getId(),

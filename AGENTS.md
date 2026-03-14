@@ -1,5 +1,7 @@
 # Codex Repository Instructions
 
+- Always use the `prompt-leverage` skill to upgrade the user's initial prompt before executing any tasks.
+
 ## Project Scope
 
 - Work only inside the root project files for the inventory and flash sale system.

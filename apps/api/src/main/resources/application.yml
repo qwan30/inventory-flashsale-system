@@ -54,6 +54,8 @@ app:
     lease-timeout: 5s
   outbox:
     publish-batch-size: 50
+    retry-delay: 10s
+    max-attempts: 5
   scheduler:
     expired-reservation-delay: 30s
     outbox-delay: 5s

@@ -3,6 +3,12 @@ package com.codex.flashsale.outbox;
 import com.codex.flashsale.common.time.TimeProvider;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -20,6 +26,12 @@ public class OutboxService {
     private final TimeProvider timeProvider;
     private final String topic;
     private final int publishBatchSize;
+    private final Duration retryDelay;
+    private final int maxAttempts;
+    private final Counter publishSuccessCounter;
+    private final Counter publishFailureCounter;
+    private final Counter retryScheduledCounter;
+    private final Timer publishLatency;
 
     public OutboxService(
             OutboxEventRepository repository,
@@ -27,7 +39,10 @@ public class OutboxService {
             KafkaTemplate<String, String> kafkaTemplate,
             TimeProvider timeProvider,
             @Value("${app.kafka.topic:inventory-flashsale.events}") String topic,
-            @Value("${app.outbox.publish-batch-size:50}") int publishBatchSize
+            @Value("${app.outbox.publish-batch-size:50}") int publishBatchSize,
+            @Value("${app.outbox.retry-delay:10s}") Duration retryDelay,
+            @Value("${app.outbox.max-attempts:5}") int maxAttempts,
+            MeterRegistry meterRegistry
     ) {
         this.repository = repository;
         this.objectMapper = objectMapper;
@@ -35,6 +50,16 @@ public class OutboxService {
         this.timeProvider = timeProvider;
         this.topic = topic;
         this.publishBatchSize = publishBatchSize;
+        this.retryDelay = retryDelay;
+        this.maxAttempts = maxAttempts;
+        this.publishSuccessCounter = meterRegistry.counter("outbox.publish.success");
+        this.publishFailureCounter = meterRegistry.counter("outbox.publish.failure");
+        this.retryScheduledCounter = meterRegistry.counter("outbox.retry.scheduled");
+        this.publishLatency = meterRegistry.timer("outbox.publish.latency");
+        Gauge.builder("outbox.backlog.pending", repository, value -> value.countByStatus(OutboxStatus.PENDING))
+                .register(meterRegistry);
+        Gauge.builder("outbox.backlog.failed", repository, value -> value.countByStatus(OutboxStatus.FAILED))
+                .register(meterRegistry);
     }
 
     public OutboxEvent record(String aggregateType, String aggregateId, String eventType, Object payload) {
@@ -61,11 +86,28 @@ public class OutboxService {
         return pendingEvents.size();
     }
 
+    public int retryFailedEvents() {
+        Instant now = timeProvider.now();
+        List<OutboxEvent> retryableEvents = repository.findByStatusAndNextAttemptAtLessThanEqualOrderByNextAttemptAtAscCreatedAtAsc(
+                OutboxStatus.FAILED,
+                now,
+                PageRequest.of(0, publishBatchSize)
+        );
+        if (retryableEvents.isEmpty()) {
+            return 0;
+        }
+        retryableEvents.forEach(OutboxEvent::resetForRetry);
+        repository.saveAllAndFlush(retryableEvents);
+        retryScheduledCounter.increment(retryableEvents.size());
+        return retryableEvents.size();
+    }
+
     public OutboxEvent save(OutboxEvent event) {
         return repository.saveAndFlush(event);
     }
 
     private void publishEvent(OutboxEvent event) {
+        Timer.Sample sample = Timer.start();
         try {
             OutboxEnvelope envelope = new OutboxEnvelope(
                     event.getId(),
@@ -78,10 +120,13 @@ public class OutboxService {
             String message = objectMapper.writeValueAsString(envelope);
             kafkaTemplate.send(topic, event.getAggregateId(), message).get(5, TimeUnit.SECONDS);
             event.markPublished(timeProvider.now());
+            publishSuccessCounter.increment();
         } catch (Exception exception) {
-            event.markFailed(exception.getMessage());
+            event.markFailed(exception.getMessage(), timeProvider.now(), retryDelay, maxAttempts);
+            publishFailureCounter.increment();
+        } finally {
+            sample.stop(publishLatency);
         }
         repository.saveAndFlush(event);
     }
 }
-

@@ -9,6 +9,14 @@ Use this together with the root `AGENTS.md`.
 - Core modules live under `modules/`
 - Ignore `everything-claude-code/` and Maven build output under `target/`
 
+## Docs First
+
+- For broad repo context, read `docs/00_index.md` first.
+- For architecture and flow understanding, read `docs/system-map.md`.
+- For fast entrypoints into debugging or feature work, read `docs/retrieval-guide.md`.
+- When resuming after a gap, check the newest relevant file in `docs/05_history/`.
+- Treat `docs/` as the durable project memory; keep `.codex/` focused on Codex bootstrap and workspace-specific guidance.
+
 ## Agent Skill Workspace
 
 - For application feature work, treat `skills/` as vendor/reference-only and not part of the build.

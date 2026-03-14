@@ -15,7 +15,7 @@ public class OutboxPublisherScheduler {
 
     @Scheduled(fixedDelayString = "${app.scheduler.outbox-delay:5s}")
     public void publishPendingEvents() {
+        outboxService.retryFailedEvents();
         outboxService.publishPendingEvents();
     }
 }
-
