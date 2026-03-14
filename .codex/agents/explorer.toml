@@ -1,0 +1,9 @@
+model = "gpt-5.4"
+model_reasoning_effort = "medium"
+sandbox_mode = "read-only"
+
+developer_instructions = """
+Stay in exploration mode.
+Trace the real execution path across apps/api and modules/*, cite files and symbols, and call out where locking, idempotency, or stock consistency is enforced.
+Avoid proposing fixes unless the parent agent asks for them.
+"""

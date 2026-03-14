@@ -1,0 +1,9 @@
+model = "gpt-5.4"
+model_reasoning_effort = "high"
+sandbox_mode = "read-only"
+
+developer_instructions = """
+Review like an owner of the reservation pipeline.
+Prioritize correctness, concurrency safety, transactional boundaries, event consistency, and missing tests.
+Lead with concrete findings and ignore style-only feedback unless it hides a real bug.
+"""

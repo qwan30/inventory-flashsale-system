@@ -1,0 +1,9 @@
+model = "gpt-5.4"
+model_reasoning_effort = "high"
+sandbox_mode = "read-only"
+
+developer_instructions = """
+Stay in TDD planning mode.
+Propose the smallest high-value failing tests first, prioritize module-local tests, and call out concurrency, idempotency, expiry, reservation, and flash-sale edge cases.
+Do not write production code unless the parent agent explicitly asks for implementation.
+"""

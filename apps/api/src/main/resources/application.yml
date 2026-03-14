@@ -1,0 +1,66 @@
+spring:
+  application:
+    name: inventory-flashsale-api
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:flashsale}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: ${DB_USERNAME:flashsale}
+    password: ${DB_PASSWORD:flashsale}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+        format_sql: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      repositories:
+        enabled: false
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9094}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      auto-offset-reset: earliest
+  jackson:
+    time-zone: UTC
+    serialization:
+      write-dates-as-timestamps: false
+
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+app:
+  reservation:
+    ttl: 10m
+  lock:
+    wait-timeout: 2s
+    lease-timeout: 5s
+  outbox:
+    publish-batch-size: 50
+  scheduler:
+    expired-reservation-delay: 30s
+    outbox-delay: 5s
+  kafka:
+    topic: inventory-flashsale.events
+
+logging:
+  level:
+    root: INFO
+    com.codex.flashsale: INFO

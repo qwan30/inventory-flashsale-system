@@ -1,0 +1,421 @@
+{
+  "version": 1,
+  "generatedOn": "2026-03-14",
+  "sources": [
+    {
+      "id": "multi-agent-skills",
+      "label": "hoangnb24/skills",
+      "url": "https://github.com/hoangnb24/skills",
+      "localRoot": "skills/.agents/skills",
+      "notes": "Existing multi-agent skill pack already present in the repository.",
+      "skills": [
+        {
+          "name": "prompt-leverage",
+          "installName": "prompt-leverage",
+          "sourcePath": "skills/.agents/skills/prompt-leverage",
+          "purpose": "Strengthen rough prompts into execution-ready instructions."
+        },
+        {
+          "name": "planning",
+          "installName": "planning",
+          "sourcePath": "skills/.agents/skills/planning",
+          "purpose": "Create structured implementation plans for complex tasks."
+        },
+        {
+          "name": "orchestrator",
+          "installName": "orchestrator",
+          "sourcePath": "skills/.agents/skills/orchestrator",
+          "purpose": "Coordinate multi-agent execution."
+        },
+        {
+          "name": "worker",
+          "installName": "worker",
+          "sourcePath": "skills/.agents/skills/worker",
+          "purpose": "Execute delegated tasks in a multi-agent workflow."
+        },
+        {
+          "name": "knowledge",
+          "installName": "knowledge",
+          "sourcePath": "skills/.agents/skills/knowledge",
+          "purpose": "Capture useful learnings back into documentation."
+        },
+        {
+          "name": "issue-resolution",
+          "installName": "issue-resolution",
+          "sourcePath": "skills/.agents/skills/issue-resolution",
+          "purpose": "Drive bug triage and verified fixes."
+        }
+      ]
+    },
+    {
+      "id": "ui-ux-pro-max",
+      "label": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "url": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
+      "commit": "07f4ef3ac2568c25a3b0c8ef5165a86abc3e56e4",
+      "localRoot": "skills/vendors/ui-ux-pro-max-skill/.claude/skills",
+      "notes": "Vendored UI/UX and design-system intelligence pack.",
+      "skills": [
+        {
+          "name": "ui-ux-pro-max",
+          "installName": "ui-ux-pro-max",
+          "sourcePath": "skills/vendors/ui-ux-pro-max-skill/.claude/skills/ui-ux-pro-max",
+          "purpose": "Broad UI/UX design intelligence with searchable design-system guidance."
+        },
+        {
+          "name": "design",
+          "installName": "design",
+          "sourcePath": "skills/vendors/ui-ux-pro-max-skill/.claude/skills/design",
+          "purpose": "General product and interface design guidance."
+        },
+        {
+          "name": "design-system",
+          "installName": "design-system",
+          "sourcePath": "skills/vendors/ui-ux-pro-max-skill/.claude/skills/design-system",
+          "purpose": "Generate or refine design systems."
+        },
+        {
+          "name": "ui-styling",
+          "installName": "ui-styling",
+          "sourcePath": "skills/vendors/ui-ux-pro-max-skill/.claude/skills/ui-styling",
+          "purpose": "Style and polish interface visuals."
+        },
+        {
+          "name": "brand",
+          "installName": "brand",
+          "sourcePath": "skills/vendors/ui-ux-pro-max-skill/.claude/skills/brand",
+          "purpose": "Brand direction and visual identity guidance."
+        },
+        {
+          "name": "slides",
+          "installName": "slides",
+          "sourcePath": "skills/vendors/ui-ux-pro-max-skill/.claude/skills/slides",
+          "purpose": "Presentation and deck design guidance."
+        },
+        {
+          "name": "banner-design",
+          "installName": "banner-design",
+          "sourcePath": "skills/vendors/ui-ux-pro-max-skill/.claude/skills/banner-design",
+          "purpose": "Banner and promo asset design guidance."
+        }
+      ]
+    },
+    {
+      "id": "vercel-agent-skills",
+      "label": "vercel-labs/agent-skills",
+      "url": "https://github.com/vercel-labs/agent-skills",
+      "commit": "5847a7c7e79bab3e400cf47800b83449d7aea2d4",
+      "localRoot": "skills/vendors/agent-skills/skills",
+      "notes": "Vendored frontend implementation and deployment skills.",
+      "skills": [
+        {
+          "name": "react-best-practices",
+          "installName": "react-best-practices",
+          "sourcePath": "skills/vendors/agent-skills/skills/react-best-practices",
+          "purpose": "Vercel React and Next.js performance patterns."
+        },
+        {
+          "name": "web-design-guidelines",
+          "installName": "web-design-guidelines",
+          "sourcePath": "skills/vendors/agent-skills/skills/web-design-guidelines",
+          "purpose": "Audit UI code for accessibility, UX, and interface quality."
+        },
+        {
+          "name": "composition-patterns",
+          "installName": "composition-patterns",
+          "sourcePath": "skills/vendors/agent-skills/skills/composition-patterns",
+          "purpose": "React component composition patterns."
+        },
+        {
+          "name": "react-native-skills",
+          "installName": "react-native-skills",
+          "sourcePath": "skills/vendors/agent-skills/skills/react-native-skills",
+          "purpose": "React Native architecture and performance guidance."
+        },
+        {
+          "name": "deploy-to-vercel",
+          "installName": "deploy-to-vercel",
+          "sourcePath": "skills/vendors/agent-skills/skills/deploy-to-vercel",
+          "purpose": "Claimable Vercel deployment workflow."
+        }
+      ]
+    },
+    {
+      "id": "ecc-codex-native",
+      "label": "everything-claude-code (.agents/skills)",
+      "url": "https://github.com/hoangnb24/everything-claude-code",
+      "commit": "fdea3085a76c842edea49a72ea695ccc7ff537ed",
+      "localRoot": "everything-claude-code/.agents/skills",
+      "notes": "Codex-oriented ECC skill catalog with openai.yaml metadata and multi-agent friendly workflows.",
+      "skills": [
+        {
+          "name": "api-design",
+          "installName": "api-design",
+          "sourcePath": "everything-claude-code/.agents/skills/api-design",
+          "purpose": "API contract and REST design patterns."
+        },
+        {
+          "name": "article-writing",
+          "installName": "article-writing",
+          "sourcePath": "everything-claude-code/.agents/skills/article-writing",
+          "purpose": "Long-form article drafting workflows."
+        },
+        {
+          "name": "backend-patterns",
+          "installName": "backend-patterns",
+          "sourcePath": "everything-claude-code/.agents/skills/backend-patterns",
+          "purpose": "Backend architecture, APIs, caching, and service design guidance."
+        },
+        {
+          "name": "claude-api",
+          "installName": "claude-api",
+          "sourcePath": "everything-claude-code/.agents/skills/claude-api",
+          "purpose": "Anthropic Claude API integration guidance."
+        },
+        {
+          "name": "coding-standards",
+          "installName": "coding-standards",
+          "sourcePath": "everything-claude-code/.agents/skills/coding-standards",
+          "purpose": "General coding standards and review heuristics."
+        },
+        {
+          "name": "content-engine",
+          "installName": "content-engine",
+          "sourcePath": "everything-claude-code/.agents/skills/content-engine",
+          "purpose": "Content system and repurposing workflows."
+        },
+        {
+          "name": "crosspost",
+          "installName": "crosspost",
+          "sourcePath": "everything-claude-code/.agents/skills/crosspost",
+          "purpose": "Cross-platform content distribution workflows."
+        },
+        {
+          "name": "deep-research",
+          "installName": "deep-research",
+          "sourcePath": "everything-claude-code/.agents/skills/deep-research",
+          "purpose": "Multi-source research workflow with evidence gathering."
+        },
+        {
+          "name": "dmux-workflows",
+          "installName": "dmux-workflows",
+          "sourcePath": "everything-claude-code/.agents/skills/dmux-workflows",
+          "purpose": "Multi-agent orchestration workflows."
+        },
+        {
+          "name": "e2e-testing",
+          "installName": "e2e-testing",
+          "sourcePath": "everything-claude-code/.agents/skills/e2e-testing",
+          "purpose": "End-to-end testing workflows."
+        },
+        {
+          "name": "eval-harness",
+          "installName": "eval-harness",
+          "sourcePath": "everything-claude-code/.agents/skills/eval-harness",
+          "purpose": "Eval-driven development and harness tuning."
+        },
+        {
+          "name": "exa-search",
+          "installName": "exa-search",
+          "sourcePath": "everything-claude-code/.agents/skills/exa-search",
+          "purpose": "Exa-powered neural search workflows."
+        },
+        {
+          "name": "fal-ai-media",
+          "installName": "fal-ai-media",
+          "sourcePath": "everything-claude-code/.agents/skills/fal-ai-media",
+          "purpose": "fal.ai media generation workflows."
+        },
+        {
+          "name": "frontend-patterns",
+          "installName": "frontend-patterns",
+          "sourcePath": "everything-claude-code/.agents/skills/frontend-patterns",
+          "purpose": "Frontend implementation and architecture guidance."
+        },
+        {
+          "name": "frontend-slides",
+          "installName": "frontend-slides",
+          "sourcePath": "everything-claude-code/.agents/skills/frontend-slides",
+          "purpose": "Viewport-safe slides and HTML presentation workflows."
+        },
+        {
+          "name": "investor-materials",
+          "installName": "investor-materials",
+          "sourcePath": "everything-claude-code/.agents/skills/investor-materials",
+          "purpose": "Pitch deck and investor memo generation."
+        },
+        {
+          "name": "investor-outreach",
+          "installName": "investor-outreach",
+          "sourcePath": "everything-claude-code/.agents/skills/investor-outreach",
+          "purpose": "Investor outreach planning and drafting."
+        },
+        {
+          "name": "market-research",
+          "installName": "market-research",
+          "sourcePath": "everything-claude-code/.agents/skills/market-research",
+          "purpose": "Market and competitor research workflows."
+        },
+        {
+          "name": "security-review",
+          "installName": "security-review",
+          "sourcePath": "everything-claude-code/.agents/skills/security-review",
+          "purpose": "Security review workflow and checklist."
+        },
+        {
+          "name": "strategic-compact",
+          "installName": "strategic-compact",
+          "sourcePath": "everything-claude-code/.agents/skills/strategic-compact",
+          "purpose": "Context compaction and long-session hygiene."
+        },
+        {
+          "name": "tdd-workflow",
+          "installName": "tdd-workflow",
+          "sourcePath": "everything-claude-code/.agents/skills/tdd-workflow",
+          "purpose": "Test-driven development workflow."
+        },
+        {
+          "name": "verification-loop",
+          "installName": "verification-loop",
+          "sourcePath": "everything-claude-code/.agents/skills/verification-loop",
+          "purpose": "Repeatable verification loop for build, tests, and checks."
+        },
+        {
+          "name": "video-editing",
+          "installName": "video-editing",
+          "sourcePath": "everything-claude-code/.agents/skills/video-editing",
+          "purpose": "Video editing workflows."
+        },
+        {
+          "name": "x-api",
+          "installName": "x-api",
+          "sourcePath": "everything-claude-code/.agents/skills/x-api",
+          "purpose": "X/Twitter API integration guidance."
+        }
+      ]
+    },
+    {
+      "id": "ecc-jvm-library",
+      "label": "everything-claude-code (Spring and Java)",
+      "url": "https://github.com/hoangnb24/everything-claude-code",
+      "commit": "fdea3085a76c842edea49a72ea695ccc7ff537ed",
+      "localRoot": "everything-claude-code/skills",
+      "notes": "Selected ECC JVM and Spring Boot skills from the broader catalog for this modular monolith.",
+      "skills": [
+        {
+          "name": "java-coding-standards",
+          "installName": "java-coding-standards",
+          "sourcePath": "everything-claude-code/skills/java-coding-standards",
+          "purpose": "Java 17+ coding standards for Spring Boot services."
+        },
+        {
+          "name": "jpa-patterns",
+          "installName": "jpa-patterns",
+          "sourcePath": "everything-claude-code/skills/jpa-patterns",
+          "purpose": "JPA and Hibernate entity, query, and transaction patterns."
+        },
+        {
+          "name": "database-migrations",
+          "installName": "database-migrations",
+          "sourcePath": "everything-claude-code/skills/database-migrations",
+          "purpose": "Database migration planning and rollout safety guidance."
+        },
+        {
+          "name": "springboot-patterns",
+          "installName": "springboot-patterns",
+          "sourcePath": "everything-claude-code/skills/springboot-patterns",
+          "purpose": "Spring Boot architecture, layering, REST, and async patterns."
+        },
+        {
+          "name": "springboot-security",
+          "installName": "springboot-security",
+          "sourcePath": "everything-claude-code/skills/springboot-security",
+          "purpose": "Spring Security, input validation, headers, and secret management."
+        },
+        {
+          "name": "springboot-tdd",
+          "installName": "springboot-tdd",
+          "sourcePath": "everything-claude-code/skills/springboot-tdd",
+          "purpose": "Spring Boot test-driven development workflow."
+        },
+        {
+          "name": "springboot-verification",
+          "installName": "springboot-verification",
+          "sourcePath": "everything-claude-code/skills/springboot-verification",
+          "purpose": "Spring Boot verification loop for build, analysis, tests, and coverage."
+        }
+      ]
+    }
+  ],
+  "bundles": [
+    {
+      "name": "core",
+      "description": "Default Codex bundle for prompt quality plus frontend/UI guidance.",
+      "skills": [
+        "prompt-leverage",
+        "ui-ux-pro-max",
+        "react-best-practices",
+        "web-design-guidelines"
+      ]
+    },
+    {
+      "name": "frontend-ux",
+      "description": "Expanded design and UI review bundle.",
+      "skills": [
+        "ui-ux-pro-max",
+        "design-system",
+        "ui-styling",
+        "react-best-practices",
+        "web-design-guidelines",
+        "composition-patterns"
+      ]
+    },
+    {
+      "name": "multi-agent",
+      "description": "Planning and delegation oriented bundle.",
+      "skills": [
+        "prompt-leverage",
+        "planning",
+        "orchestrator",
+        "worker",
+        "knowledge",
+        "issue-resolution"
+      ]
+    },
+    {
+      "name": "inventory-backend",
+      "description": "Spring Boot and persistence bundle for this inventory and flash-sale system.",
+      "skills": [
+        "prompt-leverage",
+        "java-coding-standards",
+        "springboot-patterns",
+        "jpa-patterns",
+        "database-migrations",
+        "springboot-security",
+        "springboot-tdd",
+        "springboot-verification",
+        "security-review",
+        "verification-loop"
+      ]
+    },
+    {
+      "name": "ecc-codex",
+      "description": "General-purpose ECC Codex workflow bundle.",
+      "skills": [
+        "coding-standards",
+        "tdd-workflow",
+        "security-review",
+        "verification-loop",
+        "deep-research",
+        "exa-search",
+        "strategic-compact",
+        "backend-patterns",
+        "api-design"
+      ]
+    },
+    {
+      "name": "all",
+      "description": "Install every skill listed in this registry.",
+      "skills": []
+    }
+  ]
+}

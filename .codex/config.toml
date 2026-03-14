@@ -1,0 +1,71 @@
+#:schema https://developers.openai.com/codex/config-schema.json
+
+# Project-local Codex config for the inventory flash sale system.
+# Prefer the repo's AGENTS.md files for instructions and keep tool config lean.
+
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+web_search = "live"
+
+# Prefer AGENTS.md and .codex/AGENTS.md over a monolithic instruction file.
+# model_instructions_file = "/absolute/path/to/instructions.md"
+
+[mcp_servers.context7]
+command = "npx"
+args = ["-y", "@upstash/context7-mcp@latest"]
+
+[mcp_servers.github]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-github"]
+
+[mcp_servers.exa]
+url = "https://mcp.exa.ai/mcp"
+
+[mcp_servers.memory]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-memory"]
+
+[mcp_servers.playwright]
+command = "npx"
+args = ["-y", "@playwright/mcp@latest", "--extension"]
+
+[mcp_servers.sequential-thinking]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+
+[features]
+multi_agent = true
+
+[profiles.readonly]
+approval_policy = "on-request"
+sandbox_mode = "read-only"
+web_search = "cached"
+
+[profiles.fullspeed]
+approval_policy = "never"
+sandbox_mode = "workspace-write"
+web_search = "live"
+
+[agents]
+max_threads = 4
+max_depth = 1
+
+[agents.explorer]
+description = "Read-only explorer for tracing request flow, module boundaries, and concurrency safeguards."
+config_file = "agents/explorer.toml"
+
+[agents.reviewer]
+description = "Correctness and safety reviewer for inventory, reservation, and flash-sale changes."
+config_file = "agents/reviewer.toml"
+
+[agents.docs_researcher]
+description = "Documentation verifier for Spring Boot, Maven, Kafka, Redis, and Testcontainers behavior."
+config_file = "agents/docs-researcher.toml"
+
+[agents.tdd_guide]
+description = "Test-first planner for Spring Boot module changes, concurrency cases, and regression coverage."
+config_file = "agents/tdd-guide.toml"
+
+[agents.security_reviewer]
+description = "Security reviewer for auth, validation, headers, secrets, and unsafe state transitions."
+config_file = "agents/security-reviewer.toml"
