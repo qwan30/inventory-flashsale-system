@@ -43,6 +43,7 @@ import org.springframework.test.context.DynamicPropertySource;
         "app.scheduler.outbox-delay=1h",
         "app.scheduler.channel-sync-delay=1h",
         "app.scheduler.reconciliation-delay=1h",
+        "app.scheduler.alert-delivery-delay=1h",
         "app.channel.retry-delay=0s",
         "app.channel.shopee.mode=real",
         "app.channel.shopee.partner-id=123456",

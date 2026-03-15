@@ -36,9 +36,13 @@ The current repository already implements:
 - outbox recording, retry scheduling, and scheduled Kafka publish
 - backward-compatible idempotency persistence for release and order status mutations
 - channel sync attempts and persisted channel inventory snapshots
+- Shopee sandbox-ready real outbound sync and live inbound reconciliation reads
 - operator remediation APIs for outbox retry and reconciliation drift management
 - scheduled reconciliation runs inside the monolith
 - in-app operational alert evaluation for backlog, drift, stale snapshots, and scheduled-run failure
+- generic webhook-based external alert delivery with persisted delivery state
+- one promoted K6 benchmark baseline under `testing/k6/evidence/20260315-133859-e2e3644/`
+- automated benchmark promotion, comparison output, and evidence cataloging under `testing/k6/evidence/index.json`
 
 ## Target Requirement Summary
 
@@ -75,9 +79,9 @@ See:
 
 The current repository does not yet fully implement the target omnichannel vision:
 
-- channel integrations are still mock transports, not real marketplace connectors
-- alerting exists only as an in-app operational surface, not an external observability stack
-- load testing now has a committed runner and artifact convention, but still not yet a durable library of checked-in benchmark evidence
+- only Shopee has a real sandbox connector path; `WEB` and `APP` remain local/persisted channels and no second marketplace connector exists yet
+- alerting now has a generic webhook delivery path, but no richer vendor-specific observability stack or routing policy exists yet
+- load testing has a promoted checked-in baseline and automated evidence workflow, but the current evidence program still covers only the existing benchmark scenarios
 - no read replicas, order partitioning, or service decomposition are implemented
 - no real admin or operator-facing UI exists in this repository
 

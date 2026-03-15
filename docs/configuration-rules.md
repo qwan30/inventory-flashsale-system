@@ -78,6 +78,16 @@ Guidance:
 - default `5`
 - `app.alerts.channel-snapshot-staleness`
 - default `5m`
+- `app.alerts.delivery.enabled`
+- default `false`
+- `app.alerts.delivery.webhook-url`
+- required when delivery is enabled
+- `app.alerts.delivery.connect-timeout`
+- default `2s`
+- `app.alerts.delivery.read-timeout`
+- default `5s`
+- `app.alerts.delivery.reminder-interval`
+- default `15m`
 
 ### Scheduler Rules
 
@@ -89,10 +99,13 @@ Guidance:
 - default `10s`
 - `app.scheduler.reconciliation-delay`
 - default `60s`
+- `app.scheduler.alert-delivery-delay`
+- default `30s`
 
 Guidance:
 
 - scheduler tuning should be benchmarked together with outbox backlog and expiry latency
+- alert delivery must remain fail-safe and must never block reservation, outbox, channel sync, or reconciliation behavior
 
 ## Header Rules
 
@@ -117,10 +130,13 @@ Guidance:
 - benchmark environments must record the configuration values used for lock timing, batch size, scheduler cadence, and infrastructure endpoints
 - benchmark runs should use the `benchmark` Spring profile for repeatable operator validation
 - benchmark runs should persist manifest and report outputs under `testing/k6/artifacts/<timestamp>/`
-- promoted baselines should be copied to `testing/k6/evidence/<timestamp>-<commit>/`
+- benchmark runs now also emit `summary.md` and `comparison.json` under `testing/k6/artifacts/<timestamp>/`
+- promoted baselines should be copied to `testing/k6/evidence/<timestamp>-<commit>/`, ideally via `Run-BenchmarkSuite.ps1 -PromoteIfPassed`
+- `testing/k6/evidence/index.json` is the durable catalog of promoted evidence directories and copied report paths
 
 ## Current Configuration Gaps
 
 Not yet formalized:
 
 - explicit operator-run config matrix for high-load validation
+- vendor-specific alert transport integrations beyond the generic webhook delivery path

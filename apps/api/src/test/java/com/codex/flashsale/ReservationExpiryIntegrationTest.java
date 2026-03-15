@@ -24,6 +24,7 @@ import org.springframework.boot.test.context.SpringBootTest;
         "app.scheduler.expired-reservation-delay=1h",
         "app.scheduler.outbox-delay=1h",
         "app.scheduler.channel-sync-delay=1h",
+        "app.scheduler.alert-delivery-delay=1h",
         "app.lock.wait-timeout=30s",
         "app.lock.lease-timeout=30s",
         "app.reservation.ttl=1s"

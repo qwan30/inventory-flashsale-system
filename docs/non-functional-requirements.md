@@ -30,11 +30,13 @@ Current implemented signals include:
 - channel sync backlog gauges
 - reconciliation run success and failure counters plus reconciliation duration timer
 - in-app ops alerts for backlog, drift, stale snapshot, and scheduled reconciliation failure
+- generic webhook-based external alert delivery with persisted delivery state
+- promoted benchmark evidence cataloging through `testing/k6/evidence/index.json`
 
 Current gap:
 
-- richer benchmark evidence storage and external observability still need expansion
-- benchmark evidence promotion workflow must be completed so decisions can depend on durable baselines, not transient run output
+- vendor-specific observability integrations and richer alert-routing policy still need expansion beyond the generic webhook path
+- benchmark evidence now has automated promotion and comparison output, but target coverage is still bounded to the current scenario set and promoted baselines
 
 ## Performance Targets
 
@@ -67,6 +69,7 @@ Target direction:
 
 - only introduce heavier scale mechanics such as partitioning, replication, or service decomposition when benchmark evidence justifies them
 - benchmark evidence must come from promoted curated runs under `testing/k6/evidence/`
+- the current informational baseline target is `testing/k6/evidence/20260315-133859-e2e3644/report.json`
 
 ## Verification Expectations
 

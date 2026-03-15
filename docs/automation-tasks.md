@@ -82,24 +82,42 @@ Current implementation:
 
 - `OpsAlertService`
 
+### External Alert Delivery Sweep
+
+Current task:
+
+- evaluate current ops alerts on a schedule
+- send transition notifications for newly active alerts
+- resend reminders for still-active alerts after the configured interval
+- send clear notifications when a previously notified alert becomes inactive
+- persist delivery state and failures without blocking business flows
+
+Current implementation:
+
+- `OpsAlertDispatchScheduler`
+- `OpsAlertDeliveryService`
+- `alert_delivery_state`
+
 ### Benchmark Evidence Workflow
 
 Current task:
 
 - reset benchmark state before each scenario run
 - execute the declarative K6 suite against the running API
-- capture transient manifest, report, and scenario summaries
-- promote one vetted run into curated evidence with an operator copy step
+- capture transient manifest, report, summary, comparison, and scenario summaries
+- optionally promote one vetted run into curated evidence automatically
+- maintain a durable evidence catalog for promoted runs
 
 Current implementation:
 
 - `Run-BenchmarkSuite.ps1`
 - `Reset-BenchmarkState.ps1`
 - `suite.json`
+- `testing/k6/evidence/index.json`
 
 Outcome:
 
-- benchmark runs are reproducible and durable evidence can be promoted for scale-decision review
+- benchmark runs are reproducible, curated evidence can be promoted automatically, and promoted runs remain discoverable for scale-decision review
 
 ## Planned Operational Automations
 
@@ -109,7 +127,7 @@ These are planned ideas only, not implemented tasks.
 
 Target purpose:
 
-- push app-level operational breaches into an external alerting stack or notification channel
+- extend the current generic webhook path into richer vendor-specific alert routing, escalation, or observability stack integration
 
 ## Notes
 

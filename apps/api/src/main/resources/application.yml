@@ -65,11 +65,17 @@ app:
     channel-sync-failed-threshold: 10
     reconciliation-open-drift-threshold: 5
     channel-snapshot-staleness: 5m
+    delivery:
+      enabled: false
+      connect-timeout: 2s
+      read-timeout: 5s
+      reminder-interval: 15m
   scheduler:
     expired-reservation-delay: 30s
     outbox-delay: 5s
     channel-sync-delay: 10s
     reconciliation-delay: 60s
+    alert-delivery-delay: 30s
   kafka:
     topic: inventory-flashsale.events
 

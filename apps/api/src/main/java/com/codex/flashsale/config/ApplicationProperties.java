@@ -220,6 +220,7 @@ public class ApplicationProperties {
         private long channelSyncFailedThreshold = 10;
         private long reconciliationOpenDriftThreshold = 5;
         private Duration channelSnapshotStaleness = Duration.ofMinutes(5);
+        private final AlertDelivery delivery = new AlertDelivery();
 
         public long getOutboxFailedThreshold() {
             return outboxFailedThreshold;
@@ -252,6 +253,58 @@ public class ApplicationProperties {
         public void setChannelSnapshotStaleness(Duration channelSnapshotStaleness) {
             this.channelSnapshotStaleness = channelSnapshotStaleness;
         }
+
+        public AlertDelivery getDelivery() {
+            return delivery;
+        }
+    }
+
+    public static class AlertDelivery {
+        private boolean enabled;
+        private String webhookUrl;
+        private Duration connectTimeout = Duration.ofSeconds(2);
+        private Duration readTimeout = Duration.ofSeconds(5);
+        private Duration reminderInterval = Duration.ofMinutes(15);
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public String getWebhookUrl() {
+            return webhookUrl;
+        }
+
+        public void setWebhookUrl(String webhookUrl) {
+            this.webhookUrl = webhookUrl;
+        }
+
+        public Duration getConnectTimeout() {
+            return connectTimeout;
+        }
+
+        public void setConnectTimeout(Duration connectTimeout) {
+            this.connectTimeout = connectTimeout;
+        }
+
+        public Duration getReadTimeout() {
+            return readTimeout;
+        }
+
+        public void setReadTimeout(Duration readTimeout) {
+            this.readTimeout = readTimeout;
+        }
+
+        public Duration getReminderInterval() {
+            return reminderInterval;
+        }
+
+        public void setReminderInterval(Duration reminderInterval) {
+            this.reminderInterval = reminderInterval;
+        }
     }
 
     public static class Scheduler {
@@ -259,6 +312,7 @@ public class ApplicationProperties {
         private Duration outboxDelay = Duration.ofSeconds(5);
         private Duration channelSyncDelay = Duration.ofSeconds(10);
         private Duration reconciliationDelay = Duration.ofSeconds(60);
+        private Duration alertDeliveryDelay = Duration.ofSeconds(30);
 
         public Duration getExpiredReservationDelay() {
             return expiredReservationDelay;
@@ -290,6 +344,14 @@ public class ApplicationProperties {
 
         public void setReconciliationDelay(Duration reconciliationDelay) {
             this.reconciliationDelay = reconciliationDelay;
+        }
+
+        public Duration getAlertDeliveryDelay() {
+            return alertDeliveryDelay;
+        }
+
+        public void setAlertDeliveryDelay(Duration alertDeliveryDelay) {
+            this.alertDeliveryDelay = alertDeliveryDelay;
         }
     }
 

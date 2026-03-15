@@ -1,0 +1,18 @@
+{
+    "entries": [
+        {
+            "timestamp": "20260315-133859",
+            "gitCommit": "e2e3644",
+            "evidenceDir": "20260315-133859-e2e3644",
+            "artifactDir": "D:\\projects\\inventory-flashsale-system\\testing\\k6\\artifacts\\20260315-133859",
+            "reportPath": "D:\\projects\\inventory-flashsale-system\\testing\\k6\\evidence\\20260315-133859-e2e3644\\report.json",
+            "manifestPath": "D:\\projects\\inventory-flashsale-system\\testing\\k6\\evidence\\20260315-133859-e2e3644\\manifest.json",
+            "summaryPath": null,
+            "comparisonPath": null,
+            "baselineTarget": "testing/k6/evidence/20260315-133859-e2e3644/report.json",
+            "suiteStatus": "PASSED",
+            "businessChecksPassed": true,
+            "promotedAtUtc": "2026-03-15T06:38:59.6743110Z"
+        }
+    ]
+}

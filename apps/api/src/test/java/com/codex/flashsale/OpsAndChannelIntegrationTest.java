@@ -36,6 +36,7 @@ import org.springframework.boot.test.context.SpringBootTest;
         "app.scheduler.outbox-delay=1h",
         "app.scheduler.channel-sync-delay=1h",
         "app.scheduler.reconciliation-delay=1h",
+        "app.scheduler.alert-delivery-delay=1h",
         "app.channel.retry-delay=0s",
         "app.alerts.outbox-failed-threshold=1",
         "app.alerts.channel-sync-failed-threshold=1",

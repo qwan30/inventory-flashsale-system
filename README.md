@@ -59,10 +59,12 @@ k6 run .\testing\k6\reservation-expiry.js
 ```powershell
 .\mvnw clean install -DskipTests
 .\mvnw -f .\apps\api\pom.xml spring-boot:run -Dspring-boot.run.profiles=benchmark
-.\testing\k6\Run-BenchmarkSuite.ps1 -BaseUrl http://localhost:8080
+.\testing\k6\Run-BenchmarkSuite.ps1 -BaseUrl http://localhost:8080 -SpringProfile benchmark -PromoteIfPassed
 ```
 
-Promote only runs where `suiteStatus` is `PASSED`, every `scenarioResults[*].status` is `PASSED`, and `businessChecks.passed` is `true`. Copy the vetted artifact set into `testing/k6/evidence/<timestamp>-<commit>/` unchanged as the promoted baseline.
+Use `-CommitSha <value>` when the current git commit is unavailable or when promoting evidence for a detached artifact review. Each suite run now emits `summary.md` and `comparison.json` alongside `manifest.json`, `report.json`, and per-scenario summaries. When `-PromoteIfPassed` is supplied, only runs where `suiteStatus` is `PASSED`, every `scenarioResults[*].status` is `PASSED`, and `businessChecks.passed` is `true` are copied automatically into `testing/k6/evidence/<timestamp>-<commit>/`.
+
+Promoted evidence sets are cataloged in `testing/k6/evidence/index.json`, which records the curated evidence directory, its copied report/manifest paths, and the baseline target used for comparison.
 
 The repo's current informational baseline target is `testing/k6/evidence/20260315-133859-e2e3644/report.json`.
 

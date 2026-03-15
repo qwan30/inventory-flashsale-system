@@ -38,20 +38,22 @@ docker compose up -d
 4. Run benchmark suite:
 
 ```powershell
-.\testing\k6\Run-BenchmarkSuite.ps1 -BaseUrl http://localhost:8080 -SpringProfile benchmark
+.\testing\k6\Run-BenchmarkSuite.ps1 -BaseUrl http://localhost:8080 -SpringProfile benchmark -PromoteIfPassed
 ```
 
-5. Inspect generated `manifest.json` and `report.json`.
-6. Promote only a vetted run where:
+Optional commit override:
+
+```powershell
+.\testing\k6\Run-BenchmarkSuite.ps1 -BaseUrl http://localhost:8080 -SpringProfile benchmark -PromoteIfPassed -CommitSha e2e3644
+```
+
+5. Inspect generated `manifest.json`, `report.json`, `summary.md`, and `comparison.json`.
+6. Auto-promotion only occurs for a vetted run where:
    - `suiteStatus` is `PASSED`
    - every `scenarioResults[*].status` is `PASSED`
    - `businessChecks.passed` is `true`
-   - `report.json`, `manifest.json`, and all scenario summaries are copied unchanged
-7. Promote one vetted run to curated evidence (copy, do not move):
-
-```powershell
-Copy-Item -Recurse .\testing\k6\artifacts\<timestamp> .\testing\k6\evidence\<timestamp>-<commit>
-```
+   - `report.json`, `manifest.json`, `summary.md`, `comparison.json`, and all scenario summaries are copied unchanged
+7. `testing/k6/evidence/index.json` is updated when auto-promotion succeeds so future sessions can enumerate curated evidence sets without scanning directories manually.
 
 Optional fixture validation:
 
@@ -65,13 +67,17 @@ Transient artifacts are generated under:
 
 - `testing/k6/artifacts/<timestamp>/manifest.json`
 - `testing/k6/artifacts/<timestamp>/report.json`
+- `testing/k6/artifacts/<timestamp>/summary.md`
+- `testing/k6/artifacts/<timestamp>/comparison.json`
 - `testing/k6/artifacts/<timestamp>/<scenario>.summary.json`
 
 Curated evidence is copied to:
 
 - `testing/k6/evidence/<timestamp>-<commit>/`
+- `testing/k6/evidence/index.json`
 
-The promoted directory must keep the same `manifest.json`, `report.json`, and scenario summary structure.
+The promoted directory must keep the same `manifest.json`, `report.json`, `summary.md`, `comparison.json`, and scenario summary structure.
+The evidence index catalogs promoted runs by timestamp and commit, and points at the durable copied files under `testing/k6/evidence/`.
 
 ## Evidence Gate
 
@@ -87,6 +93,6 @@ Runner behavior expected in this repository:
 
 - `Run-BenchmarkSuite.ps1` resets benchmark state per scenario via `Reset-BenchmarkState.ps1 -Scenario <name>`.
 - Runner output uses the timestamped directory structure documented above.
-- `Run-BenchmarkSuite.ps1` accepts `-BaseUrl`, `-ArtifactRoot`, `-SuitePath`, `-SpringProfile`, and `-ValidateFixtures`.
+- `Run-BenchmarkSuite.ps1` accepts `-BaseUrl`, `-ArtifactRoot`, `-SuitePath`, `-SpringProfile`, `-ValidateFixtures`, `-PromoteIfPassed`, and `-CommitSha`.
 - `Run-BenchmarkSuite.ps1` now compares later runs against `suite.json.baselineTarget` and keeps that comparison informational only.
-- Promotion is currently an operator copy step, not a built-in runner flag.
+- Promotion is now a built-in runner option behind `-PromoteIfPassed`.

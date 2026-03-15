@@ -24,15 +24,16 @@ Current responsibilities:
 
 - identify supported sales channels
 - validate reservation requests through channel adapters
-- provide mock sync adapters for `WEB`, `APP`, and `SHOPEE`
+- provide local/persisted sync behavior for `WEB` and `APP`
+- provide mock or real-mode transport for `SHOPEE`
 - persist outbound channel sync attempts and channel inventory snapshots
 - store reconciliation runs and reconciliation drifts
 - support scheduled reconciliation inputs and staleness evaluation
 
 Current gap:
 
-- no real marketplace transport or credentialed connector
-- inbound facts are derived from persisted snapshots, not pulled from external systems
+- only Shopee has a credentialed real connector; no second marketplace transport exists
+- `WEB` and `APP` inbound facts remain derived from persisted snapshots, while Shopee can read live remote stock in `real` mode
 - alerting is exposed through the app only, not an external observability stack
 
 Target extension direction:
