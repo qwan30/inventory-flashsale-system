@@ -21,7 +21,7 @@ public class ChannelSyncService {
 
     private final ChannelSyncAttemptRepository attemptRepository;
     private final ChannelInventorySnapshotRepository snapshotRepository;
-    private final ChannelInboundPort channelInboundPort;
+    private final Map<SalesChannel, ChannelInboundPort> inboundPorts;
     private final Map<SalesChannel, ChannelSyncPort> syncPorts;
     private final TimeProvider timeProvider;
     private final int syncBatchSize;
@@ -32,7 +32,7 @@ public class ChannelSyncService {
     public ChannelSyncService(
             ChannelSyncAttemptRepository attemptRepository,
             ChannelInventorySnapshotRepository snapshotRepository,
-            ChannelInboundPort channelInboundPort,
+            List<ChannelInboundPort> inboundPorts,
             List<ChannelSyncPort> syncPorts,
             TimeProvider timeProvider,
             @Value("${app.channel.sync-batch-size:50}") int syncBatchSize,
@@ -42,7 +42,8 @@ public class ChannelSyncService {
     ) {
         this.attemptRepository = attemptRepository;
         this.snapshotRepository = snapshotRepository;
-        this.channelInboundPort = channelInboundPort;
+        this.inboundPorts = new EnumMap<>(SalesChannel.class);
+        inboundPorts.forEach(inboundPort -> this.inboundPorts.put(inboundPort.channel(), inboundPort));
         this.syncPorts = new EnumMap<>(SalesChannel.class);
         syncPorts.forEach(syncPort -> this.syncPorts.put(syncPort.channel(), syncPort));
         this.timeProvider = timeProvider;
@@ -113,7 +114,11 @@ public class ChannelSyncService {
     }
 
     public Optional<ChannelInventorySnapshotView> fetchSnapshot(SalesChannel channel, String sku) {
-        return channelInboundPort.fetchInventorySnapshot(channel, sku);
+        ChannelInboundPort inboundPort = inboundPorts.get(channel);
+        if (inboundPort == null) {
+            return Optional.empty();
+        }
+        return inboundPort.fetchInventorySnapshot(sku);
     }
 
     public long countPendingAttempts() {

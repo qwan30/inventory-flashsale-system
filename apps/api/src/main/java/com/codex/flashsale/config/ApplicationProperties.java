@@ -109,6 +109,7 @@ public class ApplicationProperties {
         private int syncBatchSize = 50;
         private Duration retryDelay = Duration.ofSeconds(15);
         private int maxAttempts = 3;
+        private final Shopee shopee = new Shopee();
 
         public int getSyncBatchSize() {
             return syncBatchSize;
@@ -132,6 +133,85 @@ public class ApplicationProperties {
 
         public void setMaxAttempts(int maxAttempts) {
             this.maxAttempts = maxAttempts;
+        }
+
+        public Shopee getShopee() {
+            return shopee;
+        }
+    }
+
+    public static class Shopee {
+        private String mode = "mock";
+        private String baseUrl = "https://partner.test-stable.shopeemobile.com";
+        private Long partnerId;
+        private String partnerKey;
+        private Long shopId;
+        private String accessToken;
+        private Duration connectTimeout = Duration.ofSeconds(2);
+        private Duration readTimeout = Duration.ofSeconds(5);
+
+        public String getMode() {
+            return mode;
+        }
+
+        public void setMode(String mode) {
+            this.mode = mode;
+        }
+
+        public String getBaseUrl() {
+            return baseUrl;
+        }
+
+        public void setBaseUrl(String baseUrl) {
+            this.baseUrl = baseUrl;
+        }
+
+        public Long getPartnerId() {
+            return partnerId;
+        }
+
+        public void setPartnerId(Long partnerId) {
+            this.partnerId = partnerId;
+        }
+
+        public String getPartnerKey() {
+            return partnerKey;
+        }
+
+        public void setPartnerKey(String partnerKey) {
+            this.partnerKey = partnerKey;
+        }
+
+        public Long getShopId() {
+            return shopId;
+        }
+
+        public void setShopId(Long shopId) {
+            this.shopId = shopId;
+        }
+
+        public String getAccessToken() {
+            return accessToken;
+        }
+
+        public void setAccessToken(String accessToken) {
+            this.accessToken = accessToken;
+        }
+
+        public Duration getConnectTimeout() {
+            return connectTimeout;
+        }
+
+        public void setConnectTimeout(Duration connectTimeout) {
+            this.connectTimeout = connectTimeout;
+        }
+
+        public Duration getReadTimeout() {
+            return readTimeout;
+        }
+
+        public void setReadTimeout(Duration readTimeout) {
+            this.readTimeout = readTimeout;
         }
     }
 

@@ -109,7 +109,7 @@ public class OpsApplicationService {
                                 inventoryItem.getSoldQty(),
                                 snapshot.availableQty(),
                                 snapshot.reservedQty(),
-                                snapshot.soldQty()
+                                observedSoldQty(inventoryItem, snapshot)
                         );
                         openDrifts += 1;
                     }
@@ -158,9 +158,23 @@ public class OpsApplicationService {
     }
 
     private boolean isDrift(InventoryItem inventoryItem, ChannelInventorySnapshotView snapshot) {
-        return inventoryItem.getAvailableQty() != snapshot.availableQty()
-                || inventoryItem.getReservedQty() != snapshot.reservedQty()
-                || inventoryItem.getSoldQty() != snapshot.soldQty();
+        boolean stockDrift = inventoryItem.getAvailableQty() != snapshot.availableQty()
+                || inventoryItem.getReservedQty() != snapshot.reservedQty();
+        if (stockDrift) {
+            return true;
+        }
+        if (!snapshot.soldQtyComparable()) {
+            return false;
+        }
+        return inventoryItem.getSoldQty() != snapshot.soldQty();
+    }
+
+    private int observedSoldQty(InventoryItem inventoryItem, ChannelInventorySnapshotView snapshot) {
+        if (!snapshot.soldQtyComparable()) {
+            // Shopee live stock APIs do not expose sold quantity.
+            return inventoryItem.getSoldQty();
+        }
+        return snapshot.soldQty();
     }
 
     private ReconciliationDriftResponse toReconciliationDriftResponse(InventoryReconciliationDrift drift) {

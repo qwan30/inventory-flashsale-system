@@ -10,6 +10,19 @@ public record ChannelInventorySnapshotView(
         int reservedQty,
         int soldQty,
         Instant syncedAt,
-        String sourceOutboxEventId
+        String sourceOutboxEventId,
+        boolean soldQtyComparable
 ) {
+
+    public ChannelInventorySnapshotView(
+            SalesChannel channel,
+            String sku,
+            int availableQty,
+            int reservedQty,
+            int soldQty,
+            Instant syncedAt,
+            String sourceOutboxEventId
+    ) {
+        this(channel, sku, availableQty, reservedQty, soldQty, syncedAt, sourceOutboxEventId, true);
+    }
 }

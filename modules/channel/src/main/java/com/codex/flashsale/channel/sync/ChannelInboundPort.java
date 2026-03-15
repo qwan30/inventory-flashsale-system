@@ -5,5 +5,7 @@ import java.util.Optional;
 
 public interface ChannelInboundPort {
 
-    Optional<ChannelInventorySnapshotView> fetchInventorySnapshot(SalesChannel channel, String sku);
+    SalesChannel channel();
+
+    Optional<ChannelInventorySnapshotView> fetchInventorySnapshot(String sku);
 }
