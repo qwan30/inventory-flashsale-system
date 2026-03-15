@@ -54,6 +54,15 @@ k6 run .\testing\k6\flash-sale-window.js
 k6 run .\testing\k6\reservation-expiry.js
 ```
 
+5. Run benchmark evidence suite:
+
+```powershell
+.\mvnw spring-boot:run -pl apps/api -Dspring-boot.run.profiles=benchmark
+.\testing\k6\Run-BenchmarkSuite.ps1 -BaseUrl http://localhost:8080
+```
+
+Review `testing/k6/artifacts/<timestamp>/manifest.json` and `report.json`, then copy one vetted run into `testing/k6/evidence/<timestamp>-<commit>/` as the promoted baseline.
+
 ## Key API endpoints
 
 - `POST /api/v1/flash-sales/{campaignId}/reservations`
@@ -67,3 +76,4 @@ k6 run .\testing\k6\reservation-expiry.js
 - `everything-claude-code/` and `skills/` are ignored and excluded from the build.
 - The project is configured for Codex usage through repo-local guidance in `AGENTS.md` and `.codex/`.
 - Demo seed data is available with campaign `campaign-demo-001` and SKU `SKU-DEMO-001`.
+- Evidence gate: do not propose topology or scale-out changes without promoted benchmark evidence from `testing/k6/evidence/`.

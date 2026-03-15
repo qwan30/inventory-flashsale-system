@@ -10,6 +10,8 @@ Current high-signal records:
   Monolith-first foundation for persisted mutation idempotency, channel sync, reconciliation, ops remediation, and expanded integration tests.
 - `2026-03-15-ops-closure-slice.md`
   Scheduled reconciliation, app-level ops alerts, and K6 artifact capture conventions.
+- `2026-03-15-benchmark-evidence-program.md`
+  Durable benchmark evidence workflow contracts covering transient artifacts, curated promotion, and evidence-gated scale decisions.
 
 Good content:
 

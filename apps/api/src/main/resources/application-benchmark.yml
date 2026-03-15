@@ -1,0 +1,31 @@
+spring:
+  config:
+    activate:
+      on-profile: benchmark
+
+app:
+  reservation:
+    ttl: 10m
+  lock:
+    wait-timeout: 2s
+    lease-timeout: 5s
+  outbox:
+    publish-batch-size: 50
+    retry-delay: 10s
+    max-attempts: 5
+  channel:
+    sync-batch-size: 50
+    retry-delay: 15s
+    max-attempts: 3
+  alerts:
+    outbox-failed-threshold: 10
+    channel-sync-failed-threshold: 10
+    reconciliation-open-drift-threshold: 5
+    channel-snapshot-staleness: 5m
+  scheduler:
+    expired-reservation-delay: 60s
+    outbox-delay: 60s
+    channel-sync-delay: 60s
+    reconciliation-delay: 300s
+  kafka:
+    topic: inventory-flashsale.events

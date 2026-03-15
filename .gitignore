@@ -7,5 +7,5 @@ target/
 /.mvn/wrapper/maven-wrapper.jar
 /everything-claude-code/
 /skills/
-/testing/k6/artifacts/*.json
-/testing/k6/artifacts/*.txt
+/testing/k6/artifacts/**
+!/testing/k6/artifacts/.gitkeep

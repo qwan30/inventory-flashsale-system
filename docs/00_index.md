@@ -67,10 +67,14 @@ Read in this order for broad project work:
   Broader monolith-first delivery covering persisted idempotency, channel sync, ops remediation, and reconciliation foundation.
 - `docs/03_implementation/2026-03-15-ops-closure-slice.md`
   Operational closure for scheduled reconciliation, alert evaluation, and repeatable benchmark artifact generation.
+- `docs/03_implementation/2026-03-15-benchmark-evidence-program.md`
+  Benchmark evidence contracts for transient artifacts, curated promotion, and evidence-gated scale decisions.
 - `docs/04_audit_remediation/`
   Risk audits, bug investigations, remediation plans, and postmortems.
 - `docs/05_history/`
   Concise dated records of important completed work or important discoveries worth reloading next session.
+- `docs/05_history/2026-03-15-benchmark-evidence-program.md`
+  Durable note describing benchmark evidence workflow updates and integration checkpoints.
 
 ## What Belongs Here
 

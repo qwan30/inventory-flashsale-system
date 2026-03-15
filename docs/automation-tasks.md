@@ -82,15 +82,28 @@ Current implementation:
 
 - `OpsAlertService`
 
+### Benchmark Evidence Workflow
+
+Current task:
+
+- reset benchmark state before each scenario run
+- execute the declarative K6 suite against the running API
+- capture transient manifest, report, and scenario summaries
+- promote one vetted run into curated evidence with an operator copy step
+
+Current implementation:
+
+- `Run-BenchmarkSuite.ps1`
+- `Reset-BenchmarkState.ps1`
+- `suite.json`
+
+Outcome:
+
+- benchmark runs are reproducible and durable evidence can be promoted for scale-decision review
+
 ## Planned Operational Automations
 
 These are planned ideas only, not implemented tasks.
-
-### Benchmark Report Generation
-
-Target purpose:
-
-- run K6 suites, collect performance results, and produce repeatable benchmark evidence
 
 ### Drift Or Backlog Alerting
 

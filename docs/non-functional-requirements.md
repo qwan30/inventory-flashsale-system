@@ -34,6 +34,7 @@ Current implemented signals include:
 Current gap:
 
 - richer benchmark evidence storage and external observability still need expansion
+- benchmark evidence promotion workflow must be completed so decisions can depend on durable baselines, not transient run output
 
 ## Performance Targets
 
@@ -65,6 +66,7 @@ Current state:
 Target direction:
 
 - only introduce heavier scale mechanics such as partitioning, replication, or service decomposition when benchmark evidence justifies them
+- benchmark evidence must come from promoted curated runs under `testing/k6/evidence/`
 
 ## Verification Expectations
 

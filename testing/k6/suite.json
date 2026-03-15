@@ -1,0 +1,89 @@
+{
+  "seed": {
+    "sku": "SKU-DEMO-001",
+    "activeCampaignId": "campaign-demo-001",
+    "inactiveCampaignId": "campaign-ended-001",
+    "totalStock": 100
+  },
+  "configCapture": [
+    "app.reservation.ttl",
+    "app.lock.wait-timeout",
+    "app.lock.lease-timeout",
+    "app.outbox.publish-batch-size",
+    "app.outbox.retry-delay",
+    "app.outbox.max-attempts",
+    "app.channel.sync-batch-size",
+    "app.channel.retry-delay",
+    "app.channel.max-attempts",
+    "app.alerts.outbox-failed-threshold",
+    "app.alerts.channel-sync-failed-threshold",
+    "app.alerts.reconciliation-open-drift-threshold",
+    "app.alerts.channel-snapshot-staleness",
+    "app.scheduler.expired-reservation-delay",
+    "app.scheduler.outbox-delay",
+    "app.scheduler.channel-sync-delay",
+    "app.scheduler.reconciliation-delay",
+    "app.kafka.topic"
+  ],
+  "baselineTarget": "",
+  "scenarios": [
+    {
+      "name": "hot-sku-contention",
+      "file": "hot-sku-contention.js",
+      "resetRequired": true,
+      "env": {
+        "CAMPAIGN_ID": "campaign-demo-001",
+        "SKU": "SKU-DEMO-001"
+      },
+      "postRunChecks": [
+        "inventory_invariants",
+        "ops_snapshots"
+      ]
+    },
+    {
+      "name": "flash-sale-window",
+      "file": "flash-sale-window.js",
+      "resetRequired": true,
+      "env": {
+        "ACTIVE_CAMPAIGN_ID": "campaign-demo-001",
+        "INACTIVE_CAMPAIGN_ID": "campaign-ended-001",
+        "SKU": "SKU-DEMO-001"
+      },
+      "postRunChecks": [
+        "inventory_invariants",
+        "ops_snapshots"
+      ]
+    },
+    {
+      "name": "reservation-expiry",
+      "file": "reservation-expiry.js",
+      "resetRequired": true,
+      "env": {
+        "CAMPAIGN_ID": "campaign-demo-001",
+        "SKU": "SKU-DEMO-001"
+      },
+      "postRunChecks": [
+        "inventory_invariants",
+        "ops_snapshots"
+      ]
+    },
+    {
+      "name": "outbox-backlog-recovery",
+      "file": "outbox-backlog-recovery.js",
+      "resetRequired": true,
+      "env": {},
+      "postRunChecks": [
+        "ops_snapshots"
+      ]
+    },
+    {
+      "name": "reconciliation-load",
+      "file": "reconciliation-load.js",
+      "resetRequired": true,
+      "env": {},
+      "postRunChecks": [
+        "ops_snapshots"
+      ]
+    }
+  ]
+}

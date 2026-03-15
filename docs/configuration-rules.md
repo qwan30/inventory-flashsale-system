@@ -115,10 +115,12 @@ Guidance:
 
 - K6 should target the running API instance
 - benchmark environments must record the configuration values used for lock timing, batch size, scheduler cadence, and infrastructure endpoints
+- benchmark runs should use the `benchmark` Spring profile for repeatable operator validation
+- benchmark runs should persist manifest and report outputs under `testing/k6/artifacts/<timestamp>/`
+- promoted baselines should be copied to `testing/k6/evidence/<timestamp>-<commit>/`
 
 ## Current Configuration Gaps
 
 Not yet formalized:
 
-- benchmark-specific config profiles
 - explicit operator-run config matrix for high-load validation
