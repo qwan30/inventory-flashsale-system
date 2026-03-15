@@ -6,6 +6,8 @@ const activeCampaignId = __ENV.ACTIVE_CAMPAIGN_ID || "campaign-demo-001";
 const inactiveCampaignId = __ENV.INACTIVE_CAMPAIGN_ID || "campaign-ended-001";
 const sku = __ENV.SKU || "SKU-DEMO-001";
 
+http.setResponseCallback(http.expectedStatuses(200, 201, 404, 409, 423));
+
 export const options = {
   scenarios: {
     activeWindow: {
@@ -40,7 +42,7 @@ function reserve(campaignId, channel) {
 export function activeWindow() {
   const response = reserve(activeCampaignId, "APP");
   check(response, {
-    "active campaign does not 5xx": (r) => r.status < 500,
+    "active campaign handled safely": (r) => [200, 201, 409, 423].includes(r.status),
   });
   sleep(0.2);
 }
@@ -52,4 +54,3 @@ export function inactiveWindow() {
   });
   sleep(0.2);
 }
-

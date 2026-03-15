@@ -16,14 +16,35 @@ function Get-K6MetricValue {
     }
 
     $metric = $Summary.metrics.$MetricName
-    if (-not $metric.values) {
-        return $null
+    $valueSource = $metric
+    if ($metric.values) {
+        $valueSource = $metric.values
     }
-    if (-not ($metric.values.PSObject.Properties.Name -contains $ValueName)) {
+    if (-not ($valueSource.PSObject.Properties.Name -contains $ValueName)) {
         return $null
     }
 
-    return $metric.values.$ValueName
+    return $valueSource.$ValueName
+}
+
+function Get-K6MetricValueFirstAvailable {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Summary,
+        [Parameter(Mandatory = $true)]
+        [string]$MetricName,
+        [Parameter(Mandatory = $true)]
+        [string[]]$ValueNames
+    )
+
+    foreach ($valueName in $ValueNames) {
+        $value = Get-K6MetricValue -Summary $Summary -MetricName $MetricName -ValueName $valueName
+        if ($null -ne $value) {
+            return $value
+        }
+    }
+
+    return $null
 }
 
 function Get-K6ScenarioStats {
@@ -35,8 +56,8 @@ function Get-K6ScenarioStats {
     return [ordered]@{
         httpReqDurationAvg = Get-K6MetricValue -Summary $Summary -MetricName "http_req_duration" -ValueName "avg"
         httpReqDurationP95 = Get-K6MetricValue -Summary $Summary -MetricName "http_req_duration" -ValueName "p(95)"
-        httpReqFailedRate = Get-K6MetricValue -Summary $Summary -MetricName "http_req_failed" -ValueName "rate"
-        checksRate = Get-K6MetricValue -Summary $Summary -MetricName "checks" -ValueName "rate"
+        httpReqFailedRate = Get-K6MetricValueFirstAvailable -Summary $Summary -MetricName "http_req_failed" -ValueNames @("rate", "value")
+        checksRate = Get-K6MetricValueFirstAvailable -Summary $Summary -MetricName "checks" -ValueNames @("rate", "value")
     }
 }
 

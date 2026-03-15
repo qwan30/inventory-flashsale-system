@@ -5,6 +5,8 @@ const baseUrl = __ENV.BASE_URL || "http://localhost:8080";
 const campaignId = __ENV.CAMPAIGN_ID || "campaign-demo-001";
 const sku = __ENV.SKU || "SKU-DEMO-001";
 
+http.setResponseCallback(http.expectedStatuses(200, 201, 409));
+
 export const options = {
   vus: 5,
   iterations: 20,
@@ -23,10 +25,10 @@ export default function () {
   );
 
   check(reserveResponse, {
-    "reservation created": (r) => r.status === 200,
+    "reservation created": (r) => [200, 201].includes(r.status),
   });
 
-  if (reserveResponse.status !== 200) {
+  if (![200, 201].includes(reserveResponse.status)) {
     return;
   }
 

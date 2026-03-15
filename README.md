@@ -57,11 +57,14 @@ k6 run .\testing\k6\reservation-expiry.js
 5. Run benchmark evidence suite:
 
 ```powershell
-.\mvnw spring-boot:run -pl apps/api -Dspring-boot.run.profiles=benchmark
+.\mvnw clean install -DskipTests
+.\mvnw -f .\apps\api\pom.xml spring-boot:run -Dspring-boot.run.profiles=benchmark
 .\testing\k6\Run-BenchmarkSuite.ps1 -BaseUrl http://localhost:8080
 ```
 
-Review `testing/k6/artifacts/<timestamp>/manifest.json` and `report.json`, then copy one vetted run into `testing/k6/evidence/<timestamp>-<commit>/` as the promoted baseline.
+Promote only runs where `suiteStatus` is `PASSED`, every `scenarioResults[*].status` is `PASSED`, and `businessChecks.passed` is `true`. Copy the vetted artifact set into `testing/k6/evidence/<timestamp>-<commit>/` unchanged as the promoted baseline.
+
+The repo's current informational baseline target is `testing/k6/evidence/20260315-133859-e2e3644/report.json`.
 
 ## Key API endpoints
 

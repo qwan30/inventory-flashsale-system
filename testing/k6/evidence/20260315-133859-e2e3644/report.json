@@ -1,0 +1,198 @@
+{
+    "suiteStatus":  "PASSED",
+    "scenarioResults":  [
+                            {
+                                "name":  "hot-sku-contention",
+                                "file":  "hot-sku-contention.js",
+                                "status":  "PASSED",
+                                "exitCode":  0,
+                                "summaryPath":  "D:\\projects\\inventory-flashsale-system\\testing\\k6\\artifacts\\20260315-133859\\hot-sku-contention.summary.json",
+                                "stats":  {
+                                              "httpReqDurationAvg":  164.1271904499302,
+                                              "httpReqDurationP95":  920.3577493999999,
+                                              "httpReqFailedRate":  0,
+                                              "checksRate":  1
+                                          },
+                                "postRunChecks":  [
+                                                      "inventory_invariants",
+                                                      "ops_snapshots"
+                                                  ]
+                            },
+                            {
+                                "name":  "flash-sale-window",
+                                "file":  "flash-sale-window.js",
+                                "status":  "PASSED",
+                                "exitCode":  0,
+                                "summaryPath":  "D:\\projects\\inventory-flashsale-system\\testing\\k6\\artifacts\\20260315-133859\\flash-sale-window.summary.json",
+                                "stats":  {
+                                              "httpReqDurationAvg":  70.11552285304657,
+                                              "httpReqDurationP95":  220.255593,
+                                              "httpReqFailedRate":  0,
+                                              "checksRate":  1
+                                          },
+                                "postRunChecks":  [
+                                                      "inventory_invariants",
+                                                      "ops_snapshots"
+                                                  ]
+                            },
+                            {
+                                "name":  "reservation-expiry",
+                                "file":  "reservation-expiry.js",
+                                "status":  "PASSED",
+                                "exitCode":  0,
+                                "summaryPath":  "D:\\projects\\inventory-flashsale-system\\testing\\k6\\artifacts\\20260315-133859\\reservation-expiry.summary.json",
+                                "stats":  {
+                                              "httpReqDurationAvg":  48.3262672,
+                                              "httpReqDurationP95":  175.51302139999996,
+                                              "httpReqFailedRate":  0,
+                                              "checksRate":  1
+                                          },
+                                "postRunChecks":  [
+                                                      "inventory_invariants",
+                                                      "ops_snapshots"
+                                                  ]
+                            },
+                            {
+                                "name":  "outbox-backlog-recovery",
+                                "file":  "outbox-backlog-recovery.js",
+                                "status":  "PASSED",
+                                "exitCode":  0,
+                                "summaryPath":  "D:\\projects\\inventory-flashsale-system\\testing\\k6\\artifacts\\20260315-133859\\outbox-backlog-recovery.summary.json",
+                                "stats":  {
+                                              "httpReqDurationAvg":  5.569046205000003,
+                                              "httpReqDurationP95":  8.342661099999995,
+                                              "httpReqFailedRate":  0,
+                                              "checksRate":  1
+                                          },
+                                "postRunChecks":  [
+                                                      "ops_snapshots"
+                                                  ]
+                            },
+                            {
+                                "name":  "reconciliation-load",
+                                "file":  "reconciliation-load.js",
+                                "status":  "PASSED",
+                                "exitCode":  0,
+                                "summaryPath":  "D:\\projects\\inventory-flashsale-system\\testing\\k6\\artifacts\\20260315-133859\\reconciliation-load.summary.json",
+                                "stats":  {
+                                              "httpReqDurationAvg":  8.262430361538462,
+                                              "httpReqDurationP95":  25.5898546,
+                                              "httpReqFailedRate":  0,
+                                              "checksRate":  1
+                                          },
+                                "postRunChecks":  [
+                                                      "ops_snapshots"
+                                                  ]
+                            }
+                        ],
+    "businessChecks":  {
+                           "passed":  true,
+                           "checks":  [
+                                          {
+                                              "check":  "inventory_non_negative",
+                                              "passed":  true,
+                                              "detail":  "available=100, reserved=0, sold=0"
+                                          },
+                                          {
+                                              "check":  "inventory_stock_conservation",
+                                              "passed":  true,
+                                              "detail":  "sum=100, expected=100"
+                                          },
+                                          {
+                                              "check":  "outbox_backlog_endpoint_available",
+                                              "passed":  true,
+                                              "detail":  "OK"
+                                          },
+                                          {
+                                              "check":  "alerts_endpoint_available",
+                                              "passed":  true,
+                                              "detail":  "OK"
+                                          },
+                                          {
+                                              "check":  "reconciliation_drifts_endpoint_available",
+                                              "passed":  true,
+                                              "detail":  "OK"
+                                          }
+                                      ]
+                       },
+    "opsSnapshots":  {
+                         "outboxBacklog":  {
+                                               "pendingCount":  0,
+                                               "failedCount":  0,
+                                               "retryableFailedCount":  0
+                                           },
+                         "alerts":  [
+                                        {
+                                            "code":  "OUTBOX_FAILED_BACKLOG",
+                                            "severity":  "WARN",
+                                            "status":  "INACTIVE",
+                                            "message":  "Failed outbox backlog breached threshold",
+                                            "currentValue":  "0",
+                                            "threshold":  "10",
+                                            "observedAt":  "2026-03-15T06:41:53.408556284Z"
+                                        },
+                                        {
+                                            "code":  "CHANNEL_SYNC_FAILED_BACKLOG",
+                                            "severity":  "WARN",
+                                            "status":  "INACTIVE",
+                                            "message":  "Failed channel sync backlog breached threshold",
+                                            "currentValue":  "0",
+                                            "threshold":  "10",
+                                            "observedAt":  "2026-03-15T06:41:53.408556284Z"
+                                        },
+                                        {
+                                            "code":  "RECONCILIATION_OPEN_DRIFTS",
+                                            "severity":  "WARN",
+                                            "status":  "INACTIVE",
+                                            "message":  "Open reconciliation drift count breached threshold",
+                                            "currentValue":  "0",
+                                            "threshold":  "5",
+                                            "observedAt":  "2026-03-15T06:41:53.408556284Z"
+                                        },
+                                        {
+                                            "code":  "CHANNEL_SYNC_RETRYABLE_BACKLOG",
+                                            "severity":  "INFO",
+                                            "status":  "INACTIVE",
+                                            "message":  "Retryable channel sync backlog currently waiting for replay",
+                                            "currentValue":  "0",
+                                            "threshold":  "0",
+                                            "observedAt":  "2026-03-15T06:41:53.408556284Z"
+                                        },
+                                        {
+                                            "code":  "STALE_CHANNEL_SNAPSHOTS",
+                                            "severity":  "WARN",
+                                            "status":  "INACTIVE",
+                                            "message":  "Channel snapshots older than the configured staleness window were detected",
+                                            "currentValue":  "0",
+                                            "threshold":  "PT5M",
+                                            "observedAt":  "2026-03-15T06:41:53.408556284Z"
+                                        },
+                                        {
+                                            "code":  "RECONCILIATION_RUN_FAILURE",
+                                            "severity":  "CRITICAL",
+                                            "status":  "INACTIVE",
+                                            "message":  "No scheduled reconciliation run has failed",
+                                            "currentValue":  "NONE",
+                                            "threshold":  "COMPLETED",
+                                            "observedAt":  "2026-03-15T06:41:53.408556284Z"
+                                        }
+                                    ],
+                         "reconciliationDrifts":  {
+
+                                                  },
+                         "endpointErrors":  {
+                                                "outboxBacklog":  null,
+                                                "alerts":  null,
+                                                "reconciliationDrifts":  null
+                                            }
+                     },
+    "baselineComparison":  {
+                               "mode":  "informational",
+                               "baselineTarget":  "",
+                               "available":  false,
+                               "note":  "No baseline target configured.",
+                               "scenarioDeltas":  [
+
+                                                  ]
+                           }
+}

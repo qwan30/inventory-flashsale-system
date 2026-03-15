@@ -25,7 +25,7 @@
     "app.scheduler.reconciliation-delay",
     "app.kafka.topic"
   ],
-  "baselineTarget": "",
+  "baselineTarget": "testing/k6/evidence/20260315-133859-e2e3644/report.json",
   "scenarios": [
     {
       "name": "hot-sku-contention",

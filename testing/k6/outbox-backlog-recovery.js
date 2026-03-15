@@ -4,21 +4,28 @@ import { check, sleep } from "k6";
 const baseUrl = __ENV.BASE_URL || "http://localhost:8080";
 const retryEventId = __ENV.RETRY_EVENT_ID;
 
-export const options = {
-  scenarios: {
-    backlogPolling: {
-      executor: "constant-vus",
-      vus: 5,
-      duration: "20s",
-      exec: "pollBacklog",
-    },
-    optionalRetry: {
-      executor: "constant-vus",
-      vus: retryEventId ? 1 : 0,
-      duration: "20s",
-      exec: "retryFailedEvent",
-    },
+http.setResponseCallback(http.expectedStatuses(200, 404, 409));
+
+const scenarios = {
+  backlogPolling: {
+    executor: "constant-vus",
+    vus: 5,
+    duration: "20s",
+    exec: "pollBacklog",
   },
+};
+
+if (retryEventId) {
+  scenarios.optionalRetry = {
+    executor: "constant-vus",
+    vus: 1,
+    duration: "20s",
+    exec: "retryFailedEvent",
+  };
+}
+
+export const options = {
+  scenarios,
 };
 
 export function pollBacklog() {

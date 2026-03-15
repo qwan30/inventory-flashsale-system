@@ -3,6 +3,8 @@ import { check, sleep } from "k6";
 
 const baseUrl = __ENV.BASE_URL || "http://localhost:8080";
 
+http.setResponseCallback(http.expectedStatuses(200));
+
 export const options = {
   scenarios: {
     reconciliationRuns: {

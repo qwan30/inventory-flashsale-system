@@ -1,0 +1,50 @@
+{
+    "timestampUtc":  "2026-03-15T06:38:59.6743110Z",
+    "gitCommit":  "e2e3644",
+    "baseUrl":  "http://localhost:8080",
+    "springProfile":  "benchmark",
+    "scenarioOrder":  [
+                          "hot-sku-contention",
+                          "flash-sale-window",
+                          "reservation-expiry",
+                          "outbox-backlog-recovery",
+                          "reconciliation-load"
+                      ],
+    "seed":  {
+                 "sku":  "SKU-DEMO-001",
+                 "activeCampaignId":  "campaign-demo-001",
+                 "inactiveCampaignId":  "campaign-ended-001",
+                 "totalStock":  100
+             },
+    "config":  {
+                   "app.reservation.ttl":  "10m",
+                   "app.lock.wait-timeout":  "2s",
+                   "app.lock.lease-timeout":  "5s",
+                   "app.outbox.publish-batch-size":  "50",
+                   "app.outbox.retry-delay":  "10s",
+                   "app.outbox.max-attempts":  "5",
+                   "app.channel.sync-batch-size":  "50",
+                   "app.channel.retry-delay":  "15s",
+                   "app.channel.max-attempts":  "3",
+                   "app.alerts.outbox-failed-threshold":  "10",
+                   "app.alerts.channel-sync-failed-threshold":  "10",
+                   "app.alerts.reconciliation-open-drift-threshold":  "5",
+                   "app.alerts.channel-snapshot-staleness":  "5m",
+                   "app.scheduler.expired-reservation-delay":  "60s",
+                   "app.scheduler.outbox-delay":  "60s",
+                   "app.scheduler.channel-sync-delay":  "60s",
+                   "app.scheduler.reconciliation-delay":  "300s",
+                   "app.kafka.topic":  "inventory-flashsale.events"
+               },
+    "artifacts":  {
+                      "summaries":  {
+                                        "hot-sku-contention":  "D:\\projects\\inventory-flashsale-system\\testing\\k6\\artifacts\\20260315-133859\\hot-sku-contention.summary.json",
+                                        "flash-sale-window":  "D:\\projects\\inventory-flashsale-system\\testing\\k6\\artifacts\\20260315-133859\\flash-sale-window.summary.json",
+                                        "reservation-expiry":  "D:\\projects\\inventory-flashsale-system\\testing\\k6\\artifacts\\20260315-133859\\reservation-expiry.summary.json",
+                                        "outbox-backlog-recovery":  "D:\\projects\\inventory-flashsale-system\\testing\\k6\\artifacts\\20260315-133859\\outbox-backlog-recovery.summary.json",
+                                        "reconciliation-load":  "D:\\projects\\inventory-flashsale-system\\testing\\k6\\artifacts\\20260315-133859\\reconciliation-load.summary.json"
+                                    },
+                      "manifest":  "D:\\projects\\inventory-flashsale-system\\testing\\k6\\artifacts\\20260315-133859\\manifest.json",
+                      "report":  "D:\\projects\\inventory-flashsale-system\\testing\\k6\\artifacts\\20260315-133859\\report.json"
+                  }
+}

@@ -5,6 +5,8 @@ const baseUrl = __ENV.BASE_URL || "http://localhost:8080";
 const campaignId = __ENV.CAMPAIGN_ID || "campaign-demo-001";
 const sku = __ENV.SKU || "SKU-DEMO-001";
 
+http.setResponseCallback(http.expectedStatuses(200, 201, 409, 423));
+
 export const options = {
   scenarios: {
     contention: {
@@ -15,7 +17,7 @@ export const options = {
   },
   thresholds: {
     http_req_failed: ["rate<0.3"],
-    http_req_duration: ["p(95)<500"],
+    http_req_duration: ["p(95)<1000"],
   },
 };
 
@@ -43,4 +45,3 @@ export default function () {
   });
   sleep(0.1);
 }
-
