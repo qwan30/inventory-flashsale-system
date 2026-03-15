@@ -24,6 +24,9 @@ Current rules:
 - campaign status must be `ACTIVE`
 - current time must be within campaign start and end time
 - remaining campaign quota must be sufficient before reservation is accepted
+- only `DRAFT` campaigns can be updated
+- admin activation transitions a draft campaign to `ACTIVE`
+- admin end transitions a draft or active campaign to `ENDED`
 
 ## Reservation Rules
 
@@ -70,6 +73,16 @@ Current rules:
 - a different idempotency key for an already applied keyed transition is a conflict
 - invalid transitions are rejected as conflicts
 
+## Admin Access Rules
+
+Current rules:
+
+- admin auth login requires valid seeded or persisted credentials
+- admin refresh tokens are rotated on refresh and revoked on logout
+- `/api/v1/admin/campaigns/**` requires role `ADMIN`
+- `/api/v1/admin/ops/**` and `/api/v1/ops/**` require role `ADMIN` or `OPERATOR`
+- admin campaign and ops mutations are written to immutable activity audit records
+
 ## Eventing Rules
 
 Current rules:
@@ -84,11 +97,11 @@ Current rules:
 
 Current gap:
 
-- channel transports are still mock implementations rather than real external connectors
+- Shopee has a real sandbox-ready connector path, but a second marketplace connector is still missing
 
 ## Target Future Rules
 
 Target future rules not yet implemented:
 
-- alerting rules for drift and backlog thresholds
 - connector-specific retry and credential policies for real marketplaces
+- richer alert routing policy beyond the current generic webhook delivery path

@@ -41,6 +41,8 @@ The current repository already implements:
 - scheduled reconciliation runs inside the monolith
 - in-app operational alert evaluation for backlog, drift, stale snapshots, and scheduled-run failure
 - generic webhook-based external alert delivery with persisted delivery state
+- app-managed admin authentication with JWT access and refresh tokens
+- role-gated admin APIs for campaign lifecycle management and audited ops remediation
 - one promoted K6 benchmark baseline under `testing/k6/evidence/20260315-133859-e2e3644/`
 - automated benchmark promotion, comparison output, and evidence cataloging under `testing/k6/evidence/index.json`
 
@@ -66,6 +68,9 @@ Current implemented capabilities include:
 - scheduled reconciliation evidence capture without auto-correction
 - persisted release and order-status idempotency replay
 - channel snapshot reconciliation runs and drift resolution APIs
+- admin login, refresh, and logout flows with seeded local admin and operator identities
+- admin campaign create, update, activate, end, and campaign audit reads
+- admin ops wrappers for alerts, outbox retry, and reconciliation actions
 - ops alert surface for operational breaches and scheduler failure visibility
 - error responses with correlation ID support
 
@@ -82,8 +87,9 @@ The current repository does not yet fully implement the target omnichannel visio
 - only Shopee has a real sandbox connector path; `WEB` and `APP` remain local/persisted channels and no second marketplace connector exists yet
 - alerting now has a generic webhook delivery path, but no richer vendor-specific observability stack or routing policy exists yet
 - load testing has a promoted checked-in baseline and automated evidence workflow, but the current evidence program still covers only the existing benchmark scenarios
+- event contracts and reference downstream consumers are not yet formalized inside the repo
 - no read replicas, order partitioning, or service decomposition are implemented
-- no real admin or operator-facing UI exists in this repository
+- no real admin or operator-facing UI exists in this repository yet
 
 ## Recommended Reading Order
 

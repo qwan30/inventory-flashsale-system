@@ -41,12 +41,12 @@ Current states:
 
 Current implemented transition semantics:
 
+- admin APIs now expose the campaign lifecycle directly
+- `DRAFT -> ACTIVE` through admin activation
+- `DRAFT -> ENDED` through admin end
+- `ACTIVE -> ENDED` through admin end
 - reservation acceptance requires `ACTIVE`
 - reservation acceptance also requires current time within campaign window
-
-Current gap:
-
-- explicit transition workflows between `DRAFT`, `ACTIVE`, and `ENDED` are not yet exposed through public APIs
 
 ## Order State Machine
 

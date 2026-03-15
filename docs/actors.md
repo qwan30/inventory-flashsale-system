@@ -31,11 +31,13 @@ Current role:
 
 - identify the origin of a reservation or order lifecycle event
 - route request validation through channel-specific adapters
+- receive outbound sync attempts and contribute reconciliation facts
 
 Current gap:
 
-- channel adapters are still mock validators
-- they do not yet perform real external synchronization or reconciliation
+- `WEB` and `APP` still use local persisted sync and inbound snapshot behavior
+- `SHOPEE` supports real-mode outbound sync and live inbound reconciliation reads
+- no second marketplace connector exists yet
 
 ### Application Services
 
@@ -52,6 +54,9 @@ Current role:
 
 - `ReservationExpiryScheduler` releases expired active reservations
 - `OutboxPublisherScheduler` publishes pending outbox events
+- `ChannelSyncScheduler` dispatches pending channel sync attempts
+- `ReconciliationScheduler` runs scheduled inventory reconciliation
+- `OpsAlertDispatchScheduler` sends external alert notifications
 
 These are the current automated operational actors inside the system.
 
@@ -61,11 +66,12 @@ Current role:
 
 - operationally monitors system health, inventory correctness, and event backlog
 - manages infrastructure and benchmark execution outside the application
+- authenticates into the admin API to manage campaigns and run remediation actions
 
 Current gap:
 
-- there is no implemented admin API or UI in this repository
-- operator workflows are inferred from backend responsibilities, not delivered as product features
+- secure admin and operator APIs now exist in the repository
+- there is still no implemented admin UI in this repository
 
 ### Downstream Systems
 
@@ -84,7 +90,7 @@ Current gap:
 Target future actors may include:
 
 - channel integration workers for marketplace sync
-- reconciliation jobs that compare central inventory with channel state
 - internal support or operations tools for remediation and manual review
+- second-marketplace actors such as TikTok Shop once the connector slice lands
 
 These are target roles only and are not yet implemented.

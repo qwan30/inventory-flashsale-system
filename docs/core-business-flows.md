@@ -87,6 +87,35 @@ Current path:
 3. Message is published to Kafka topic `inventory-flashsale.events`.
 4. Event is marked `PUBLISHED` on success or `FAILED` on publish error.
 
+### 7. Manage Flash Sale Campaigns
+
+Current path:
+
+1. Admin client authenticates through `POST /api/v1/admin/auth/login`.
+2. Admin calls `POST /api/v1/admin/campaigns` to create a `DRAFT` campaign for an existing SKU.
+3. Admin may update the draft with `PUT /api/v1/admin/campaigns/{campaignId}`.
+4. Admin activates the campaign through `POST /api/v1/admin/campaigns/{campaignId}/activate`.
+5. Admin may end a campaign through `POST /api/v1/admin/campaigns/{campaignId}/end`.
+6. Each create, update, activate, and end action records an immutable audit entry.
+
+### 8. Admin Or Operator Ops Remediation
+
+Current path:
+
+1. Admin or operator authenticates through the admin auth flow.
+2. Client calls `GET /api/v1/admin/ops/alerts` or `GET /api/v1/admin/ops/outbox/backlog` to inspect current issues.
+3. Operator-triggered actions such as outbox retry or reconciliation run and drift resolution are invoked through the `/api/v1/admin/ops/**` namespace.
+4. Each mutating remediation action records an immutable admin activity audit entry.
+
+### 9. Inventory Reconciliation
+
+Current path:
+
+1. Scheduler or operator triggers reconciliation.
+2. The system compares central inventory with the latest channel snapshots or live Shopee reads in real mode.
+3. Open drifts are created or refreshed for mismatches.
+4. Operators may resolve open drifts through the admin or ops remediation surface.
+
 ## Target Future Flows
 
 ### Omnichannel Sync
@@ -99,7 +128,8 @@ Target future path:
 
 Current gap:
 
-- not yet implemented beyond channel request validation
+- central outbound sync, persisted snapshots, and Shopee live reads are implemented
+- inbound marketplace orders and non-Shopee real connectors are still not implemented
 
 ### Inventory Reconciliation
 
@@ -110,7 +140,8 @@ Target future path:
 
 Current gap:
 
-- not implemented
+- scheduled and manual reconciliation now exist inside the monolith
+- richer drift analytics, auto-remediation policy, and second-marketplace comparison are still open
 
 ## Related Current-State Docs
 

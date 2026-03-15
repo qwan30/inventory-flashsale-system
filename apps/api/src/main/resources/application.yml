@@ -78,6 +78,19 @@ app:
     alert-delivery-delay: 30s
   kafka:
     topic: inventory-flashsale.events
+  security:
+    jwt:
+      issuer: ${APP_SECURITY_JWT_ISSUER:inventory-flashsale-api}
+      secret: ${APP_SECURITY_JWT_SECRET:change-me-change-me-change-me-1234}
+      access-token-ttl: ${APP_SECURITY_JWT_ACCESS_TOKEN_TTL:15m}
+      refresh-token-ttl: ${APP_SECURITY_JWT_REFRESH_TOKEN_TTL:168h}
+    seed-users:
+      admin-username: ${APP_SECURITY_SEED_ADMIN_USERNAME:admin}
+      admin-password: ${APP_SECURITY_SEED_ADMIN_PASSWORD:Admin123!}
+      admin-display-name: ${APP_SECURITY_SEED_ADMIN_DISPLAY_NAME:System Admin}
+      operator-username: ${APP_SECURITY_SEED_OPERATOR_USERNAME:operator}
+      operator-password: ${APP_SECURITY_SEED_OPERATOR_PASSWORD:Operator123!}
+      operator-display-name: ${APP_SECURITY_SEED_OPERATOR_DISPLAY_NAME:Operations User}
 
 logging:
   level:

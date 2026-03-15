@@ -3,6 +3,7 @@ package com.codex.flashsale.flashsale;
 import com.codex.flashsale.common.exception.BadRequestException;
 import com.codex.flashsale.common.exception.NotFoundException;
 import java.time.Instant;
+import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -33,5 +34,12 @@ public class FlashSaleCampaignService {
     public FlashSaleCampaign save(FlashSaleCampaign campaign) {
         return repository.save(campaign);
     }
-}
 
+    public List<FlashSaleCampaign> findAll() {
+        return repository.findAll();
+    }
+
+    public boolean exists(String campaignId) {
+        return repository.existsById(campaignId);
+    }
+}

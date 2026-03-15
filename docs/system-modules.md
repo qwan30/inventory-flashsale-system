@@ -92,7 +92,7 @@ Current responsibilities:
 
 Current gap:
 
-- failure handling is stronger, but it still lacks alerting and richer operator workflows beyond backlog inspection and retry
+- failure handling is stronger, but event contracts and downstream compatibility fixtures are still not formalized
 
 Target extension direction:
 
@@ -106,6 +106,7 @@ Current responsibilities:
 - HTTP controllers
 - application service orchestration
 - configuration properties
+- Spring Security configuration with JWT auth for admin and ops APIs
 - correlation ID filter
 - Redis lock manager
 - Flyway migrations

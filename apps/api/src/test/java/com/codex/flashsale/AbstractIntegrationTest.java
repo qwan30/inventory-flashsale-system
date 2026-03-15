@@ -3,6 +3,8 @@ package com.codex.flashsale;
 import com.codex.flashsale.flashsale.CampaignStatus;
 import com.codex.flashsale.flashsale.FlashSaleCampaign;
 import com.codex.flashsale.flashsale.FlashSaleCampaignRepository;
+import com.codex.flashsale.admin.AdminActivityAuditRepository;
+import com.codex.flashsale.admin.AdminRefreshTokenRepository;
 import com.codex.flashsale.alerts.AlertDeliveryStateRepository;
 import com.codex.flashsale.channel.reconciliation.InventoryReconciliationDriftRepository;
 import com.codex.flashsale.channel.reconciliation.InventoryReconciliationRunRepository;
@@ -77,6 +79,12 @@ abstract class AbstractIntegrationTest {
     @Autowired
     protected AlertDeliveryStateRepository alertDeliveryStateRepository;
 
+    @Autowired
+    protected AdminRefreshTokenRepository adminRefreshTokenRepository;
+
+    @Autowired
+    protected AdminActivityAuditRepository adminActivityAuditRepository;
+
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", MYSQL::getJdbcUrl);
@@ -89,6 +97,8 @@ abstract class AbstractIntegrationTest {
 
     protected void resetDatabase(int availableQty, int quota, Instant startsAt, Instant endsAt, CampaignStatus status) {
         alertDeliveryStateRepository.deleteAll();
+        adminActivityAuditRepository.deleteAll();
+        adminRefreshTokenRepository.deleteAll();
         inventoryReconciliationDriftRepository.deleteAll();
         inventoryReconciliationRunRepository.deleteAll();
         channelInventorySnapshotRepository.deleteAll();

@@ -27,6 +27,21 @@ Public HTTP endpoints:
 - `POST /api/v1/reservations/{reservationId}/release`
 - `GET /api/v1/inventory/{sku}`
 - `POST /api/v1/orders/{orderId}/status`
+- `POST /api/v1/admin/auth/login`
+- `POST /api/v1/admin/auth/refresh`
+- `POST /api/v1/admin/auth/logout`
+- `GET /api/v1/admin/campaigns`
+- `POST /api/v1/admin/campaigns`
+- `PUT /api/v1/admin/campaigns/{campaignId}`
+- `POST /api/v1/admin/campaigns/{campaignId}/activate`
+- `POST /api/v1/admin/campaigns/{campaignId}/end`
+- `GET /api/v1/admin/campaigns/{campaignId}/audits`
+- `GET /api/v1/admin/ops/alerts`
+- `GET /api/v1/admin/ops/outbox/backlog`
+- `POST /api/v1/admin/ops/outbox/{eventId}/retry`
+- `POST /api/v1/admin/ops/reconciliation/runs`
+- `GET /api/v1/admin/ops/reconciliation/drifts`
+- `POST /api/v1/admin/ops/reconciliation/{driftId}/resolve`
 
 Main orchestration entrypoints:
 
@@ -35,11 +50,21 @@ Main orchestration entrypoints:
 - `ReservationApplicationService.release(...)`
 - `ReservationApplicationService.expireReservation(...)`
 - `OrderApplicationService.updateStatus(...)`
+- `AdminCampaignApplicationService.createCampaign(...)`
+- `AdminCampaignApplicationService.updateCampaign(...)`
+- `AdminCampaignApplicationService.activateCampaign(...)`
+- `AdminCampaignApplicationService.endCampaign(...)`
+- `AdminAuthService.login(...)`
+- `AdminAuthService.refresh(...)`
+- `AdminAuthService.logout(...)`
 
 Background jobs:
 
 - `ReservationExpiryScheduler` scans expired active reservations every `30s` by default.
 - `OutboxPublisherScheduler` publishes pending outbox rows every `5s` by default.
+- `ChannelSyncScheduler` processes pending channel sync attempts every `10s` by default.
+- `ReconciliationScheduler` runs scheduled inventory reconciliation every `60s` by default.
+- `OpsAlertDispatchScheduler` evaluates and sends alert notifications every `30s` by default.
 
 ## End-to-End Flow
 
@@ -131,7 +156,8 @@ Background jobs:
 ### Channel
 
 - Reservation validation is delegated by `SalesChannel`.
-- Mock adapters currently enforce only basic rules: supported channel, non-blank SKU, and quantity greater than zero.
+- `WEB` and `APP` currently use persisted sync and inbound snapshot behavior.
+- `SHOPEE` supports mock or real-mode transport, including live inbound reconciliation reads in real mode.
 
 ## Persistence And Infra
 

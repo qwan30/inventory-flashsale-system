@@ -62,6 +62,12 @@ public class FlashSaleCampaign extends AuditTimestamps {
         this.status = status;
     }
 
+    public static FlashSaleCampaign draft(String id, String sku, Instant startsAt, Instant endsAt, int quota) {
+        validateWindow(startsAt, endsAt);
+        validateQuota(quota);
+        return new FlashSaleCampaign(id, sku, startsAt, endsAt, quota, 0, 0, CampaignStatus.DRAFT);
+    }
+
     public void ensureActive(Instant now) {
         if (status != CampaignStatus.ACTIVE) {
             throw new ConflictException("FLASH_SALE_INACTIVE", "Flash sale campaign is not active");
@@ -89,6 +95,34 @@ public class FlashSaleCampaign extends AuditTimestamps {
         }
         reservedQuota -= quantity;
         soldQuota += quantity;
+    }
+
+    public void updateDraft(Instant startsAt, Instant endsAt, int quota) {
+        ensureStatus(CampaignStatus.DRAFT, "FLASH_SALE_CAMPAIGN_NOT_DRAFT", "Only draft campaigns can be updated");
+        validateWindow(startsAt, endsAt);
+        validateQuota(quota);
+        if (soldQuota > 0 || reservedQuota > 0) {
+            throw new ConflictException(
+                    "FLASH_SALE_CAMPAIGN_ALREADY_USED",
+                    "Campaign with existing reservations or sales cannot be edited as draft"
+            );
+        }
+        this.startsAt = startsAt;
+        this.endsAt = endsAt;
+        this.quota = quota;
+    }
+
+    public void activate() {
+        ensureStatus(CampaignStatus.DRAFT, "FLASH_SALE_CAMPAIGN_NOT_DRAFT", "Only draft campaigns can be activated");
+        validateWindow(startsAt, endsAt);
+        this.status = CampaignStatus.ACTIVE;
+    }
+
+    public void end() {
+        if (status == CampaignStatus.ENDED) {
+            throw new ConflictException("FLASH_SALE_CAMPAIGN_ALREADY_ENDED", "Campaign is already ended");
+        }
+        this.status = CampaignStatus.ENDED;
     }
 
     public String getId() {
@@ -121,5 +155,23 @@ public class FlashSaleCampaign extends AuditTimestamps {
 
     public CampaignStatus getStatus() {
         return status;
+    }
+
+    private static void validateWindow(Instant startsAt, Instant endsAt) {
+        if (startsAt == null || endsAt == null || !startsAt.isBefore(endsAt)) {
+            throw new ConflictException("FLASH_SALE_INVALID_WINDOW", "Campaign start time must be before end time");
+        }
+    }
+
+    private static void validateQuota(int quota) {
+        if (quota <= 0) {
+            throw new ConflictException("FLASH_SALE_INVALID_QUOTA", "Campaign quota must be greater than zero");
+        }
+    }
+
+    private void ensureStatus(CampaignStatus requiredStatus, String code, String message) {
+        if (status != requiredStatus) {
+            throw new ConflictException(code, message);
+        }
     }
 }

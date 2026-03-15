@@ -89,6 +89,30 @@ Guidance:
 - `app.alerts.delivery.reminder-interval`
 - default `15m`
 
+### Security Rules
+
+- `app.security.jwt.issuer`
+- default `inventory-flashsale-api`
+- `app.security.jwt.secret`
+- must be at least `32` bytes and should be overridden outside local development
+- `app.security.jwt.access-token-ttl`
+- default `15m`
+- `app.security.jwt.refresh-token-ttl`
+- default `168h`
+- `app.security.seed-users.admin-username`
+- default `admin`
+- `app.security.seed-users.admin-password`
+- default local seed password `Admin123!`
+- `app.security.seed-users.operator-username`
+- default `operator`
+- `app.security.seed-users.operator-password`
+- default local seed password `Operator123!`
+
+Guidance:
+
+- override seed-user credentials and JWT secret in any non-local environment
+- shopper APIs stay open, but admin and ops APIs now require bearer authentication with `ADMIN` or `OPERATOR` roles
+
 ### Scheduler Rules
 
 - `app.scheduler.expired-reservation-delay`
@@ -111,6 +135,7 @@ Guidance:
 
 - `X-Idempotency-Key` is required for reserve and confirm
 - `X-Correlation-Id` is optional and echoed or generated automatically
+- `Authorization: Bearer <token>` is required for `/api/v1/admin/**` and `/api/v1/ops/**`
 
 ## Environment Rules
 

@@ -13,6 +13,7 @@ public class ApplicationProperties {
     private final Alerts alerts = new Alerts();
     private final Scheduler scheduler = new Scheduler();
     private final Kafka kafka = new Kafka();
+    private final Security security = new Security();
 
     public Reservation getReservation() {
         return reservation;
@@ -40,6 +41,10 @@ public class ApplicationProperties {
 
     public Kafka getKafka() {
         return kafka;
+    }
+
+    public Security getSecurity() {
+        return security;
     }
 
     public static class Reservation {
@@ -364,6 +369,115 @@ public class ApplicationProperties {
 
         public void setTopic(String topic) {
             this.topic = topic;
+        }
+    }
+
+    public static class Security {
+        private final Jwt jwt = new Jwt();
+        private final SeedUsers seedUsers = new SeedUsers();
+
+        public Jwt getJwt() {
+            return jwt;
+        }
+
+        public SeedUsers getSeedUsers() {
+            return seedUsers;
+        }
+    }
+
+    public static class Jwt {
+        private String issuer = "inventory-flashsale-api";
+        private String secret = "change-me-change-me-change-me-1234";
+        private Duration accessTokenTtl = Duration.ofMinutes(15);
+        private Duration refreshTokenTtl = Duration.ofDays(7);
+
+        public String getIssuer() {
+            return issuer;
+        }
+
+        public void setIssuer(String issuer) {
+            this.issuer = issuer;
+        }
+
+        public String getSecret() {
+            return secret;
+        }
+
+        public void setSecret(String secret) {
+            this.secret = secret;
+        }
+
+        public Duration getAccessTokenTtl() {
+            return accessTokenTtl;
+        }
+
+        public void setAccessTokenTtl(Duration accessTokenTtl) {
+            this.accessTokenTtl = accessTokenTtl;
+        }
+
+        public Duration getRefreshTokenTtl() {
+            return refreshTokenTtl;
+        }
+
+        public void setRefreshTokenTtl(Duration refreshTokenTtl) {
+            this.refreshTokenTtl = refreshTokenTtl;
+        }
+    }
+
+    public static class SeedUsers {
+        private String adminUsername = "admin";
+        private String adminPassword = "Admin123!";
+        private String adminDisplayName = "System Admin";
+        private String operatorUsername = "operator";
+        private String operatorPassword = "Operator123!";
+        private String operatorDisplayName = "Operations User";
+
+        public String getAdminUsername() {
+            return adminUsername;
+        }
+
+        public void setAdminUsername(String adminUsername) {
+            this.adminUsername = adminUsername;
+        }
+
+        public String getAdminPassword() {
+            return adminPassword;
+        }
+
+        public void setAdminPassword(String adminPassword) {
+            this.adminPassword = adminPassword;
+        }
+
+        public String getAdminDisplayName() {
+            return adminDisplayName;
+        }
+
+        public void setAdminDisplayName(String adminDisplayName) {
+            this.adminDisplayName = adminDisplayName;
+        }
+
+        public String getOperatorUsername() {
+            return operatorUsername;
+        }
+
+        public void setOperatorUsername(String operatorUsername) {
+            this.operatorUsername = operatorUsername;
+        }
+
+        public String getOperatorPassword() {
+            return operatorPassword;
+        }
+
+        public void setOperatorPassword(String operatorPassword) {
+            this.operatorPassword = operatorPassword;
+        }
+
+        public String getOperatorDisplayName() {
+            return operatorDisplayName;
+        }
+
+        public void setOperatorDisplayName(String operatorDisplayName) {
+            this.operatorDisplayName = operatorDisplayName;
         }
     }
 }
