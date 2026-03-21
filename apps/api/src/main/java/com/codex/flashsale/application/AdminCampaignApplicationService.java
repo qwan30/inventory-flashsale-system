@@ -44,6 +44,11 @@ public class AdminCampaignApplicationService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public AdminCampaignResponse getCampaign(String campaignId) {
+        return toResponse(flashSaleCampaignService.getRequired(campaignId));
+    }
+
     @Transactional
     public AdminCampaignResponse createCampaign(AdminCreateCampaignRequest request, AdminActor actor, String correlationId) {
         if (flashSaleCampaignService.exists(request.id())) {

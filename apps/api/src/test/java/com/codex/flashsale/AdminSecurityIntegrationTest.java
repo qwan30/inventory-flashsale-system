@@ -92,6 +92,12 @@ class AdminSecurityIntegrationTest extends AbstractIntegrationTest {
     void shouldRequireAuthenticationForOpsEndpoints() throws Exception {
         mockMvc.perform(get("/api/v1/ops/alerts"))
                 .andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/api/v1/admin/ops/outbox/events"))
+                .andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/api/v1/admin/ops/reconciliation/runs"))
+                .andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/api/v1/admin/channels/health"))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -101,6 +107,22 @@ class AdminSecurityIntegrationTest extends AbstractIntegrationTest {
         mockMvc.perform(get("/api/v1/admin/ops/alerts")
                         .header(AUTHORIZATION, bearer(operator.accessToken())))
                 .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/v1/admin/ops/outbox/events")
+                        .header(AUTHORIZATION, bearer(operator.accessToken())))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/v1/admin/ops/reconciliation/runs")
+                        .header(AUTHORIZATION, bearer(operator.accessToken())))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/v1/admin/channels/health")
+                        .header(AUTHORIZATION, bearer(operator.accessToken())))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/v1/admin/campaigns/{campaignId}", BASE_CAMPAIGN_ID)
+                        .header(AUTHORIZATION, bearer(operator.accessToken())))
+                .andExpect(status().isForbidden());
 
         String requestBody = """
                 {

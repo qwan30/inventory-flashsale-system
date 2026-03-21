@@ -1,6 +1,7 @@
 # Implementation Notes
 
 Use this folder for implementation-phase records that are worth keeping after coding starts.
+Choose this folder when the prompt outcome is implemented work that landed, not just planning or review.
 
 Current high-signal records:
 
@@ -19,5 +20,7 @@ Good content:
 - migration notes
 - rollout notes
 - important implementation constraints discovered during execution
+
+Use dated filenames like `YYYY-MM-DD-topic.md`.
 
 Do not turn this folder into a duplicate changelog. Keep only records that help future debugging or extension work.

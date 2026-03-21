@@ -9,6 +9,8 @@ public interface OutboxEventRepository extends JpaRepository<OutboxEvent, String
 
     List<OutboxEvent> findByStatusOrderByCreatedAtAsc(OutboxStatus status, Pageable pageable);
 
+    List<OutboxEvent> findByStatusOrderByUpdatedAtDescCreatedAtDesc(OutboxStatus status, Pageable pageable);
+
     List<OutboxEvent> findByStatusAndNextAttemptAtLessThanEqualOrderByNextAttemptAtAscCreatedAtAsc(
             OutboxStatus status,
             Instant nextAttemptAt,

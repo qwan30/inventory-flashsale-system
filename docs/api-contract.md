@@ -1,6 +1,6 @@
 # API Contract
 
-**Last Updated:** 2026-03-15
+**Last Updated:** 2026-03-16
 
 ## Current Public Endpoints
 
@@ -248,6 +248,10 @@ Request body:
 }
 ```
 
+Browser mode:
+
+- when refresh-cookie mode is enabled, callers may omit `refreshToken` in the body and rely on the HttpOnly refresh cookie instead
+
 Current failure classes:
 
 - `401` invalid or expired refresh token
@@ -271,6 +275,10 @@ Request body:
 }
 ```
 
+Browser mode:
+
+- when refresh-cookie mode is enabled, callers may omit `refreshToken` in the body and rely on the HttpOnly refresh cookie instead
+
 ### `GET /api/v1/admin/campaigns`
 
 Purpose:
@@ -281,6 +289,26 @@ Headers:
 
 - required `Authorization: Bearer <token>` with role `ADMIN`
 - optional `X-Correlation-Id`
+
+### `GET /api/v1/admin/campaigns/{campaignId}`
+
+Purpose:
+
+- read one flash sale campaign for detail, edit, and audit workflows
+
+Headers:
+
+- required `Authorization: Bearer <token>` with role `ADMIN`
+- optional `X-Correlation-Id`
+
+Success response:
+
+- current implementation returns `200 OK`
+- response shape matches the `AdminCampaignResponse` returned by the list endpoint
+
+Current failure classes:
+
+- `404` campaign not found
 
 ### `POST /api/v1/admin/campaigns`
 
@@ -339,6 +367,347 @@ Headers:
 
 - required `Authorization: Bearer <token>` with role `ADMIN` or `OPERATOR`
 - optional `X-Correlation-Id`
+
+### `GET /api/v1/admin/ops/outbox/events`
+
+Purpose:
+
+- list outbox events for remediation workflows, defaulting to failed events
+
+Headers:
+
+- required `Authorization: Bearer <token>` with role `ADMIN` or `OPERATOR`
+- optional `X-Correlation-Id`
+
+Query params:
+
+- optional `status`, default `FAILED`
+- optional `limit`, default `50`, max `200`
+
+Success response:
+
+```json
+[
+  {
+    "eventId": "string",
+    "aggregateType": "reservation",
+    "aggregateId": "string",
+    "eventType": "inventory.reservation.created",
+    "eventVersion": 1,
+    "status": "FAILED",
+    "attempts": 3,
+    "lastError": "broker down",
+    "nextAttemptAt": "2026-03-16T00:00:00Z",
+    "createdAt": "2026-03-16T00:00:00Z",
+    "updatedAt": "2026-03-16T00:01:00Z"
+  }
+]
+```
+
+### `GET /api/v1/admin/ops/reconciliation/runs`
+
+Purpose:
+
+- list recent reconciliation runs for operator history and remediation context
+
+Headers:
+
+- required `Authorization: Bearer <token>` with role `ADMIN` or `OPERATOR`
+- optional `X-Correlation-Id`
+
+Query params:
+
+- optional `limit`, default `20`, max `100`
+
+Success response:
+
+```json
+[
+  {
+    "runId": "string",
+    "triggerType": "MANUAL",
+    "status": "COMPLETED",
+    "scannedSkuCount": 1,
+    "scannedSnapshotCount": 3,
+    "openDriftCount": 0,
+    "failureMessage": null,
+    "createdAt": "2026-03-16T00:00:00Z",
+    "completedAt": "2026-03-16T00:00:02Z"
+  }
+]
+```
+
+### `POST /api/v1/channel-ingress/tiktok/inventory`
+
+Purpose:
+
+- accept signed TikTok inventory facts and persist/update the TikTok channel snapshot
+
+Headers:
+
+- required `X-TikTok-Timestamp`
+- required `X-TikTok-Signature`
+
+Request body:
+
+```json
+{
+  "receiptId": "tt-inventory-1",
+  "sku": "SKU-DEMO-001",
+  "availableQty": 17,
+  "reservedQty": 2,
+  "soldQty": 1,
+  "observedAt": "2026-03-15T00:00:00Z"
+}
+```
+
+### `POST /api/v1/channel-ingress/tiktok/orders/status`
+
+Purpose:
+
+- accept signed TikTok order-status callbacks and normalize them into the central order lifecycle
+
+### `POST /api/v1/admin/channels/tiktok/ingress/replay`
+
+Purpose:
+
+- replay normalized TikTok ingress payloads for remediation or test support
+
+### `GET /api/v1/admin/channels/health`
+
+Purpose:
+
+- read additive per-channel marketplace posture for operator workflows
+
+Headers:
+
+- required `Authorization: Bearer <token>` with role `ADMIN` or `OPERATOR`
+- optional `X-Correlation-Id`
+
+Success response:
+
+```json
+[
+  {
+    "channel": "SHOPEE",
+    "status": "HEALTHY",
+    "connectorMode": "REAL",
+    "configValid": true,
+    "syncBacklogCount": 0,
+    "staleSnapshotCount": 0,
+    "openDriftCount": 0,
+    "lastReconciliationAt": "2026-03-16T00:00:00Z",
+    "latestIngressReceipt": null,
+    "latestReplay": null
+  },
+  {
+    "channel": "TIKTOK_SHOP",
+    "status": "DEGRADED",
+    "connectorMode": "MOCK",
+    "configValid": true,
+    "syncBacklogCount": 2,
+    "staleSnapshotCount": 1,
+    "openDriftCount": 1,
+    "lastReconciliationAt": "2026-03-16T00:00:00Z",
+    "latestIngressReceipt": {
+      "type": "INVENTORY",
+      "externalReceiptId": "receipt-1",
+      "outcome": "PROCESSED",
+      "processedAt": "2026-03-16T00:01:00Z"
+    },
+    "latestReplay": {
+      "action": "TIKTOK_INGRESS_REPLAY_TRIGGERED",
+      "resourceId": "receipt-1",
+      "outcome": "SUCCESS",
+      "createdAt": "2026-03-16T00:02:00Z",
+      "details": "kind=INVENTORY, outcome=PROCESSED"
+    }
+  }
+]
+```
+
+### `GET /api/v1/admin/channels/health/{channel}`
+
+Purpose:
+
+- read one channel's operator drill-down payload with recent failure and reconciliation context
+
+Headers:
+
+- required `Authorization: Bearer <token>` with role `ADMIN` or `OPERATOR`
+- optional `X-Correlation-Id`
+
+Success response:
+
+```json
+{
+  "channel": "TIKTOK_SHOP",
+  "status": "DEGRADED",
+  "connectorMode": "MOCK",
+  "configValid": true,
+  "syncBacklogCount": 2,
+  "staleSnapshotCount": 1,
+  "openDriftCount": 1,
+  "latestSyncFailure": {
+    "attemptId": "sync-1",
+    "failureType": "TRANSIENT",
+    "error": "timeout",
+    "attempts": 2,
+    "lastUpdatedAt": "2026-03-16T00:00:00Z"
+  },
+  "latestIngressReceipt": {
+    "type": "INVENTORY",
+    "externalReceiptId": "receipt-1",
+    "outcome": "PROCESSED",
+    "processedAt": "2026-03-16T00:01:00Z"
+  },
+  "latestReplay": {
+    "action": "TIKTOK_INGRESS_REPLAY_TRIGGERED",
+    "resourceId": "receipt-1",
+    "outcome": "SUCCESS",
+    "createdAt": "2026-03-16T00:02:00Z",
+    "details": "kind=INVENTORY"
+  },
+  "recentReconciliationRun": {
+    "runId": "run-1",
+    "triggerType": "SCHEDULED",
+    "status": "COMPLETED",
+    "scannedSkuCount": 3,
+    "scannedSnapshotCount": 3,
+    "openDriftCount": 1,
+    "failureMessage": null,
+    "createdAt": "2026-03-16T00:03:00Z",
+    "completedAt": "2026-03-16T00:03:05Z"
+  }
+}
+```
+
+Current failure classes:
+
+- `400` unsupported or blank channel
+
+### `GET /api/v1/admin/ops/copilot/capabilities`
+
+Purpose:
+
+- return current advisory copilot availability and allowed analysis scopes
+
+Headers:
+
+- required `Authorization: Bearer <token>` with role `ADMIN` or `OPERATOR`
+- optional `X-Correlation-Id`
+
+Success response:
+
+```json
+{
+  "enabled": true,
+  "advisoryOnly": true,
+  "provider": "gemini",
+  "model": "gemini-2.5-flash",
+  "allowedScopes": [
+    "OPS_OVERVIEW",
+    "BENCHMARK_RUN",
+    "CHANNEL_HEALTH",
+    "CAMPAIGN_AUDIT"
+  ],
+  "statusMessage": "Ops copilot is ready for advisory analysis."
+}
+```
+
+### `POST /api/v1/admin/ops/copilot/analyze`
+
+Purpose:
+
+- run advisory-only operational analysis over a bounded ops context
+
+Headers:
+
+- required `Authorization: Bearer <token>` with role `ADMIN` or `OPERATOR`
+- optional `X-Correlation-Id`
+
+Request body:
+
+```json
+{
+  "scope": "OPS_OVERVIEW",
+  "focusQuestion": "What should I inspect first?",
+  "benchmarkRunId": null,
+  "channel": null,
+  "campaignId": null
+}
+```
+
+Success response:
+
+```json
+{
+  "scope": "OPS_OVERVIEW",
+  "subjectId": "ops-overview",
+  "summary": "Retry backlog and drift posture should be reviewed first.",
+  "prioritizedFindings": [
+    {
+      "severity": "WARN",
+      "title": "Retry backlog",
+      "detail": "Failed outbox events are still pending operator review.",
+      "sourceIds": [
+        "outbox-failed-events"
+      ]
+    }
+  ],
+  "recommendedActions": [
+    {
+      "label": "Open remediation",
+      "href": "/ops/remediation",
+      "rationale": "Review failed events and drift resolution options.",
+      "sourceIds": [
+        "outbox-failed-events"
+      ]
+    }
+  ],
+  "citations": [
+    {
+      "sourceId": "outbox-failed-events",
+      "label": "Failed outbox events",
+      "detail": "Newest failed outbox events from the remediation read model."
+    }
+  ],
+  "providerMetadata": {
+    "provider": "gemini",
+    "model": "gemini-2.5-flash",
+    "advisoryOnly": true,
+    "requestId": "string"
+  }
+}
+```
+
+Current failure classes:
+
+- `400` unsupported scope, missing subject id for scoped requests, or copilot disabled/unconfigured
+
+### `GET /api/v1/admin/ops/benchmarks/evidence`
+
+Purpose:
+
+- list promoted benchmark evidence entries from the K6 evidence index
+
+### `GET /api/v1/admin/ops/benchmarks/evidence/{runId}`
+
+Purpose:
+
+- return manifest, report, optional comparison, optional summary markdown, and typed suite/scenario summaries for one promoted run
+
+Additional typed fields:
+
+- `suiteSummary`
+- `scenarioSummaries[]`
+- `scenarioComparisons[]`
+
+### `GET /api/v1/admin/ops/benchmarks/evidence/latest`
+
+Purpose:
+
+- return the newest promoted benchmark evidence entry with the same typed detail payload
 
 ### `GET /api/v1/ops/alerts`
 
@@ -438,6 +807,7 @@ Success response:
   "scannedSnapshotCount": 3,
   "openDriftCount": 0,
   "failureMessage": null,
+  "createdAt": "2026-03-15T00:00:00Z",
   "completedAt": "2026-03-15T00:00:00Z"
 }
 ```
@@ -530,5 +900,4 @@ Notes:
 Not yet implemented:
 
 - omnichannel sync APIs
-- benchmark evidence summary APIs
-- admin or operator UI
+- no direct benchmark execution API; benchmark orchestration remains script-driven under `testing/k6`

@@ -137,8 +137,19 @@ public class ChannelSyncService {
         );
     }
 
+    public long countBacklogForChannel(SalesChannel channel) {
+        return attemptRepository.countByChannelAndStatusIn(
+                channel,
+                List.of(ChannelSyncStatus.PENDING, ChannelSyncStatus.FAILED)
+        );
+    }
+
     public long countStaleSnapshots(Duration stalenessWindow) {
         return snapshotRepository.countBySyncedAtBefore(timeProvider.now().minus(stalenessWindow));
+    }
+
+    public long countStaleSnapshotsForChannel(SalesChannel channel, Duration stalenessWindow) {
+        return snapshotRepository.countByChannelAndSyncedAtBefore(channel, timeProvider.now().minus(stalenessWindow));
     }
 
     private void publishAttempt(ChannelSyncAttempt attempt) {

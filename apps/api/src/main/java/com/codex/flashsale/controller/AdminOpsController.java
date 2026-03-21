@@ -8,6 +8,7 @@ import com.codex.flashsale.admin.AdminActor;
 import com.codex.flashsale.admin.AdminRequestMetadata;
 import com.codex.flashsale.api.OpsAlertResponse;
 import com.codex.flashsale.api.OutboxBacklogResponse;
+import com.codex.flashsale.api.OutboxEventSummaryResponse;
 import com.codex.flashsale.api.OutboxRetryResponse;
 import com.codex.flashsale.api.ReconciliationDriftResponse;
 import com.codex.flashsale.api.ReconciliationRunResponse;
@@ -23,7 +24,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.codex.flashsale.outbox.OutboxStatus;
 
 @RestController
 @RequestMapping("/api/v1/admin/ops")
@@ -50,6 +53,14 @@ public class AdminOpsController {
         return opsApplicationService.getOutboxBacklog();
     }
 
+    @GetMapping("/outbox/events")
+    public List<OutboxEventSummaryResponse> listOutboxEvents(
+            @RequestParam(defaultValue = "FAILED") OutboxStatus status,
+            @RequestParam(defaultValue = "50") Integer limit
+    ) {
+        return opsApplicationService.listOutboxEvents(status, limit);
+    }
+
     @PostMapping("/outbox/{eventId}/retry")
     public OutboxRetryResponse retryOutboxEvent(
             @AuthenticationPrincipal Jwt jwt,
@@ -69,6 +80,13 @@ public class AdminOpsController {
         ReconciliationRunResponse response = opsApplicationService.runReconciliation();
         record(jwt, AdminActivityAction.RECONCILIATION_RUN_TRIGGERED, response.runId(), servletRequest, "status=%s".formatted(response.status()));
         return response;
+    }
+
+    @GetMapping("/reconciliation/runs")
+    public List<ReconciliationRunResponse> listReconciliationRuns(
+            @RequestParam(defaultValue = "20") Integer limit
+    ) {
+        return opsApplicationService.listReconciliationRuns(limit);
     }
 
     @GetMapping("/reconciliation/drifts")

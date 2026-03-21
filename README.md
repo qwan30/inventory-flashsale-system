@@ -82,3 +82,31 @@ The repo's current informational baseline target is `testing/k6/evidence/2026031
 - The project is configured for Codex usage through repo-local guidance in `AGENTS.md` and `.codex/`.
 - Demo seed data is available with campaign `campaign-demo-001` and SKU `SKU-DEMO-001`.
 - Evidence gate: do not propose topology or scale-out changes without promoted benchmark evidence from `testing/k6/evidence/`.
+
+## Deployment & CI
+
+The repository ships containers for the API and the admin UI so a simple-cloud container platform can deploy the stack.
+
+### Environment
+
+- `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USERNAME`, `DB_PASSWORD`: standard MySQL connectivity.
+- `REDIS_HOST`, `REDIS_PORT`: Redis lock support.
+- `KAFKA_BOOTSTRAP_SERVERS`: Kafka bootstrap.
+- `APP_SECURITY_JWT_SECRET`: must be at least 32 bytes for the API signing key.
+- `VITE_API_BASE_URL`: admin UI runtime API endpoint (defaults to `http://localhost:8080`).
+- `API_BACKEND_HOST`: nginx proxy target inside the admin UI container (defaults to `localhost:8080`).
+
+### Build and Run the Containers
+
+```
+docker build -f apps/api/Dockerfile -t inventory-flashsale-api .
+docker build -f apps/admin-ui/Dockerfile -t inventory-flashsale-admin-ui .
+docker run -d --name flashsale-api -p 8080:8080 \
+  -e DB_HOST=... -e REDIS_HOST=... -e KAFKA_BOOTSTRAP_SERVERS=... \
+  inventory-flashsale-api
+docker run -d --name flashsale-admin -p 3000:80 \
+  -e VITE_API_BASE_URL=http://host.docker.internal:8080 \
+  inventory-flashsale-admin-ui
+```
+
+Refer to the CI workflow at `.github/workflows/ci.yml` for the commands run on push/pull requests.

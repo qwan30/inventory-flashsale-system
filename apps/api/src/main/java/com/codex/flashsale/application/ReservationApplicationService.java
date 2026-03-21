@@ -13,6 +13,8 @@ import com.codex.flashsale.common.exception.ConflictException;
 import com.codex.flashsale.common.time.TimeProvider;
 import com.codex.flashsale.config.ApplicationProperties;
 import com.codex.flashsale.config.RedisLockManager;
+import com.codex.flashsale.events.EventContract;
+import com.codex.flashsale.events.EventContracts;
 import com.codex.flashsale.events.OrderEventPayload;
 import com.codex.flashsale.events.ReservationEventPayload;
 import com.codex.flashsale.flashsale.FlashSaleCampaign;
@@ -224,10 +226,12 @@ public class ReservationApplicationService {
                     idempotencyKey,
                     now.plus(applicationProperties.getReservation().getTtl())
             );
+            EventContract contract = EventContracts.RESERVATION_CREATED;
             OutboxEvent outboxEvent = outboxService.record(
                     "reservation",
                     reservation.getId(),
-                    "inventory.reservation.created",
+                    contract.eventType(),
+                    contract.version(),
                     new ReservationEventPayload(
                             reservation.getId(),
                             reservation.getCampaignId(),
@@ -274,10 +278,12 @@ public class ReservationApplicationService {
 
         reservation.confirm(confirmIdempotencyKey, order.getId(), now);
         inventoryService.saveReservation(reservation);
+        EventContract contract = EventContracts.ORDER_CREATED;
         OutboxEvent outboxEvent = outboxService.record(
                 "order",
                 order.getId(),
-                "order.created",
+                contract.eventType(),
+                contract.version(),
                 new OrderEventPayload(order.getId(), order.getReservationId(), order.getChannel(), order.getStatus())
         );
         scheduleInventorySync(outboxEvent, reservation.getSku(), inventoryItem);
@@ -330,10 +336,12 @@ public class ReservationApplicationService {
                     response
             );
         }
+        EventContract contract = EventContracts.RESERVATION_RELEASED;
         OutboxEvent outboxEvent = outboxService.record(
                 "reservation",
                 reservation.getId(),
-                "inventory.reservation.released",
+                contract.eventType(),
+                contract.version(),
                 new ReservationEventPayload(
                         reservation.getId(),
                         reservation.getCampaignId(),

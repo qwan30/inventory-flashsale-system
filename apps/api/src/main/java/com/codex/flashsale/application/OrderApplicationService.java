@@ -2,6 +2,8 @@ package com.codex.flashsale.application;
 
 import com.codex.flashsale.api.OrderResponse;
 import com.codex.flashsale.channel.sync.ChannelSyncService;
+import com.codex.flashsale.events.EventContract;
+import com.codex.flashsale.events.EventContracts;
 import com.codex.flashsale.events.OrderEventPayload;
 import com.codex.flashsale.idempotency.OperationIdempotencyService;
 import com.codex.flashsale.idempotency.OperationIdempotencyType;
@@ -77,15 +79,16 @@ public class OrderApplicationService {
                 );
             }
 
-            String eventType = switch (newStatus) {
-                case PAID -> "order.paid";
-                case SHIPPED -> "order.shipped";
-                default -> "order.created";
+            EventContract contract = switch (newStatus) {
+                case PAID -> EventContracts.ORDER_PAID;
+                case SHIPPED -> EventContracts.ORDER_SHIPPED;
+                default -> EventContracts.ORDER_CREATED;
             };
             OutboxEvent outboxEvent = outboxService.record(
                     "order",
                     order.getId(),
-                    eventType,
+                    contract.eventType(),
+                    contract.version(),
                     new OrderEventPayload(order.getId(), order.getReservationId(), order.getChannel(), order.getStatus())
             );
             channelSyncService.scheduleSync(

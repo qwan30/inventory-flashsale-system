@@ -9,4 +9,6 @@ public interface AdminActivityAuditRepository extends JpaRepository<AdminActivit
             AdminActivityResourceType resourceType,
             String resourceId
     );
+
+    java.util.Optional<AdminActivityAudit> findTopByActionOrderByCreatedAtDesc(AdminActivityAction action);
 }

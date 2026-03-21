@@ -15,6 +15,8 @@ import java.time.Instant;
 @Table(name = "outbox_event")
 public class OutboxEvent extends AuditTimestamps {
 
+    public static final int DEFAULT_EVENT_VERSION = 1;
+
     @Id
     private String id;
 
@@ -26,6 +28,9 @@ public class OutboxEvent extends AuditTimestamps {
 
     @Column(name = "event_type", nullable = false)
     private String eventType;
+
+    @Column(name = "event_version", nullable = false)
+    private int eventVersion;
 
     @Lob
     @Column(name = "payload", nullable = false, columnDefinition = "TEXT")
@@ -51,10 +56,22 @@ public class OutboxEvent extends AuditTimestamps {
     }
 
     public OutboxEvent(String id, String aggregateType, String aggregateId, String eventType, String payload) {
+        this(id, aggregateType, aggregateId, eventType, DEFAULT_EVENT_VERSION, payload);
+    }
+
+    public OutboxEvent(
+            String id,
+            String aggregateType,
+            String aggregateId,
+            String eventType,
+            int eventVersion,
+            String payload
+    ) {
         this.id = id;
         this.aggregateType = aggregateType;
         this.aggregateId = aggregateId;
         this.eventType = eventType;
+        this.eventVersion = eventVersion;
         this.payload = payload;
         this.status = OutboxStatus.PENDING;
         this.attempts = 0;
@@ -110,6 +127,10 @@ public class OutboxEvent extends AuditTimestamps {
 
     public String getPayload() {
         return payload;
+    }
+
+    public int getEventVersion() {
+        return eventVersion;
     }
 
     public OutboxStatus getStatus() {

@@ -62,7 +62,7 @@ class OpsAlertDeliveryServiceTest {
         opsAlertDeliveryService = new OpsAlertDeliveryService(
                 opsAlertService,
                 alertDeliveryStateRepository,
-                alertDeliveryPublisher,
+                List.of(alertDeliveryPublisher),
                 applicationProperties,
                 timeProvider,
                 new SimpleMeterRegistry()
@@ -120,7 +120,7 @@ class OpsAlertDeliveryServiceTest {
         opsAlertDeliveryService = new OpsAlertDeliveryService(
                 opsAlertService,
                 alertDeliveryStateRepository,
-                alertDeliveryPublisher,
+                List.of(alertDeliveryPublisher),
                 applicationProperties,
                 timeProvider,
                 new SimpleMeterRegistry()

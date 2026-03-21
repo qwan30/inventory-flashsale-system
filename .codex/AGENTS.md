@@ -17,6 +17,17 @@ Use this together with the root `AGENTS.md`.
 - When resuming after a gap, check the newest relevant file in `docs/05_history/`.
 - Treat `docs/` as the durable project memory; keep `.codex/` focused on Codex bootstrap and workspace-specific guidance.
 
+## Session Memory Routing
+
+- After each non-trivial session, persist one primary durable note under `docs/` based on task type:
+  - planning or orchestration -> `docs/02_planning/`
+  - implemented delivery -> `docs/03_implementation/`
+  - audit, review, or remediation -> `docs/04_audit_remediation/`
+  - concise milestone or discovery memory -> `docs/05_history/`
+- Use `docs/05_history/` as a short reload note, not as the only record when a fuller planning, implementation, or audit doc exists.
+- When source-of-truth project docs change, update the affected top-level `docs/*.md` file and refresh `docs/00_index.md` if discoverability changed.
+- Keep `.codex/` free of project-history notes; project memory belongs in `docs/`.
+
 ## Agent Skill Workspace
 
 - For application feature work, treat `skills/` as vendor/reference-only and not part of the build.

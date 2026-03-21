@@ -4,9 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.codex.flashsale.common.time.TimeProvider;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.time.Duration;
@@ -17,6 +19,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +36,7 @@ class OutboxServiceTest {
     private KafkaTemplate<String, String> kafkaTemplate;
 
     private final AtomicReference<Instant> now = new AtomicReference<>(Instant.parse("2026-03-15T00:00:00Z"));
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private OutboxService outboxService;
 
@@ -41,7 +45,7 @@ class OutboxServiceTest {
         TimeProvider timeProvider = now::get;
         outboxService = new OutboxService(
                 repository,
-                new ObjectMapper(),
+                objectMapper,
                 kafkaTemplate,
                 timeProvider,
                 "inventory-flashsale.events",
@@ -53,7 +57,7 @@ class OutboxServiceTest {
     }
 
     @Test
-    void shouldRetryFailedPublishThenMarkPublished() {
+    void shouldRetryFailedPublishThenMarkPublished() throws Exception {
         OutboxEvent event = new OutboxEvent("evt-1", "reservation", "res-1", "inventory.reservation.created", "{\"ok\":true}");
         Instant retryAt = now.get().plusSeconds(10);
 
@@ -86,6 +90,15 @@ class OutboxServiceTest {
         assertThat(event.getAttempts()).isEqualTo(2);
         assertThat(event.getNextAttemptAt()).isNull();
         assertThat(event.getPublishedAt()).isEqualTo(retryAt);
+
+        ArgumentCaptor<String> messageCaptor = ArgumentCaptor.forClass(String.class);
+        verify(kafkaTemplate, org.mockito.Mockito.times(2))
+                .send(eq("inventory-flashsale.events"), eq("res-1"), messageCaptor.capture());
+        JsonNode envelope = objectMapper.readTree(messageCaptor.getAllValues().getLast());
+        assertThat(envelope.path("eventType").asText()).isEqualTo("inventory.reservation.created");
+        assertThat(envelope.path("eventVersion").asInt()).isEqualTo(1);
+        assertThat(envelope.path("occurredAt").asText()).isNotBlank();
+        assertThat(envelope.path("payload").path("ok").asBoolean()).isTrue();
     }
 
     private CompletableFuture<SendResult<String, String>> failedFuture(RuntimeException exception) {

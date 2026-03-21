@@ -2,9 +2,7 @@ package com.codex.flashsale.admin;
 
 import com.codex.flashsale.api.AdminAuthResponse;
 import com.codex.flashsale.api.AdminLoginRequest;
-import com.codex.flashsale.api.AdminLogoutRequest;
 import com.codex.flashsale.api.AdminLogoutResponse;
-import com.codex.flashsale.api.AdminTokenRefreshRequest;
 import com.codex.flashsale.common.exception.UnauthorizedException;
 import com.codex.flashsale.common.time.TimeProvider;
 import com.codex.flashsale.config.ApplicationProperties;
@@ -73,9 +71,9 @@ public class AdminAuthService {
     }
 
     @Transactional
-    public AdminAuthResponse refresh(AdminTokenRefreshRequest request, AdminRequestMetadata metadata) {
+    public AdminAuthResponse refresh(String refreshTokenValue, AdminRequestMetadata metadata) {
         Instant now = timeProvider.now();
-        AdminRefreshToken refreshToken = adminRefreshTokenRepository.findByTokenHash(adminTokenHashService.hash(request.refreshToken()))
+        AdminRefreshToken refreshToken = adminRefreshTokenRepository.findByTokenHash(adminTokenHashService.hash(refreshTokenValue))
                 .orElseThrow(() -> invalidRefreshToken());
         if (!refreshToken.isActive(now)) {
             throw invalidRefreshToken();
@@ -99,9 +97,9 @@ public class AdminAuthService {
     }
 
     @Transactional
-    public AdminLogoutResponse logout(String actorUsername, AdminLogoutRequest request, AdminRequestMetadata metadata) {
+    public AdminLogoutResponse logout(String actorUsername, String refreshTokenValue, AdminRequestMetadata metadata) {
         Instant now = timeProvider.now();
-        adminRefreshTokenRepository.findByTokenHash(adminTokenHashService.hash(request.refreshToken()))
+        adminRefreshTokenRepository.findByTokenHash(adminTokenHashService.hash(refreshTokenValue))
                 .ifPresent(token -> token.revoke(now));
         adminUserRepository.findByUsernameIgnoreCase(actorUsername).ifPresent(user ->
                 adminActivityAuditService.record(

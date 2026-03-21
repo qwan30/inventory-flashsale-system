@@ -84,6 +84,43 @@
       "postRunChecks": [
         "ops_snapshots"
       ]
+    },
+    {
+      "name": "mixed-channel-flow",
+      "file": "mixed-channel-flow.js",
+      "resetRequired": true,
+      "env": {
+        "CAMPAIGN_ID": "campaign-demo-001",
+        "SKU": "SKU-DEMO-001"
+      },
+      "postRunChecks": [
+        "inventory_invariants",
+        "ops_snapshots"
+      ]
+    },
+    {
+      "name": "admin-benchmark-reporting",
+      "file": "admin-benchmark-reporting.js",
+      "resetRequired": true,
+      "env": {
+        "ADMIN_USERNAME": "admin",
+        "ADMIN_PASSWORD": "Admin123!"
+      },
+      "postRunChecks": [
+        "ops_snapshots"
+      ]
+    },
+    {
+      "name": "tiktok-ingress-burst",
+      "file": "tiktok-ingress-burst.js",
+      "resetRequired": true,
+      "env": {
+        "SKU": "SKU-DEMO-001",
+        "TIKTOK_INGRESS_SECRET": "tiktok-ingress-secret"
+      },
+      "postRunChecks": [
+        "ops_snapshots"
+      ]
     }
   ]
 }

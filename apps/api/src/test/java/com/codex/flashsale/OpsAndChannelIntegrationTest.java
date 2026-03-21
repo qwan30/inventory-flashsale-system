@@ -7,15 +7,18 @@ import com.codex.flashsale.api.OpsAlertResponse;
 import com.codex.flashsale.api.OutboxRetryResponse;
 import com.codex.flashsale.api.ReconciliationDriftResponse;
 import com.codex.flashsale.api.ReconciliationRunResponse;
+import com.codex.flashsale.application.ChannelHealthStatus;
+import com.codex.flashsale.application.ChannelHealthSummary;
 import com.codex.flashsale.application.OpsApplicationService;
 import com.codex.flashsale.application.ReservationApplicationService;
 import com.codex.flashsale.channel.SalesChannel;
+import com.codex.flashsale.channel.ingress.TikTokIngressReceipt;
 import com.codex.flashsale.channel.reconciliation.ChannelReconciliationService;
 import com.codex.flashsale.channel.sync.ChannelInventorySnapshot;
 import com.codex.flashsale.channel.sync.ChannelSyncAttempt;
 import com.codex.flashsale.channel.sync.ChannelSyncFailureType;
-import com.codex.flashsale.channel.sync.ChannelSyncStatus;
 import com.codex.flashsale.channel.sync.ChannelSyncService;
+import com.codex.flashsale.config.ApplicationProperties;
 import com.codex.flashsale.flashsale.CampaignStatus;
 import com.codex.flashsale.flashsale.FlashSaleCampaign;
 import com.codex.flashsale.inventory.InventoryItem;
@@ -64,6 +67,9 @@ class OpsAndChannelIntegrationTest extends AbstractIntegrationTest {
     @Autowired
     private ChannelReconciliationService channelReconciliationService;
 
+    @Autowired
+    private ApplicationProperties applicationProperties;
+
     @BeforeEach
     void setUp() {
         resetDatabase(
@@ -85,11 +91,11 @@ class OpsAndChannelIntegrationTest extends AbstractIntegrationTest {
 
         int publishedCount = channelSyncService.publishPendingAttempts();
 
-        assertThat(publishedCount).isEqualTo(3);
-        assertThat(channelSyncAttemptRepository.count()).isEqualTo(3);
+        assertThat(publishedCount).isEqualTo(4);
+        assertThat(channelSyncAttemptRepository.count()).isEqualTo(4);
         assertThat(channelSyncAttemptRepository.findAll())
                 .allSatisfy(attempt -> assertThat(attempt.getStatus().name()).isEqualTo("SYNCED"));
-        assertThat(channelInventorySnapshotRepository.count()).isEqualTo(3);
+        assertThat(channelInventorySnapshotRepository.count()).isEqualTo(4);
     }
 
     @Test
@@ -118,10 +124,10 @@ class OpsAndChannelIntegrationTest extends AbstractIntegrationTest {
         int retriedCount = channelSyncService.retryFailedAttempts();
         int publishedSecondPass = channelSyncService.publishPendingAttempts();
 
-        assertThat(failedFirstPass).isEqualTo(3);
-        assertThat(retriedCount).isEqualTo(3);
-        assertThat(publishedSecondPass).isEqualTo(3);
-        assertThat(channelInventorySnapshotRepository.count()).isEqualTo(3);
+        assertThat(failedFirstPass).isEqualTo(4);
+        assertThat(retriedCount).isEqualTo(4);
+        assertThat(publishedSecondPass).isEqualTo(4);
+        assertThat(channelInventorySnapshotRepository.count()).isEqualTo(4);
         assertThat(channelSyncAttemptRepository.findAll())
                 .allSatisfy(attempt -> assertThat(attempt.getStatus().name()).isEqualTo("SYNCED"));
     }
@@ -145,8 +151,8 @@ class OpsAndChannelIntegrationTest extends AbstractIntegrationTest {
 
         assertThat(run.triggerType()).isEqualTo("MANUAL");
         assertThat(run.status()).isEqualTo("COMPLETED");
-        assertThat(run.openDriftCount()).isEqualTo(3);
-        assertThat(run.scannedSnapshotCount()).isEqualTo(3);
+        assertThat(run.openDriftCount()).isEqualTo(4);
+        assertThat(run.scannedSnapshotCount()).isEqualTo(4);
 
         ReconciliationDriftResponse drift = opsApplicationService.listOpenReconciliationDrifts().getFirst();
         ReconciliationDriftResponse resolved = opsApplicationService.resolveReconciliationDrift(
@@ -155,7 +161,7 @@ class OpsAndChannelIntegrationTest extends AbstractIntegrationTest {
         );
 
         assertThat(resolved.status()).isEqualTo("RESOLVED");
-        assertThat(opsApplicationService.listOpenReconciliationDrifts()).hasSize(2);
+        assertThat(opsApplicationService.listOpenReconciliationDrifts()).hasSize(3);
     }
 
     @Test
@@ -200,7 +206,7 @@ class OpsAndChannelIntegrationTest extends AbstractIntegrationTest {
         reconciliationScheduler.runScheduledReconciliation();
         reconciliationScheduler.runScheduledReconciliation();
 
-        assertThat(channelReconciliationService.listOpenDrifts()).hasSize(3);
+        assertThat(channelReconciliationService.listOpenDrifts()).hasSize(4);
         assertThat(inventoryReconciliationRunRepository.findAll())
                 .extracting(run -> run.getStatus().name())
                 .containsOnly("COMPLETED");
@@ -282,5 +288,143 @@ class OpsAndChannelIntegrationTest extends AbstractIntegrationTest {
 
         assertThat(alerts.get("RECONCILIATION_RUN_FAILURE").status().name()).isEqualTo("ACTIVE");
         assertThat(alerts.get("RECONCILIATION_RUN_FAILURE").message()).contains("synthetic failure");
+    }
+
+    @Test
+    void shouldReturnHealthyChannelHealthSummariesWhenSignalsAreClean() {
+        Map<SalesChannel, ChannelHealthSummary> summaries = opsApplicationService.listChannelHealthSummaries().stream()
+                .collect(java.util.stream.Collectors.toMap(ChannelHealthSummary::channel, summary -> summary));
+
+        assertThat(summaries.keySet()).containsExactlyInAnyOrder(SalesChannel.SHOPEE, SalesChannel.TIKTOK_SHOP);
+        assertThat(summaries.values()).allSatisfy(summary -> {
+            assertThat(summary.status()).isEqualTo(ChannelHealthStatus.HEALTHY);
+            assertThat(summary.configValid()).isTrue();
+            assertThat(summary.syncBacklogCount()).isZero();
+            assertThat(summary.staleSnapshotCount()).isZero();
+            assertThat(summary.openDriftCount()).isZero();
+            assertThat(summary.latestReplay()).isNull();
+            assertThat(summary.lastReconciliationAt()).isNull();
+        });
+        assertThat(summaries.get(SalesChannel.TIKTOK_SHOP).latestIngressReceipt()).isNull();
+    }
+
+    @Test
+    void shouldReturnDegradedSummaryWithBacklogStalenessDriftAndIngressReceipt() {
+        OutboxEvent failedOutbox = new OutboxEvent(
+                "evt-tiktok-health-1",
+                "reservation",
+                "res-tiktok-health-1",
+                "inventory.reservation.created",
+                "{\"ok\":true}"
+        );
+        failedOutbox.markFailed("connector down", Instant.now(), Duration.ofSeconds(5), 5);
+        outboxService.save(failedOutbox);
+
+        ChannelSyncAttempt pendingAttempt = new ChannelSyncAttempt(
+                "sync-tiktok-pending",
+                failedOutbox.getId(),
+                SalesChannel.TIKTOK_SHOP,
+                BASE_SKU,
+                "inventory.reservation.created",
+                failedOutbox.getPayload(),
+                10,
+                0,
+                0
+        );
+        channelSyncAttemptRepository.saveAndFlush(pendingAttempt);
+
+        ChannelSyncAttempt failedAttempt = new ChannelSyncAttempt(
+                "sync-tiktok-failed",
+                failedOutbox.getId(),
+                SalesChannel.TIKTOK_SHOP,
+                BASE_SKU,
+                "inventory.reservation.created",
+                failedOutbox.getPayload(),
+                10,
+                0,
+                0
+        );
+        failedAttempt.markFailed(ChannelSyncFailureType.PERMANENT, "partner failure", Instant.now(), Duration.ofSeconds(1), 3);
+        channelSyncAttemptRepository.saveAndFlush(failedAttempt);
+
+        ChannelInventorySnapshot staleSnapshot = new ChannelInventorySnapshot(
+                ChannelInventorySnapshot.snapshotId(SalesChannel.TIKTOK_SHOP, BASE_SKU),
+                SalesChannel.TIKTOK_SHOP,
+                BASE_SKU,
+                10,
+                0,
+                0,
+                failedOutbox.getId(),
+                Instant.now().minus(Duration.ofMinutes(10))
+        );
+        channelInventorySnapshotRepository.saveAndFlush(staleSnapshot);
+
+        var run = channelReconciliationService.startRun(
+                com.codex.flashsale.channel.reconciliation.ReconciliationTriggerType.MANUAL
+        );
+        channelReconciliationService.recordDrift(
+                run.getId(),
+                SalesChannel.TIKTOK_SHOP,
+                BASE_SKU,
+                9,
+                1,
+                0,
+                10,
+                0,
+                0
+        );
+
+        tikTokIngressReceiptRepository.saveAndFlush(new TikTokIngressReceipt(
+                "TIKTOK_SHOP:INVENTORY:receipt-channel-health",
+                SalesChannel.TIKTOK_SHOP,
+                "INVENTORY",
+                "receipt-channel-health",
+                "hash",
+                "PROCESSED",
+                Instant.now().minus(Duration.ofMinutes(1))
+        ));
+
+        Map<SalesChannel, ChannelHealthSummary> summaries = opsApplicationService.listChannelHealthSummaries().stream()
+                .collect(java.util.stream.Collectors.toMap(ChannelHealthSummary::channel, summary -> summary));
+
+        ChannelHealthSummary tikTokSummary = summaries.get(SalesChannel.TIKTOK_SHOP);
+        assertThat(tikTokSummary.status()).isEqualTo(ChannelHealthStatus.DEGRADED);
+        assertThat(tikTokSummary.syncBacklogCount()).isEqualTo(2);
+        assertThat(tikTokSummary.staleSnapshotCount()).isEqualTo(1);
+        assertThat(tikTokSummary.openDriftCount()).isEqualTo(1);
+        assertThat(tikTokSummary.lastReconciliationAt()).isNotNull();
+        assertThat(tikTokSummary.latestIngressReceipt()).isNotNull();
+        assertThat(tikTokSummary.latestIngressReceipt().externalReceiptId()).isEqualTo("receipt-channel-health");
+        assertThat(tikTokSummary.latestReplay()).isNull();
+
+        ChannelHealthSummary shopeeSummary = summaries.get(SalesChannel.SHOPEE);
+        assertThat(shopeeSummary.status()).isEqualTo(ChannelHealthStatus.HEALTHY);
+    }
+
+    @Test
+    void shouldReturnUnavailableWhenConnectorModeIsRealButConfigIsInvalid() {
+        String originalShopeeMode = applicationProperties.getChannel().getShopee().getMode();
+        Long originalShopeePartnerId = applicationProperties.getChannel().getShopee().getPartnerId();
+        String originalTikTokMode = applicationProperties.getChannel().getTikTok().getMode();
+        String originalTikTokAppKey = applicationProperties.getChannel().getTikTok().getAppKey();
+        try {
+            applicationProperties.getChannel().getShopee().setMode("real");
+            applicationProperties.getChannel().getShopee().setPartnerId(null);
+            applicationProperties.getChannel().getTikTok().setMode("real");
+            applicationProperties.getChannel().getTikTok().setAppKey(null);
+
+            Map<SalesChannel, ChannelHealthSummary> summaries = opsApplicationService.listChannelHealthSummaries().stream()
+                    .collect(java.util.stream.Collectors.toMap(ChannelHealthSummary::channel, summary -> summary));
+
+            assertThat(summaries.get(SalesChannel.SHOPEE).status()).isEqualTo(ChannelHealthStatus.UNAVAILABLE);
+            assertThat(summaries.get(SalesChannel.SHOPEE).configValid()).isFalse();
+            assertThat(summaries.get(SalesChannel.TIKTOK_SHOP).status()).isEqualTo(ChannelHealthStatus.UNAVAILABLE);
+            assertThat(summaries.get(SalesChannel.TIKTOK_SHOP).configValid()).isFalse();
+        } finally {
+            applicationProperties.getChannel().getShopee().setMode(originalShopeeMode);
+            applicationProperties.getChannel().getShopee().setPartnerId(originalShopeePartnerId);
+            applicationProperties.getChannel().getTikTok().setMode(originalTikTokMode);
+            applicationProperties.getChannel().getTikTok().setAppKey(originalTikTokAppKey);
+        }
     }
 }

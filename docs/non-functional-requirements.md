@@ -1,6 +1,6 @@
 # Non-Functional Requirements
 
-**Last Updated:** 2026-03-15
+**Last Updated:** 2026-03-16
 
 ## Current Non-Functional Priorities
 
@@ -31,6 +31,7 @@ Current implemented signals include:
 - reconciliation run success and failure counters plus reconciliation duration timer
 - in-app ops alerts for backlog, drift, stale snapshot, and scheduled reconciliation failure
 - generic webhook-based external alert delivery with persisted delivery state
+- ops copilot analysis success/failure counters plus duration timer
 - promoted benchmark evidence cataloging through `testing/k6/evidence/index.json`
 
 Current gap:
@@ -75,4 +76,6 @@ Target direction:
 
 - backend changes should prefer `.\mvnw test`
 - cross-boundary behavior should use integration tests
+- admin/operator browser workflows should use Playwright in addition to page-level Vitest coverage
+- focused web-slice or provider tests are acceptable for advisory AI and read-only admin additions when full Docker-backed integration proof is not available in the current workspace
 - performance claims should be backed by repeatable K6 scenarios, not narrative only

@@ -35,6 +35,11 @@ public class AdminCampaignController {
         return adminCampaignApplicationService.listCampaigns();
     }
 
+    @GetMapping("/{campaignId}")
+    public AdminCampaignResponse getCampaign(@PathVariable String campaignId) {
+        return adminCampaignApplicationService.getCampaign(campaignId);
+    }
+
     @PostMapping
     public AdminCampaignResponse createCampaign(
             @AuthenticationPrincipal Jwt jwt,

@@ -17,6 +17,8 @@ import com.codex.flashsale.inventory.InventoryItem;
 import com.codex.flashsale.order.OrderStatus;
 import com.codex.flashsale.outbox.OutboxEvent;
 import com.codex.flashsale.outbox.OutboxService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -49,6 +51,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 })
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class ReservationFlowIntegrationTest extends AbstractIntegrationTest {
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Autowired
     private ReservationApplicationService reservationApplicationService;
@@ -237,6 +241,20 @@ class ReservationFlowIntegrationTest extends AbstractIntegrationTest {
                 "order.paid",
                 "order.shipped"
         );
+        List<JsonNode> envelopes = new ArrayList<>();
+        records.forEach(record -> {
+            try {
+                envelopes.add(OBJECT_MAPPER.readTree(record.value()));
+            } catch (Exception exception) {
+                throw new IllegalStateException("Expected JSON outbox envelope", exception);
+            }
+        });
+        assertThat(envelopes)
+                .allSatisfy(envelope -> {
+                    assertThat(envelope.path("eventVersion").asInt()).isEqualTo(1);
+                    assertThat(envelope.path("aggregateId").asText()).isNotBlank();
+                    assertThat(envelope.path("payload").isObject()).isTrue();
+                });
         assertThat(outboxEventRepository.findAll()).allSatisfy(event ->
                 assertThat(event.getStatus().name()).isEqualTo("PUBLISHED")
         );

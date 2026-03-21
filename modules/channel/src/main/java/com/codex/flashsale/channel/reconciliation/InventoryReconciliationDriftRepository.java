@@ -16,4 +16,6 @@ public interface InventoryReconciliationDriftRepository extends JpaRepository<In
     );
 
     long countByStatus(ReconciliationDriftStatus status);
+
+    long countByStatusAndChannel(ReconciliationDriftStatus status, SalesChannel channel);
 }

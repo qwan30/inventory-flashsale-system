@@ -60,6 +60,16 @@ app:
     sync-batch-size: 50
     retry-delay: 15s
     max-attempts: 3
+    tik-tok:
+      mode: mock
+      base-url: ${APP_CHANNEL_TIKTOK_BASE_URL:https://open-api.tiktokglobalshop.com}
+      app-key: ${APP_CHANNEL_TIKTOK_APP_KEY:}
+      app-secret: ${APP_CHANNEL_TIKTOK_APP_SECRET:}
+      shop-cipher: ${APP_CHANNEL_TIKTOK_SHOP_CIPHER:}
+      access-token: ${APP_CHANNEL_TIKTOK_ACCESS_TOKEN:}
+      ingress-secret: ${APP_CHANNEL_TIKTOK_INGRESS_SECRET:}
+      connect-timeout: 2s
+      read-timeout: 5s
   alerts:
     outbox-failed-threshold: 10
     channel-sync-failed-threshold: 10
@@ -67,9 +77,23 @@ app:
     channel-snapshot-staleness: 5m
     delivery:
       enabled: false
+      webhook-url: ${APP_ALERTS_DELIVERY_WEBHOOK_URL:}
       connect-timeout: 2s
       read-timeout: 5s
       reminder-interval: 15m
+      slack:
+        enabled: false
+        webhook-url: ${APP_ALERTS_DELIVERY_SLACK_WEBHOOK_URL:}
+        minimum-severity: WARN
+        connect-timeout: 2s
+        read-timeout: 5s
+      pager-duty:
+        enabled: false
+        events-url: ${APP_ALERTS_DELIVERY_PAGER_DUTY_EVENTS_URL:https://events.pagerduty.com/v2/enqueue}
+        routing-key: ${APP_ALERTS_DELIVERY_PAGER_DUTY_ROUTING_KEY:}
+        minimum-severity: CRITICAL
+        connect-timeout: 2s
+        read-timeout: 5s
   scheduler:
     expired-reservation-delay: 30s
     outbox-delay: 5s
@@ -78,12 +102,32 @@ app:
     alert-delivery-delay: 30s
   kafka:
     topic: inventory-flashsale.events
+  benchmark:
+    evidence-root: testing/k6/evidence
+  ai:
+    enabled: ${APP_AI_ENABLED:false}
+    provider: ${APP_AI_PROVIDER:gemini}
+    connect-timeout: ${APP_AI_CONNECT_TIMEOUT:2s}
+    read-timeout: ${APP_AI_READ_TIMEOUT:20s}
+    retry-count: ${APP_AI_RETRY_COUNT:1}
+    max-response-chars: ${APP_AI_MAX_RESPONSE_CHARS:4000}
+    max-output-tokens: ${APP_AI_MAX_OUTPUT_TOKENS:768}
+    gemini:
+      base-url: ${APP_AI_GEMINI_BASE_URL:https://generativelanguage.googleapis.com}
+      api-key: ${APP_AI_GEMINI_API_KEY:}
+      model: ${APP_AI_GEMINI_MODEL:gemini-2.5-flash}
   security:
     jwt:
       issuer: ${APP_SECURITY_JWT_ISSUER:inventory-flashsale-api}
       secret: ${APP_SECURITY_JWT_SECRET:change-me-change-me-change-me-1234}
       access-token-ttl: ${APP_SECURITY_JWT_ACCESS_TOKEN_TTL:15m}
       refresh-token-ttl: ${APP_SECURITY_JWT_REFRESH_TOKEN_TTL:168h}
+      refresh-cookie:
+        enabled: false
+        name: admin_refresh_token
+        path: /api/v1/admin/auth
+        secure: false
+        same-site: Strict
     seed-users:
       admin-username: ${APP_SECURITY_SEED_ADMIN_USERNAME:admin}
       admin-password: ${APP_SECURITY_SEED_ADMIN_PASSWORD:Admin123!}

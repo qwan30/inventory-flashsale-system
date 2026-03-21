@@ -65,6 +65,16 @@ public class OutboxService {
     }
 
     public OutboxEvent record(String aggregateType, String aggregateId, String eventType, Object payload) {
+        return record(aggregateType, aggregateId, eventType, OutboxEvent.DEFAULT_EVENT_VERSION, payload);
+    }
+
+    public OutboxEvent record(
+            String aggregateType,
+            String aggregateId,
+            String eventType,
+            int eventVersion,
+            Object payload
+    ) {
         try {
             String serializedPayload = objectMapper.writeValueAsString(payload);
             return repository.save(new OutboxEvent(
@@ -72,6 +82,7 @@ public class OutboxService {
                     aggregateType,
                     aggregateId,
                     eventType,
+                    eventVersion,
                     serializedPayload
             ));
         } catch (JsonProcessingException exception) {
@@ -128,6 +139,10 @@ public class OutboxService {
         return repository.countByStatusAndNextAttemptAtLessThanEqual(OutboxStatus.FAILED, timeProvider.now());
     }
 
+    public List<OutboxEvent> listEventsByStatus(OutboxStatus status, int limit) {
+        return repository.findByStatusOrderByUpdatedAtDescCreatedAtDesc(status, PageRequest.of(0, limit));
+    }
+
     public OutboxEvent save(OutboxEvent event) {
         return repository.saveAndFlush(event);
     }
@@ -140,8 +155,9 @@ public class OutboxService {
                     event.getAggregateType(),
                     event.getAggregateId(),
                     event.getEventType(),
+                    event.getEventVersion(),
                     event.getCreatedAt(),
-                    event.getPayload()
+                    objectMapper.readTree(event.getPayload())
             );
             String message = objectMapper.writeValueAsString(envelope);
             kafkaTemplate.send(topic, event.getAggregateId(), message).get(5, TimeUnit.SECONDS);

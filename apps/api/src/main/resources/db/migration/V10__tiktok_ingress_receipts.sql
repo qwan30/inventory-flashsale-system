@@ -1,0 +1,11 @@
+CREATE TABLE channel_ingress_receipt (
+    id VARCHAR(128) PRIMARY KEY,
+    channel VARCHAR(64) NOT NULL,
+    receipt_type VARCHAR(64) NOT NULL,
+    external_receipt_id VARCHAR(128) NOT NULL,
+    payload_hash VARCHAR(128) NOT NULL,
+    outcome VARCHAR(64) NOT NULL,
+    processed_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);

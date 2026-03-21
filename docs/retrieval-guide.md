@@ -69,6 +69,44 @@ Look for:
 - request and response DTOs
 - required headers such as `Idempotency-Key`
 
+### Channel Health And Operator Posture
+
+Read in this order:
+
+- `apps/api/src/main/java/com/codex/flashsale/controller/AdminChannelController.java`
+- `apps/api/src/main/java/com/codex/flashsale/application/OpsApplicationService.java`
+- `modules/channel/src/main/java/com/codex/flashsale/channel/sync/ChannelSyncService.java`
+- `modules/channel/src/main/java/com/codex/flashsale/channel/reconciliation/ChannelReconciliationService.java`
+- `apps/api/src/main/java/com/codex/flashsale/channel/ingress/TikTokIngressService.java`
+- `apps/admin-ui/src/views/channels/ChannelHealthPage.tsx`
+- `apps/admin-ui/e2e/admin-workflows.spec.ts`
+
+Use this path for:
+
+- channel health endpoint changes
+- per-channel drill-down changes
+- degraded or unavailable marketplace posture
+- stale snapshot or backlog aggregation
+- replay summary visibility
+- operator route regressions in the admin UI
+
+### Ops Copilot
+
+Read in this order:
+
+- `apps/api/src/main/java/com/codex/flashsale/controller/AdminOpsCopilotController.java`
+- `apps/api/src/main/java/com/codex/flashsale/ai/OpsCopilotService.java`
+- `apps/api/src/main/java/com/codex/flashsale/ai/OpsCopilotContextService.java`
+- `apps/api/src/main/java/com/codex/flashsale/ai/GeminiOpsCopilotProvider.java`
+- `apps/admin-ui/src/views/ops/OpsCopilotPanel.tsx`
+
+Use this path for:
+
+- Gemini provider wiring
+- advisory-only AI response shaping
+- prompt context composition
+- copilot UI regressions in the ops workflow
+
 ### Order Lifecycle Work
 
 Read in this order:
@@ -133,6 +171,8 @@ Use this path for:
 
 - If the problem changes inventory numbers, start with `ReservationApplicationService` and `InventoryItem`.
 - If the problem mentions campaign windows or quota, inspect `FlashSaleCampaign`.
+- If the problem mentions channel posture or operator dashboards, start with `OpsApplicationService` and `ChannelHealthPage`.
+- If the problem mentions advisory AI analysis for operators, start with `AdminOpsCopilotController`, `OpsCopilotService`, and `OpsCopilotPanel`.
 - If the problem mentions duplicate requests, inspect reservation and confirm idempotency handling in `StockReservation` and `ReservationApplicationService`.
 - If the problem mentions delayed or missing events, inspect `OutboxService` and scheduler timings in `application.yml`.
 - If the problem mentions behavior under load, compare app logic with `ReservationFlowIntegrationTest` and the `testing/k6` scripts.

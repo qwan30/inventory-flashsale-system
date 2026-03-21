@@ -43,6 +43,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/api/v1/flash-sales/**", "/api/v1/reservations/**", "/api/v1/inventory/**", "/api/v1/orders/**")
                         .permitAll()
+                        .requestMatchers("/api/v1/channel-ingress/tiktok/**").permitAll()
                         .requestMatchers("/api/v1/admin/auth/login", "/api/v1/admin/auth/refresh").permitAll()
                         .requestMatchers("/api/v1/admin/campaigns/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/admin/ops/**", "/api/v1/ops/**", "/api/v1/admin/auth/logout")

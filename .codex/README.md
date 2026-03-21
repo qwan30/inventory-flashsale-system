@@ -8,7 +8,7 @@
 - Durable project docs index: `docs/00_index.md`
 - Durable system map: `docs/system-map.md`
 - Durable retrieval guide: `docs/retrieval-guide.md`
-- Durable completion history: `docs/05_history/`
+- Durable session docs: `docs/02_planning/`, `docs/03_implementation/`, `docs/04_audit_remediation/`, `docs/05_history/`
 - Project skill registry: `.codex/skills/registry.json`
 - Project skill installer: `.codex/scripts/Install-ProjectSkills.ps1`
 - ECC integration source: `everything-claude-code/`

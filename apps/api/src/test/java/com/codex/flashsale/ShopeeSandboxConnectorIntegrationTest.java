@@ -103,7 +103,7 @@ class ShopeeSandboxConnectorIntegrationTest extends AbstractIntegrationTest {
 
         int publishedAttempts = channelSyncService.publishPendingAttempts();
 
-        assertThat(publishedAttempts).isEqualTo(3);
+        assertThat(publishedAttempts).isEqualTo(4);
         assertThat(SHOPEE_STUB.countRequests("/api/v2/product/update_stock")).isEqualTo(1);
         assertThat(SHOPEE_STUB.firstQuery("/api/v2/product/update_stock"))
                 .contains("partner_id=123456")

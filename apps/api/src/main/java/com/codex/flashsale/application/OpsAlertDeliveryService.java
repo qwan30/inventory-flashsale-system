@@ -24,7 +24,7 @@ public class OpsAlertDeliveryService {
 
     private final OpsAlertService opsAlertService;
     private final AlertDeliveryStateRepository alertDeliveryStateRepository;
-    private final AlertDeliveryPublisher alertDeliveryPublisher;
+    private final List<AlertDeliveryPublisher> alertDeliveryPublishers;
     private final ApplicationProperties.AlertDelivery deliveryProperties;
     private final TimeProvider timeProvider;
     private final Counter alertDeliverySuccessCounter;
@@ -33,17 +33,14 @@ public class OpsAlertDeliveryService {
     public OpsAlertDeliveryService(
             OpsAlertService opsAlertService,
             AlertDeliveryStateRepository alertDeliveryStateRepository,
-            @Nullable AlertDeliveryPublisher alertDeliveryPublisher,
+            @Nullable List<AlertDeliveryPublisher> alertDeliveryPublishers,
             ApplicationProperties applicationProperties,
             TimeProvider timeProvider,
             MeterRegistry meterRegistry
     ) {
         this.opsAlertService = opsAlertService;
         this.alertDeliveryStateRepository = alertDeliveryStateRepository;
-        this.alertDeliveryPublisher = alertDeliveryPublisher != null
-                ? alertDeliveryPublisher
-                : (alert, dispatchType, dispatchedAt) -> {
-                };
+        this.alertDeliveryPublishers = alertDeliveryPublishers != null ? List.copyOf(alertDeliveryPublishers) : List.of();
         this.deliveryProperties = applicationProperties.getAlerts().getDelivery();
         this.timeProvider = timeProvider;
         this.alertDeliverySuccessCounter = meterRegistry.counter("ops.alert.delivery.success");
@@ -64,7 +61,7 @@ public class OpsAlertDeliveryService {
                 .orElseGet(() -> new AlertDeliveryState(alert.code()));
         state.observe(alert.status(), observedAt);
 
-        if (!deliveryProperties.isEnabled()) {
+        if (!hasAnyDeliveryTarget()) {
             alertDeliveryStateRepository.saveAndFlush(state);
             return;
         }
@@ -76,7 +73,13 @@ public class OpsAlertDeliveryService {
         }
 
         try {
-            alertDeliveryPublisher.publish(alert, dispatchType, now);
+            if (alertDeliveryPublishers.isEmpty()) {
+                alertDeliveryStateRepository.saveAndFlush(state);
+                return;
+            }
+            for (AlertDeliveryPublisher publisher : alertDeliveryPublishers) {
+                publisher.publish(alert, dispatchType, now);
+            }
             state.markSent(alert.status(), now);
             alertDeliverySuccessCounter.increment();
         } catch (RuntimeException exception) {
@@ -103,5 +106,11 @@ public class OpsAlertDeliveryService {
             return AlertDispatchType.TRANSITION;
         }
         return null;
+    }
+
+    private boolean hasAnyDeliveryTarget() {
+        return deliveryProperties.isEnabled()
+                || deliveryProperties.getSlack().isEnabled()
+                || deliveryProperties.getPagerDuty().isEnabled();
     }
 }

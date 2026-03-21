@@ -1,0 +1,14 @@
+{
+  "id": "evt-order-created-001",
+  "aggregateType": "order",
+  "aggregateId": "order-001",
+  "eventType": "order.created",
+  "eventVersion": 1,
+  "occurredAt": "2026-03-15T00:02:00Z",
+  "payload": {
+    "orderId": "order-001",
+    "reservationId": "reservation-001",
+    "channel": "WEB",
+    "status": "PENDING"
+  }
+}

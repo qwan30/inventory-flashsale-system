@@ -1,6 +1,6 @@
 # Project Overview
 
-**Last Updated:** 2026-03-15
+**Last Updated:** 2026-03-16
 
 ## Problem Statement
 
@@ -41,8 +41,20 @@ The current repository already implements:
 - scheduled reconciliation runs inside the monolith
 - in-app operational alert evaluation for backlog, drift, stale snapshots, and scheduled-run failure
 - generic webhook-based external alert delivery with persisted delivery state
+- provider-aware alert routing with generic webhook fallback plus first-class Slack and PagerDuty targets
 - app-managed admin authentication with JWT access and refresh tokens
+- browser-safe refresh-cookie mode for admin UI callers while retaining the JSON refresh-token flow
 - role-gated admin APIs for campaign lifecycle management and audited ops remediation
+- benchmark evidence summary APIs over promoted K6 artifacts
+- TikTok Shop real outbound sync, live inbound reconciliation reads, signed ingress APIs, and idempotent ingress receipts
+- dedicated admin channel-health summary API for marketplace posture
+- per-channel channel-health drill-down API for operator investigation
+- advisory-only Gemini-backed ops copilot APIs for operational analysis
+- admin/operator React SPA with shipped campaigns, ops, benchmarks, and secondary channel-health workflows under `apps/admin-ui`
+- ops copilot panel embedded into the shipped ops workflow in `apps/admin-ui`
+- Playwright browser coverage for the key admin/operator workflows
+- API and admin UI container packaging plus a simple-cloud CI baseline
+- versioned outbox event envelopes plus contract fixtures and simulator harnesses under `testing/contracts`
 - one promoted K6 benchmark baseline under `testing/k6/evidence/20260315-133859-e2e3644/`
 - automated benchmark promotion, comparison output, and evidence cataloging under `testing/k6/evidence/index.json`
 
@@ -69,9 +81,17 @@ Current implemented capabilities include:
 - persisted release and order-status idempotency replay
 - channel snapshot reconciliation runs and drift resolution APIs
 - admin login, refresh, and logout flows with seeded local admin and operator identities
+- optional HttpOnly refresh-cookie flow for browser admin clients
 - admin campaign create, update, activate, end, and campaign audit reads
 - admin ops wrappers for alerts, outbox retry, and reconciliation actions
+- admin channel-health read for marketplace posture
+- admin channel-health drill-down for per-channel failure context
+- admin benchmark evidence list/detail/latest reads
+- advisory ops copilot capabilities and analysis reads
 - ops alert surface for operational breaches and scheduler failure visibility
+- TikTok inventory ingress and order-status ingress with signed callback verification
+- provider-aware alert delivery via webhook, Slack, and PagerDuty publishers
+- React admin UI workflows for campaigns, ops, benchmarks, and channel health
 - error responses with correlation ID support
 
 See:
@@ -84,12 +104,11 @@ See:
 
 The current repository does not yet fully implement the target omnichannel vision:
 
-- only Shopee has a real sandbox connector path; `WEB` and `APP` remain local/persisted channels and no second marketplace connector exists yet
-- alerting now has a generic webhook delivery path, but no richer vendor-specific observability stack or routing policy exists yet
-- load testing has a promoted checked-in baseline and automated evidence workflow, but the current evidence program still covers only the existing benchmark scenarios
-- event contracts and reference downstream consumers are not yet formalized inside the repo
+- `WEB` and `APP` remain local/persisted channels, so omnichannel semantics are broader but still not fully externalized on every channel
+- load testing has promoted baseline evidence and benchmark evidence APIs, but this workspace could not refresh release-grade evidence because Docker-backed services were unavailable
+- simple-cloud packaging is now present, but runtime deployment proof on an actual target is still outstanding
 - no read replicas, order partitioning, or service decomposition are implemented
-- no real admin or operator-facing UI exists in this repository yet
+- final release-readiness still depends on Docker-backed backend integration verification and full benchmark execution on a machine with working containers
 
 ## Recommended Reading Order
 

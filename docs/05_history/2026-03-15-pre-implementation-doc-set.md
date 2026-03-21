@@ -21,7 +21,7 @@ A top-level documentation set was created under `docs/` to support implementatio
 
 Supporting updates:
 
-- `docs/02_planning/README.md` now stores the documentation-set roadmap instead of a placeholder note.
+- `docs/02_planning/2026-03-15-pre-implementation-doc-set-plan.md` now stores the documentation-set roadmap, while `docs/02_planning/README.md` remains the folder guide.
 - `docs/00_index.md` now indexes the expanded doc set.
 - `docs/AGENTS.md` now routes future sessions to the right top-level docs by question type.
 

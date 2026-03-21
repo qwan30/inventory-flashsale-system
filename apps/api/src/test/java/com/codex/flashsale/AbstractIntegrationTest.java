@@ -6,6 +6,7 @@ import com.codex.flashsale.flashsale.FlashSaleCampaignRepository;
 import com.codex.flashsale.admin.AdminActivityAuditRepository;
 import com.codex.flashsale.admin.AdminRefreshTokenRepository;
 import com.codex.flashsale.alerts.AlertDeliveryStateRepository;
+import com.codex.flashsale.channel.ingress.TikTokIngressReceiptRepository;
 import com.codex.flashsale.channel.reconciliation.InventoryReconciliationDriftRepository;
 import com.codex.flashsale.channel.reconciliation.InventoryReconciliationRunRepository;
 import com.codex.flashsale.channel.sync.ChannelInventorySnapshotRepository;
@@ -85,6 +86,9 @@ abstract class AbstractIntegrationTest {
     @Autowired
     protected AdminActivityAuditRepository adminActivityAuditRepository;
 
+    @Autowired
+    protected TikTokIngressReceiptRepository tikTokIngressReceiptRepository;
+
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", MYSQL::getJdbcUrl);
@@ -99,6 +103,7 @@ abstract class AbstractIntegrationTest {
         alertDeliveryStateRepository.deleteAll();
         adminActivityAuditRepository.deleteAll();
         adminRefreshTokenRepository.deleteAll();
+        tikTokIngressReceiptRepository.deleteAll();
         inventoryReconciliationDriftRepository.deleteAll();
         inventoryReconciliationRunRepository.deleteAll();
         channelInventorySnapshotRepository.deleteAll();

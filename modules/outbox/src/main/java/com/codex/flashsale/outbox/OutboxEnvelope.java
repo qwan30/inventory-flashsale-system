@@ -1,5 +1,6 @@
 package com.codex.flashsale.outbox;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import java.time.Instant;
 
 public record OutboxEnvelope(
@@ -7,8 +8,8 @@ public record OutboxEnvelope(
         String aggregateType,
         String aggregateId,
         String eventType,
-        Instant createdAt,
-        String payload
+        int eventVersion,
+        Instant occurredAt,
+        JsonNode payload
 ) {
 }
-

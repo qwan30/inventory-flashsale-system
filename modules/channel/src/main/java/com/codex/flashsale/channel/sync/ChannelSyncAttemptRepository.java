@@ -2,7 +2,9 @@ package com.codex.flashsale.channel.sync;
 
 import com.codex.flashsale.channel.SalesChannel;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -19,6 +21,8 @@ public interface ChannelSyncAttemptRepository extends JpaRepository<ChannelSyncA
 
     long countByStatus(ChannelSyncStatus status);
 
+    long countByChannelAndStatusIn(SalesChannel channel, Collection<ChannelSyncStatus> statuses);
+
     boolean existsByOutboxEventIdAndChannel(String outboxEventId, SalesChannel channel);
 
     long countByStatusAndFailureTypeAndNextAttemptAtLessThanEqual(
@@ -26,4 +30,6 @@ public interface ChannelSyncAttemptRepository extends JpaRepository<ChannelSyncA
             ChannelSyncFailureType failureType,
             Instant nextAttemptAt
     );
+
+    Optional<ChannelSyncAttempt> findTopByChannelAndStatusOrderByUpdatedAtDesc(SalesChannel channel, ChannelSyncStatus status);
 }

@@ -17,6 +17,8 @@ app:
     sync-batch-size: 50
     retry-delay: 15s
     max-attempts: 3
+    tik-tok:
+      mode: mock
   alerts:
     outbox-failed-threshold: 10
     channel-sync-failed-threshold: 10
@@ -29,3 +31,5 @@ app:
     reconciliation-delay: 300s
   kafka:
     topic: inventory-flashsale.events
+  benchmark:
+    evidence-root: testing/k6/evidence

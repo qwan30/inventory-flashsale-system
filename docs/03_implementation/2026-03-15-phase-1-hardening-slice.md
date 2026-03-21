@@ -2,7 +2,7 @@
 
 ## Scope Delivered
 
-This change set implements a focused subset of the [Idea 02 gap-closure roadmap](../02_planning/README.md), specifically the Phase 1 correctness hardening items that fit the current modular monolith without changing the public HTTP surface.
+This change set implements a focused subset of the early gap-closure work that followed the [pre-implementation documentation set plan](../02_planning/2026-03-15-pre-implementation-doc-set-plan.md), specifically the Phase 1 correctness hardening items that fit the current modular monolith without changing the public HTTP surface.
 
 Delivered in code:
 

@@ -10,4 +10,6 @@ public interface ChannelInventorySnapshotRepository extends JpaRepository<Channe
     Optional<ChannelInventorySnapshot> findByChannelAndSku(SalesChannel channel, String sku);
 
     long countBySyncedAtBefore(Instant syncedAt);
+
+    long countByChannelAndSyncedAtBefore(SalesChannel channel, Instant syncedAt);
 }

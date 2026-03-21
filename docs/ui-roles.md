@@ -1,6 +1,6 @@
 # UI Roles
 
-**Last Updated:** 2026-03-15
+**Last Updated:** 2026-03-16
 
 ## Interpretation
 
@@ -43,6 +43,7 @@ Current likely tools:
 - metrics endpoints
 - Kafka and infrastructure tooling
 - manual test or benchmark commands
+- the operator routes in `apps/admin-ui` for ops, benchmarks, and channel health
 
 ## Future Admin Role
 
@@ -53,9 +54,18 @@ Target future responsibilities:
 - outbox failure remediation
 - benchmark and operational reporting
 
+Current implemented surface:
+
+- secured admin and operator APIs are implemented
+- a React admin/operator UI now exists in `apps/admin-ui`
+- admins use campaign workflows
+- admins and operators use ops, benchmarks, and channel-health workflows
+- browser-safe refresh-cookie auth mode is available for the UI
+- Playwright browser coverage now exists for the key admin/operator workflows
+
 Current gap:
 
-- no admin UI or admin API is currently implemented
+- the UI is now workflow-capable, but final release readiness still depends on Docker-backed backend verification and refreshed benchmark evidence
 
 ## Documentation Boundary
 

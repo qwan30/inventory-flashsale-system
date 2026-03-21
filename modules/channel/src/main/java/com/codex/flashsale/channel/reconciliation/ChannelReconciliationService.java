@@ -6,6 +6,7 @@ import com.codex.flashsale.common.time.TimeProvider;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.PageRequest;
 
 @Service
 public class ChannelReconciliationService {
@@ -92,8 +93,20 @@ public class ChannelReconciliationService {
         return driftRepository.countByStatus(ReconciliationDriftStatus.OPEN);
     }
 
+    public long countOpenDrifts(SalesChannel channel) {
+        return driftRepository.countByStatusAndChannel(ReconciliationDriftStatus.OPEN, channel);
+    }
+
+    public java.util.Optional<InventoryReconciliationRun> findLatestRun() {
+        return runRepository.findTopByOrderByCreatedAtDesc();
+    }
+
     public java.util.Optional<InventoryReconciliationRun> findLatestRun(ReconciliationTriggerType triggerType) {
         return runRepository.findTopByTriggerTypeOrderByCreatedAtDesc(triggerType);
+    }
+
+    public List<InventoryReconciliationRun> listRecentRuns(int limit) {
+        return runRepository.findAllByOrderByCreatedAtDesc(PageRequest.of(0, limit));
     }
 
     public InventoryReconciliationDrift resolveDrift(String driftId, String resolutionNote) {

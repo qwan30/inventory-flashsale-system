@@ -1,0 +1,17 @@
+{
+  "id": "evt-reservation-created-001",
+  "aggregateType": "reservation",
+  "aggregateId": "reservation-001",
+  "eventType": "inventory.reservation.created",
+  "eventVersion": 1,
+  "occurredAt": "2026-03-15T00:00:00Z",
+  "payload": {
+    "reservationId": "reservation-001",
+    "campaignId": "campaign-demo-001",
+    "sku": "SKU-DEMO-001",
+    "channel": "WEB",
+    "quantity": 1,
+    "status": "ACTIVE",
+    "expiresAt": "2026-03-15T00:10:00Z"
+  }
+}

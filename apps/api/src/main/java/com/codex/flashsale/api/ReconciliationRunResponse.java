@@ -10,6 +10,7 @@ public record ReconciliationRunResponse(
         int scannedSnapshotCount,
         int openDriftCount,
         String failureMessage,
+        Instant createdAt,
         Instant completedAt
 ) {
 }

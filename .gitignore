@@ -9,3 +9,5 @@ target/
 /skills/
 /testing/k6/artifacts/**
 !/testing/k6/artifacts/.gitkeep
+node_modules/
+apps/admin-ui/dist/

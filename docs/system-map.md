@@ -4,11 +4,16 @@
 
 This repository is a Java 21 + Spring Boot 3 modular monolith built around inventory correctness for flash sale reservations. The app layer in `apps/api` orchestrates thin HTTP entrypoints over bounded modules in `modules/`, with MySQL for state, Redis for distributed SKU locks, and Kafka for outbox-driven event publication.
 
-Verified baseline on 2026-03-15:
+Verified baseline on 2026-03-16:
 
-- `.\mvnw test` passes.
-- Integration tests use Testcontainers for MySQL, Redis, and Kafka.
+- `npm test`, `npm run build`, and `npm run test:e2e` pass in `apps/admin-ui`.
+- `.\mvnw -pl apps/api -am -DskipTests compile` passes.
+- focused backend copilot and channel-detail tests pass.
+- Full `.\mvnw test` remains blocked in this environment when Testcontainers cannot reach Docker.
 - Demo seed data includes campaign `campaign-demo-001` and SKU `SKU-DEMO-001`.
+- Admin UI now includes a shipped secondary channel-health workflow under `apps/admin-ui`.
+- Admin UI now also includes an advisory-only ops copilot workflow on the ops route.
+- The repo now includes API and admin UI container packaging plus a GitHub Actions CI workflow.
 
 ## Runtime Surface
 
@@ -31,17 +36,30 @@ Public HTTP endpoints:
 - `POST /api/v1/admin/auth/refresh`
 - `POST /api/v1/admin/auth/logout`
 - `GET /api/v1/admin/campaigns`
+- `GET /api/v1/admin/campaigns/{campaignId}`
 - `POST /api/v1/admin/campaigns`
 - `PUT /api/v1/admin/campaigns/{campaignId}`
 - `POST /api/v1/admin/campaigns/{campaignId}/activate`
 - `POST /api/v1/admin/campaigns/{campaignId}/end`
 - `GET /api/v1/admin/campaigns/{campaignId}/audits`
+- `POST /api/v1/channel-ingress/tiktok/inventory`
+- `POST /api/v1/channel-ingress/tiktok/orders/status`
+- `POST /api/v1/admin/channels/tiktok/ingress/replay`
+- `GET /api/v1/admin/channels/health`
+- `GET /api/v1/admin/channels/health/{channel}`
 - `GET /api/v1/admin/ops/alerts`
 - `GET /api/v1/admin/ops/outbox/backlog`
+- `GET /api/v1/admin/ops/outbox/events`
 - `POST /api/v1/admin/ops/outbox/{eventId}/retry`
+- `GET /api/v1/admin/ops/reconciliation/runs`
 - `POST /api/v1/admin/ops/reconciliation/runs`
 - `GET /api/v1/admin/ops/reconciliation/drifts`
 - `POST /api/v1/admin/ops/reconciliation/{driftId}/resolve`
+- `GET /api/v1/admin/ops/copilot/capabilities`
+- `POST /api/v1/admin/ops/copilot/analyze`
+- `GET /api/v1/admin/ops/benchmarks/evidence`
+- `GET /api/v1/admin/ops/benchmarks/evidence/{runId}`
+- `GET /api/v1/admin/ops/benchmarks/evidence/latest`
 
 Main orchestration entrypoints:
 
@@ -51,12 +69,21 @@ Main orchestration entrypoints:
 - `ReservationApplicationService.expireReservation(...)`
 - `OrderApplicationService.updateStatus(...)`
 - `AdminCampaignApplicationService.createCampaign(...)`
+- `AdminCampaignApplicationService.getCampaign(...)`
 - `AdminCampaignApplicationService.updateCampaign(...)`
 - `AdminCampaignApplicationService.activateCampaign(...)`
 - `AdminCampaignApplicationService.endCampaign(...)`
 - `AdminAuthService.login(...)`
 - `AdminAuthService.refresh(...)`
 - `AdminAuthService.logout(...)`
+- `OpsApplicationService.listOutboxEvents(...)`
+- `OpsApplicationService.listReconciliationRuns(...)`
+- `OpsApplicationService.listChannelHealthSummaries(...)`
+- `OpsApplicationService.getChannelHealthDetail(...)`
+- `OpsCopilotService.getCapabilities(...)`
+- `OpsCopilotService.analyze(...)`
+- `TikTokIngressService.ingestInventory(...)`
+- `TikTokIngressService.ingestOrderStatus(...)`
 
 Background jobs:
 
@@ -119,8 +146,43 @@ Background jobs:
 1. `OutboxService.record(...)` serializes payloads and stores them as `PENDING`.
 2. `OutboxPublisherScheduler` calls `publishPendingEvents()`.
 3. `OutboxService` reads the next batch ordered by creation time.
-4. Each event is wrapped in an `OutboxEnvelope` and sent to Kafka topic `inventory-flashsale.events`.
+4. Each event is wrapped in a versioned `OutboxEnvelope` and sent to Kafka topic `inventory-flashsale.events`.
 5. Success marks the row `PUBLISHED`; failure marks it `FAILED` with the error string.
+
+### TikTok Ingress
+
+1. `TikTokIngressController` accepts signed inventory and order-status callbacks under `/api/v1/channel-ingress/tiktok/**`.
+2. `TikTokIngressSignatureVerifier` validates HMAC headers and timestamp skew before parsing the payload.
+3. `TikTokIngressService` deduplicates by persisted receipt id.
+4. Inventory ingress updates the TikTok `channel_inventory_snapshot` through a synthetic source event while keeping central inventory unchanged.
+5. Order-status ingress normalizes into `OrderApplicationService.updateStatus(...)` so central order rules remain the only lifecycle source of truth.
+
+### Channel Health
+
+1. `AdminChannelController` serves `GET /api/v1/admin/channels/health`.
+2. `OpsApplicationService.listChannelHealthSummaries(...)` composes per-channel posture for `SHOPEE` and `TIKTOK_SHOP`.
+3. Channel posture uses:
+   - channel sync backlog counts
+   - stale snapshot counts
+   - open reconciliation drifts
+   - latest reconciliation timing
+   - latest TikTok ingress receipt
+   - latest replay summary from admin activity audit
+4. Status is derived as `HEALTHY`, `DEGRADED`, or `UNAVAILABLE` without changing inventory correctness or reconciliation semantics.
+
+### Ops Copilot
+
+1. `AdminOpsCopilotController` serves `/api/v1/admin/ops/copilot/**` for authenticated admin or operator sessions.
+2. `OpsCopilotContextService` builds structured, read-only operational context from:
+   - ops alerts
+   - outbox backlog and failed-event reads
+   - reconciliation drifts and recent runs
+   - channel health summaries
+   - benchmark evidence detail
+   - campaign detail and audits
+3. `OpsCopilotPromptFactory` constrains the model to advisory-only JSON output with allowed route links and source IDs.
+4. `GeminiOpsCopilotProvider` calls Gemini through the REST API when `app.ai.enabled=true` and the Gemini key/model config is present.
+5. `OpsCopilotService` sanitizes unsupported links or citations before returning the final response.
 
 ## Module Invariants
 
@@ -150,14 +212,19 @@ Background jobs:
 ### Outbox
 
 - Domain state changes are persisted before publish.
+- Published envelopes now carry `eventVersion` in addition to `eventType`.
 - Events are retried only if some later logic resets status to `PENDING`; current code marks publish failures as `FAILED`.
 - Publish ordering is FIFO within the selected batch by `created_at`.
+- Admin remediation now has a dedicated failed-event read model ordered by audit timestamps so future UI retry queues can render directly from the API.
 
 ### Channel
 
 - Reservation validation is delegated by `SalesChannel`.
 - `WEB` and `APP` currently use persisted sync and inbound snapshot behavior.
 - `SHOPEE` supports mock or real-mode transport, including live inbound reconciliation reads in real mode.
+- `TIKTOK_SHOP` now supports mock or real-mode transport, live inbound reconciliation reads in real mode, and signed external ingress callbacks.
+- Admin/operator workflows now have a dedicated marketplace posture summary surface through `GET /api/v1/admin/channels/health`.
+- Admin/operator workflows now also have a read-only per-channel drill-down route through `GET /api/v1/admin/channels/health/{channel}`.
 
 ## Persistence And Infra
 
@@ -215,6 +282,9 @@ Covered by module tests:
 
 These were observed during validation but are not breaking the build:
 
+- API-module integration verification is blocked when Docker is unavailable because Testcontainers cannot start MySQL, Redis, and Kafka in this environment.
+- Full K6 benchmark execution and refreshed promoted evidence are likewise blocked in this workspace until Docker-backed services can run.
+- Simple-cloud packaging is now present, but runtime deployment proof on an actual target has not yet been captured in this repo.
 - Flyway warns that MySQL 8.4 is newer than its tested support window.
 - Multiple `junit-platform.properties` files are present on the test classpath.
 - Mockito emits a future JDK dynamic-agent warning during tests.
