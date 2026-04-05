@@ -102,6 +102,8 @@ Read in this order for broad project work:
   Delivered the production-hardening slice that shipped the channel-health backend/UI surface, Playwright browser verification, and the recorded Docker-blocked release-readiness outcome.
 - `docs/03_implementation/2026-03-16-ops-copilot-and-simple-cloud-slice.md`
   Delivered the advisory Gemini ops copilot, channel drill-down endpoint, admin UI copilot workflow, and the first simple-cloud packaging plus CI baseline.
+- `docs/03_implementation/2026-03-21-gitnexus-project-integration.md`
+  Delivered the project-local GitNexus integration for Codex/Claude workflows, including MCP wiring, repo-scoped indexing rules, generated agent context files, and the first verified graph baseline.
 - `docs/04_audit_remediation/`
   Risk audits, bug investigations, remediation plans, and postmortems.
 - `docs/04_audit_remediation/2026-03-15-docs-structure-audit.md`
@@ -110,6 +112,8 @@ Read in this order for broad project work:
   Evidence-backed scale decision record concluding that the system should stay on the modular monolith for now and that replication, partitioning, and lock-safety changes remain gated on stronger benchmark proof.
 - `docs/04_audit_remediation/2026-03-16-idea-02-progress-checklist.md`
   Requirement-progress audit mapping the current repo to Idea 02, including a checklist, percentage estimate, and the current Docker-blocked proof gaps.
+- `docs/04_audit_remediation/2026-03-21-cv-evidence-and-star-bullets.md`
+  Audit note qualifying which benchmark and verification numbers are safe to reuse in a CV, including short STAR-ready Vietnamese bullets and rerun replacement rules.
 - `docs/05_history/`
   Concise dated records of important completed work or important discoveries worth reloading next session.
 - `docs/05_history/2026-03-15-docs-structure-normalization.md`
@@ -138,6 +142,10 @@ Read in this order for broad project work:
   Reload note capturing the current overall completion estimate for Idea 02 and the fact that the remaining closure work is now concentrated in omnichannel depth plus Docker-backed proof.
 - `docs/05_history/2026-03-16-ops-copilot-and-simple-cloud-baseline.md`
   Reload note that advisory AI ops analysis, channel drill-down, and simple-cloud packaging/CI are now part of the repo baseline, while full Docker-backed backend proof remains open.
+- `docs/05_history/2026-03-21-gitnexus-baseline.md`
+  Reload note that GitNexus is now part of the repo-local agent workflow baseline and that future sessions can use the indexed code graph after reloading workspace MCP config.
+- `docs/05_history/2026-03-21-cv-safe-benchmark-claims.md`
+  Reload note capturing the strongest current CV-safe benchmark claims and the guardrails against overstating unproven performance targets.
 
 ## Routing Heuristic
 

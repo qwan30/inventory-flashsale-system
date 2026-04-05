@@ -1,0 +1,11 @@
+.git/
+.gitnexus/
+.mvn/
+.codex/
+everything-claude-code/
+skills/
+history/
+target/
+node_modules/
+apps/admin-ui/dist/
+testing/k6/artifacts/
