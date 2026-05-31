@@ -16,14 +16,16 @@ Codex-first base project for an omnichannel inventory and flash sale engine. The
 ## Repository layout
 
 ```text
-apps/api         Spring Boot deployable application
-modules/common   Shared error handling, time, and request utilities
-modules/channel  Internal sales channel abstraction and mock adapters
-modules/flashsale Flash sale campaign rules and quota management
-modules/inventory Inventory item and reservation logic
-modules/order    Order lifecycle skeleton
-modules/outbox   Outbox persistence and Kafka publisher
-testing/k6       Smoke load scripts
+apps/api            Spring Boot deployable application
+apps/admin-ui       React admin SPA for campaign, ops, benchmark, and channel health workflows
+modules/common      Shared error handling, time, and request utilities
+modules/channel     Internal sales channel abstraction, mock adapters, and Shopee/TikTok connectors
+modules/flashsale   Flash sale campaign rules and quota management
+modules/inventory   Inventory item and reservation logic
+modules/order       Order lifecycle skeleton
+modules/outbox      Outbox persistence and Kafka publisher
+testing/k6          Smoke load scripts and benchmark evidence suite
+testing/contracts   Versioned outbox event contracts and simulator harnesses
 ```
 
 ## Run locally

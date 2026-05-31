@@ -1,6 +1,6 @@
 # Core Business Flows
 
-**Last Updated:** 2026-03-15
+**Last Updated:** 2026-05-30
 
 ## Current Implemented Flows
 
@@ -82,10 +82,12 @@ Current path:
 
 Current path:
 
-1. Scheduler loads pending outbox rows by creation order.
-2. Each row is wrapped in an outbox envelope.
-3. Message is published to Kafka topic `inventory-flashsale.events`.
-4. Event is marked `PUBLISHED` on success or `FAILED` on publish error.
+1. Scheduler first resets retryable failed rows whose `next_attempt_at` is due.
+2. Scheduler loads pending outbox rows by creation order.
+3. Each row is wrapped in an `OutboxEnvelope` with `eventVersion`.
+4. Message is published to Kafka topic `inventory-flashsale.events`.
+5. Event is marked `PUBLISHED` on success.
+6. Publish failure marks the row `FAILED`, stores `last_error`, increments `attempts`, and schedules `next_attempt_at` until max attempts is reached.
 
 ### 7. Manage Flash Sale Campaigns
 
@@ -112,36 +114,75 @@ Current path:
 Current path:
 
 1. Scheduler or operator triggers reconciliation.
-2. The system compares central inventory with the latest channel snapshots or live Shopee reads in real mode.
-3. Open drifts are created or refreshed for mismatches.
-4. Operators may resolve open drifts through the admin or ops remediation surface.
+2. The system compares central inventory with each channel that can return an inbound snapshot.
+3. `WEB` and `APP` read persisted snapshots when present.
+4. `SHOPEE` and `TIKTOK_SHOP` read persisted snapshots in mock mode or live remote stock in real mode.
+5. Open drifts are created or refreshed for mismatches.
+6. Operators may list recent runs, list open drifts, and resolve open drifts through the admin or ops remediation surface.
 
-## Target Future Flows
+### 10. Outbound Channel Sync
 
-### Omnichannel Sync
+Current path:
 
-Target future path:
+1. Reservation reserve, confirm, release, and expire flows record a versioned outbox event.
+2. The reservation application service schedules channel sync attempts for every `SalesChannel`: `WEB`, `APP`, `SHOPEE`, and `TIKTOK_SHOP`.
+3. Order status updates schedule a channel sync attempt for the order's own channel.
+4. `ChannelSyncScheduler` first resets retryable transient failures whose `next_attempt_at` is due.
+5. Pending channel sync attempts are published through the registered port for their channel.
+6. Successful inventory-bearing attempts upsert `channel_inventory_snapshot`.
+7. Permanent failures and exhausted transient failures stay visible through ops alerts and channel health.
 
-- channel-originated orders, inventory changes, or fulfillment updates enter through a bounded integration flow
-- the system normalizes them into central inventory and order semantics
-- central inventory remains the source of truth
+### 11. TikTok Signed Ingress
 
-Current gap:
+Current inventory path:
 
-- central outbound sync, persisted snapshots, and Shopee live reads are implemented
-- inbound marketplace orders and non-Shopee real connectors are still not implemented
+1. TikTok calls `POST /api/v1/channel-ingress/tiktok/inventory`.
+2. Request must include `X-TikTok-Timestamp` and `X-TikTok-Signature`.
+3. `TikTokIngressSignatureVerifier` validates the HMAC signature and five-minute timestamp skew.
+4. `TikTokIngressService` deduplicates by `TIKTOK_SHOP:INVENTORY:{receiptId}`.
+5. A `channel.inventory.ingested` outbox event is recorded as the snapshot source.
+6. The `TIKTOK_SHOP` `channel_inventory_snapshot` is updated with the observed quantities.
+7. A `channel_ingress_receipt` records the payload hash, receipt type, outcome, and processed time.
 
-### Inventory Reconciliation
+Current order-status path:
 
-Target future path:
+1. TikTok calls `POST /api/v1/channel-ingress/tiktok/orders/status`.
+2. Signature and timestamp validation use the same ingress verifier.
+3. `TikTokIngressService` deduplicates by `TIKTOK_SHOP:ORDER_STATUS:{receiptId}`.
+4. The external status is normalized to `OrderStatus`.
+5. `OrderApplicationService.updateStatus(...)` applies the central order transition and idempotency rules.
+6. A `channel_ingress_receipt` records the processed ingress.
 
-- scheduled or operator-triggered reconciliation compares channel-side state with central inventory and order facts
-- mismatches are reported for review or remediation
+Current admin replay path:
 
-Current gap:
+1. Admin/operator calls `POST /api/v1/admin/channels/tiktok/ingress/replay`.
+2. The replay request kind is either `INVENTORY` or `ORDER_STATUS`.
+3. Replay delegates to the same inventory or order-status ingress service paths.
+4. The controller records an `admin_activity_audit` entry with `TIKTOK_INGRESS_REPLAY_TRIGGERED`.
 
-- scheduled and manual reconciliation now exist inside the monolith
-- richer drift analytics, auto-remediation policy, and second-marketplace comparison are still open
+### 12. Channel Health And Operator Drill-Down
+
+Current path:
+
+1. Admin/operator authenticates through the admin auth flow.
+2. `GET /api/v1/admin/channels/health` returns marketplace posture summaries for `SHOPEE` and `TIKTOK_SHOP`.
+3. `GET /api/v1/admin/channels/health/{channel}` returns per-channel detail.
+4. `OpsApplicationService` composes:
+   - connector mode and configuration validity
+   - sync backlog count
+   - stale snapshot count
+   - open reconciliation drift count
+   - latest reconciliation run timing
+   - latest failed channel sync detail
+   - latest TikTok ingress receipt where applicable
+   - latest TikTok replay summary from admin activity audit where applicable
+5. Health is `UNAVAILABLE` for invalid real-mode configuration, `DEGRADED` for backlog/staleness/open drifts, and `HEALTHY` otherwise.
+
+## Current Gaps
+
+- central inventory remains the source of truth; TikTok inventory ingress updates channel snapshots, not central inventory quantities
+- richer drift analytics and auto-remediation policy are still open
+- connector credential/cursor persistence remains outside the current schema
 
 ## Related Current-State Docs
 

@@ -1,6 +1,6 @@
 # Data Model
 
-**Last Updated:** 2026-03-15
+**Last Updated:** 2026-05-30
 
 ## Current Tables
 
@@ -89,6 +89,7 @@ Important fields:
 - `aggregate_type`
 - `aggregate_id`
 - `event_type`
+- `event_version`
 - `payload`
 - `status`
 - `attempts`
@@ -100,6 +101,10 @@ Important indexes:
 
 - index on `(status, created_at)` for pending event batch selection
 - index on `(status, next_attempt_at, created_at)` for retry scans
+
+Notes:
+
+- Flyway migration `V9__outbox_event_version.sql` defines `event_version` with default `1`
 
 ### `operation_idempotency`
 
@@ -139,7 +144,9 @@ Important fields:
 - `status`
 - `failure_type`
 - `attempts`
+- `last_error`
 - `next_attempt_at`
+- `synced_at`
 
 Important constraints:
 
@@ -198,6 +205,80 @@ Important fields:
 - `resolution_note`
 - `resolved_at`
 
+### `admin_user`
+
+Purpose:
+
+- application-managed admin and operator accounts
+
+Important fields:
+
+- `id` primary key
+- `username` unique
+- `password_hash`
+- `display_name`
+- `role`
+- `enabled`
+
+### `admin_refresh_token`
+
+Purpose:
+
+- hashed refresh-token state for admin/operator sessions
+
+Important fields:
+
+- `id` primary key
+- `user_id` foreign key to `admin_user`
+- `token_hash` unique
+- `expires_at`
+- `revoked_at`
+
+Important indexes:
+
+- index on `(user_id, revoked_at)` for session lookup and revocation checks
+
+### `admin_activity_audit`
+
+Purpose:
+
+- immutable audit trail for admin/operator actions
+
+Important fields:
+
+- `actor_username`
+- `actor_role`
+- `action`
+- `resource_type`
+- `resource_id`
+- `outcome`
+- `correlation_id`
+- `details`
+
+Important indexes:
+
+- index on `(resource_type, resource_id, created_at)` for resource activity history and channel replay summaries
+
+### `channel_ingress_receipt`
+
+Purpose:
+
+- idempotency and observability state for signed channel ingress callbacks
+
+Important fields:
+
+- `id` primary key, built from channel, receipt type, and external receipt id
+- `channel`
+- `receipt_type`
+- `external_receipt_id`
+- `payload_hash`
+- `outcome`
+- `processed_at`
+
+Notes:
+
+- current writes are for `TIKTOK_SHOP` inventory and order-status ingress
+
 ## Current Entity Relationships
 
 - one `inventory_item` may have many `flash_sale_campaign` rows over time
@@ -208,6 +289,10 @@ Important fields:
 - one outbox event may produce many `channel_sync_attempt` rows, one per target channel
 - one channel and SKU pair has one latest `channel_inventory_snapshot`
 - one reconciliation run may produce many reconciliation drifts
+- one `admin_user` may have many `admin_refresh_token` rows
+- admin/operator actions may produce many `admin_activity_audit` rows
+- TikTok inventory and order-status callbacks produce one `channel_ingress_receipt` per receipt type and external receipt id
+- TikTok inventory ingress records a source outbox event so the snapshot keeps its `source_outbox_event_id` foreign-key contract
 
 ## Current Enums And State-Carrying Fields
 
@@ -220,7 +305,9 @@ Important fields:
 - reconciliation run trigger type: `MANUAL`, `SCHEDULED`
 - reconciliation run status: `RUNNING`, `COMPLETED`, `FAILED`
 - reconciliation drift status: `OPEN`, `RESOLVED`
-- sales channel: `WEB`, `APP`, `SHOPEE`
+- sales channel: `WEB`, `APP`, `SHOPEE`, `TIKTOK_SHOP`
+- admin activity outcome: `SUCCESS`, `FAILURE`
+- channel ingress receipt type currently used by code: `INVENTORY`, `ORDER_STATUS`
 
 ## Target Data Model Gaps
 
@@ -228,5 +315,6 @@ Not yet implemented but likely future additions:
 
 - connector-specific credential or cursor state
 - order partitioning strategy or archive model
+- retention or archival policy for old channel ingress receipts and admin audit rows
 
 These are target-only ideas and are not part of the current schema.

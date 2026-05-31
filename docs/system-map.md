@@ -4,16 +4,16 @@
 
 This repository is a Java 21 + Spring Boot 3 modular monolith built around inventory correctness for flash sale reservations. The app layer in `apps/api` orchestrates thin HTTP entrypoints over bounded modules in `modules/`, with MySQL for state, Redis for distributed SKU locks, and Kafka for outbox-driven event publication.
 
-Verified baseline on 2026-03-16:
+Verified baseline:
 
 - `npm test`, `npm run build`, and `npm run test:e2e` pass in `apps/admin-ui`.
 - `.\mvnw -pl apps/api -am -DskipTests compile` passes.
 - focused backend copilot and channel-detail tests pass.
-- Full `.\mvnw test` remains blocked in this environment when Testcontainers cannot reach Docker.
+- Full `.\mvnw test` is blocked when Testcontainers cannot reach Docker.
 - Demo seed data includes campaign `campaign-demo-001` and SKU `SKU-DEMO-001`.
-- Admin UI now includes a shipped secondary channel-health workflow under `apps/admin-ui`.
-- Admin UI now also includes an advisory-only ops copilot workflow on the ops route.
-- The repo now includes API and admin UI container packaging plus a GitHub Actions CI workflow.
+- Admin UI includes a secondary channel-health workflow under `apps/admin-ui`.
+- Admin UI includes an advisory-only ops copilot workflow on the ops route.
+- The repo includes API and admin UI container packaging plus a GitHub Actions CI workflow.
 
 ## Runtime Surface
 
@@ -168,21 +168,7 @@ Background jobs:
    - latest reconciliation timing
    - latest TikTok ingress receipt
    - latest replay summary from admin activity audit
-4. Status is derived as `HEALTHY`, `DEGRADED`, or `UNAVAILABLE` without changing inventory correctness or reconciliation semantics.
-
-### Ops Copilot
-
-1. `AdminOpsCopilotController` serves `/api/v1/admin/ops/copilot/**` for authenticated admin or operator sessions.
-2. `OpsCopilotContextService` builds structured, read-only operational context from:
-   - ops alerts
-   - outbox backlog and failed-event reads
-   - reconciliation drifts and recent runs
-   - channel health summaries
-   - benchmark evidence detail
-   - campaign detail and audits
-3. `OpsCopilotPromptFactory` constrains the model to advisory-only JSON output with allowed route links and source IDs.
-4. `GeminiOpsCopilotProvider` calls Gemini through the REST API when `app.ai.enabled=true` and the Gemini key/model config is present.
-5. `OpsCopilotService` sanitizes unsupported links or citations before returning the final response.
+4. Status is derived as `HEALTHY`, `DEGRADED`, or `UNAVAILABLE` without changing inventory correctness or channel semantics.
 
 ## Module Invariants
 

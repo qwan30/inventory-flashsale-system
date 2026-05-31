@@ -1,6 +1,6 @@
 # Project Overview
 
-**Last Updated:** 2026-03-16
+**Last Updated:** 2026-05-30
 
 ## Problem Statement
 
@@ -26,37 +26,37 @@ Current codebase shape:
 - Testcontainers-backed integration tests
 - K6 smoke scripts under `testing/k6`
 
-The current repository already implements:
+Implemented capabilities:
 
-- centralized inventory as the source of truth
-- flash sale campaign windows and quota enforcement
-- soft reservation with expiry and release
-- order status progression from `PENDING` to `PAID` to `SHIPPED`
+- Centralized inventory as the source of truth
+- Flash sale campaign windows and quota enforcement
+- Soft reservation with expiry and release
+- Order status progression from `PENDING` to `PAID` to `SHIPPED`
 - Redis-backed SKU locking plus optimistic locking for inventory
-- outbox recording, retry scheduling, and scheduled Kafka publish
-- backward-compatible idempotency persistence for release and order status mutations
-- channel sync attempts and persisted channel inventory snapshots
+- Outbox recording, retry scheduling, and scheduled Kafka publish
+- Backward-compatible idempotency persistence for release and order status mutations
+- Channel sync attempts and persisted channel inventory snapshots
 - Shopee sandbox-ready real outbound sync and live inbound reconciliation reads
-- operator remediation APIs for outbox retry and reconciliation drift management
-- scheduled reconciliation runs inside the monolith
-- in-app operational alert evaluation for backlog, drift, stale snapshots, and scheduled-run failure
-- generic webhook-based external alert delivery with persisted delivery state
-- provider-aware alert routing with generic webhook fallback plus first-class Slack and PagerDuty targets
-- app-managed admin authentication with JWT access and refresh tokens
-- browser-safe refresh-cookie mode for admin UI callers while retaining the JSON refresh-token flow
-- role-gated admin APIs for campaign lifecycle management and audited ops remediation
-- benchmark evidence summary APIs over promoted K6 artifacts
+- Operator remediation APIs for outbox retry and reconciliation drift management
+- Scheduled reconciliation runs inside the monolith
+- In-app operational alert evaluation for backlog, drift, stale snapshots, and scheduled-run failure
+- Generic webhook-based external alert delivery with persisted delivery state
+- Provider-aware alert routing with generic webhook fallback plus first-class Slack and PagerDuty targets
+- App-managed admin authentication with JWT access and refresh tokens
+- Browser-safe refresh-cookie mode for admin UI callers while retaining the JSON refresh-token flow
+- Role-gated admin APIs for campaign lifecycle management and audited ops remediation
+- Benchmark evidence summary APIs over promoted K6 artifacts
 - TikTok Shop real outbound sync, live inbound reconciliation reads, signed ingress APIs, and idempotent ingress receipts
-- dedicated admin channel-health summary API for marketplace posture
-- per-channel channel-health drill-down API for operator investigation
-- advisory-only Gemini-backed ops copilot APIs for operational analysis
-- admin/operator React SPA with shipped campaigns, ops, benchmarks, and secondary channel-health workflows under `apps/admin-ui`
-- ops copilot panel embedded into the shipped ops workflow in `apps/admin-ui`
+- Dedicated admin channel-health summary API for marketplace posture
+- Per-channel channel-health drill-down API for operator investigation
+- Advisory-only Gemini-backed ops copilot APIs for operational analysis
+- Admin/operator React SPA with campaigns, ops, benchmark, and channel-health workflows under `apps/admin-ui`
+- Ops copilot panel embedded into the ops workflow in `apps/admin-ui`
 - Playwright browser coverage for the key admin/operator workflows
 - API and admin UI container packaging plus a simple-cloud CI baseline
-- versioned outbox event envelopes plus contract fixtures and simulator harnesses under `testing/contracts`
-- one promoted K6 benchmark baseline under `testing/k6/evidence/20260315-133859-e2e3644/`
-- automated benchmark promotion, comparison output, and evidence cataloging under `testing/k6/evidence/index.json`
+- Versioned outbox event envelopes plus contract fixtures and simulator harnesses under `testing/contracts`
+- Promoted K6 benchmark baseline under `testing/k6/evidence/20260315-133859-e2e3644/`
+- Automated benchmark promotion, comparison output, and evidence cataloging under `testing/k6/evidence/index.json`
 
 ## Target Requirement Summary
 
@@ -70,29 +70,29 @@ Idea 02 targets an omnichannel inventory and flash sale engine that:
 
 ## Implemented Capabilities
 
-Current implemented capabilities include:
+Implemented capabilities:
 
-- reservation create, confirm, release, and expire flows
-- flash sale window and quota checks
-- explicit reservation, order, and campaign states
-- durable outbox rows for business events
-- scheduled reservation expiry, outbox publish, and channel sync publish
-- scheduled reconciliation evidence capture without auto-correction
-- persisted release and order-status idempotency replay
-- channel snapshot reconciliation runs and drift resolution APIs
-- admin login, refresh, and logout flows with seeded local admin and operator identities
-- optional HttpOnly refresh-cookie flow for browser admin clients
-- admin campaign create, update, activate, end, and campaign audit reads
-- admin ops wrappers for alerts, outbox retry, and reconciliation actions
-- admin channel-health read for marketplace posture
-- admin channel-health drill-down for per-channel failure context
-- admin benchmark evidence list/detail/latest reads
-- advisory ops copilot capabilities and analysis reads
-- ops alert surface for operational breaches and scheduler failure visibility
+- Reservation create, confirm, release, and expire flows
+- Flash sale window and quota checks
+- Explicit reservation, order, and campaign states
+- Durable outbox rows for business events
+- Scheduled reservation expiry, outbox publish, and channel sync publish
+- Scheduled reconciliation evidence capture without auto-correction
+- Persisted release and order-status idempotency replay
+- Channel snapshot reconciliation runs and drift resolution APIs
+- Admin login, refresh, and logout flows with seeded local admin and operator identities
+- HttpOnly refresh-cookie flow for browser admin clients
+- Admin campaign create, update, activate, end, and campaign audit reads
+- Admin ops wrappers for alerts, outbox retry, and reconciliation actions
+- Admin channel-health read for marketplace posture
+- Admin channel-health drill-down for per-channel failure context
+- Admin benchmark evidence list/detail/latest reads
+- Advisory ops copilot capabilities and analysis reads
+- Ops alert surface for operational breaches and scheduler failure visibility
 - TikTok inventory ingress and order-status ingress with signed callback verification
-- provider-aware alert delivery via webhook, Slack, and PagerDuty publishers
+- Provider-aware alert delivery via webhook, Slack, and PagerDuty publishers
 - React admin UI workflows for campaigns, ops, benchmarks, and channel health
-- error responses with correlation ID support
+- Error responses with correlation ID support
 
 See:
 
