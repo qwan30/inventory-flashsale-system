@@ -104,6 +104,8 @@ Read in this order for broad project work:
   Delivered the advisory Gemini ops copilot, channel drill-down endpoint, admin UI copilot workflow, and the first simple-cloud packaging plus CI baseline.
 - `docs/03_implementation/2026-03-21-gitnexus-project-integration.md`
   Delivered the project-local GitNexus integration for Codex/Claude workflows, including MCP wiring, repo-scoped indexing rules, generated agent context files, and the first verified graph baseline.
+- `docs/03_implementation/2026-05-30-docs-truth-refresh.md`
+  Source-backed canonical docs refresh for system modules, data model, and core business flows, capturing current TikTok, channel sync, reconciliation, channel health, and connector behavior.
 - `docs/04_audit_remediation/`
   Risk audits, bug investigations, remediation plans, and postmortems.
 - `docs/04_audit_remediation/2026-03-15-docs-structure-audit.md`
@@ -114,6 +116,8 @@ Read in this order for broad project work:
   Requirement-progress audit mapping the current repo to Idea 02, including a checklist, percentage estimate, and the current Docker-blocked proof gaps.
 - `docs/04_audit_remediation/2026-03-21-cv-evidence-and-star-bullets.md`
   Audit note qualifying which benchmark and verification numbers are safe to reuse in a CV, including short STAR-ready Vietnamese bullets and rerun replacement rules.
+- `docs/04_audit_remediation/2026-04-27-gitnexus-bmad-source-review.md`
+  GitNexus plus BMAD-style full source review documenting implemented capabilities, verification evidence, and current follow-ups for TikTok ingress hardening, Docker-backed backend proof, and stale durable docs.
 - `docs/05_history/`
   Concise dated records of important completed work or important discoveries worth reloading next session.
 - `docs/05_history/2026-03-15-docs-structure-normalization.md`
@@ -146,6 +150,8 @@ Read in this order for broad project work:
   Reload note that GitNexus is now part of the repo-local agent workflow baseline and that future sessions can use the indexed code graph after reloading workspace MCP config.
 - `docs/05_history/2026-03-21-cv-safe-benchmark-claims.md`
   Reload note capturing the strongest current CV-safe benchmark claims and the guardrails against overstating unproven performance targets.
+- `docs/05_history/2026-05-30-gitnexus-codebase-function-scan.md`
+  Reload note for the current GitNexus-backed whole-function discovery pass, including the live index baseline, main functional map, best next reads, and verification scope.
 
 ## Routing Heuristic
 
