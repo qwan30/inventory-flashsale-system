@@ -105,7 +105,11 @@ Read in this order for broad project work:
 - `docs/03_implementation/2026-03-21-gitnexus-project-integration.md`
   Delivered the project-local GitNexus integration for Codex/Claude workflows, including MCP wiring, repo-scoped indexing rules, generated agent context files, and the first verified graph baseline.
 - `docs/03_implementation/2026-05-30-docs-truth-refresh.md`
-  Source-backed canonical docs refresh for system modules, data model, and core business flows, capturing current TikTok, channel sync, reconciliation, channel health, and connector behavior.
+  Source-backed canonical docs refresh for system modules, data model, and core business flows, capturing current TikTok, channel sync, reconciliation, and connector behavior.
+- `docs/03_implementation/2026-06-07-cicd-setup.md`
+  Delivered comprehensive CI/CD pipeline automation setup for all three projects (Inventory Flashsale, HMS, and Chatbot) including integration testing, API contract verification, Docker image push, and VPS deployment.
+- `docs/03_implementation/2026-06-07-readme-professionalization.md`
+  Rewrote and professionalized README.md files for all four repositories in the workspace to optimize for job applications, integrating technology badges, Mermaid process diagrams, and verified performance metrics.
 - `docs/04_audit_remediation/`
   Risk audits, bug investigations, remediation plans, and postmortems.
 - `docs/04_audit_remediation/2026-03-15-docs-structure-audit.md`
@@ -118,6 +122,8 @@ Read in this order for broad project work:
   Audit note qualifying which benchmark and verification numbers are safe to reuse in a CV, including short STAR-ready Vietnamese bullets and rerun replacement rules.
 - `docs/04_audit_remediation/2026-04-27-gitnexus-bmad-source-review.md`
   GitNexus plus BMAD-style full source review documenting implemented capabilities, verification evidence, and current follow-ups for TikTok ingress hardening, Docker-backed backend proof, and stale durable docs.
+- `docs/04_audit_remediation/2026-06-07-project-evidence-sheet.md`
+  Backend-focused project evidence sheet for resume preparation, classifying verified claims, unsafe claims, measurable scope, ownership evidence, benchmark evidence, and missing proof that future resume-writing work must respect.
 - `docs/05_history/`
   Concise dated records of important completed work or important discoveries worth reloading next session.
 - `docs/05_history/2026-03-15-docs-structure-normalization.md`
