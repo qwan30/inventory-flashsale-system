@@ -21,31 +21,11 @@ import java.time.Instant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.KafkaContainer;
-import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 
-@Testcontainers
 abstract class AbstractIntegrationTest {
 
     protected static final String BASE_CAMPAIGN_ID = "campaign-test-001";
     protected static final String BASE_SKU = "SKU-TEST-001";
-
-    @Container
-    static final MySQLContainer<?> MYSQL = new MySQLContainer<>("mysql:8.4")
-            .withDatabaseName("flashsale")
-            .withUsername("flashsale")
-            .withPassword("flashsale");
-
-    @Container
-    static final GenericContainer<?> REDIS = new GenericContainer<>(DockerImageName.parse("redis:7.4"))
-            .withExposedPorts(6379);
-
-    @Container
-    static final KafkaContainer KAFKA = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.8.0"));
 
     @Autowired
     protected InventoryItemRepository inventoryItemRepository;
@@ -91,12 +71,12 @@ abstract class AbstractIntegrationTest {
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", MYSQL::getJdbcUrl);
-        registry.add("spring.datasource.username", MYSQL::getUsername);
-        registry.add("spring.datasource.password", MYSQL::getPassword);
-        registry.add("spring.data.redis.host", REDIS::getHost);
-        registry.add("spring.data.redis.port", () -> REDIS.getMappedPort(6379));
-        registry.add("spring.kafka.bootstrap-servers", KAFKA::getBootstrapServers);
+        registry.add("spring.datasource.url", SharedContainers.MYSQL::getJdbcUrl);
+        registry.add("spring.datasource.username", SharedContainers.MYSQL::getUsername);
+        registry.add("spring.datasource.password", SharedContainers.MYSQL::getPassword);
+        registry.add("spring.data.redis.host", SharedContainers.REDIS::getHost);
+        registry.add("spring.data.redis.port", () -> SharedContainers.REDIS.getMappedPort(6379));
+        registry.add("spring.kafka.bootstrap-servers", SharedContainers.KAFKA::getBootstrapServers);
     }
 
     protected void resetDatabase(int availableQty, int quota, Instant startsAt, Instant endsAt, CampaignStatus status) {

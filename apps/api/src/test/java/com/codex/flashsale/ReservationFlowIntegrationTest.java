@@ -349,7 +349,7 @@ class ReservationFlowIntegrationTest extends AbstractIntegrationTest {
 
     private Consumer<String, String> createConsumer() {
         Map<String, Object> props = Map.of(
-                ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA.getBootstrapServers(),
+                ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, SharedContainers.KAFKA.getBootstrapServers(),
                 ConsumerConfig.GROUP_ID_CONFIG, "integration-" + System.nanoTime(),
                 ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest",
                 ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
