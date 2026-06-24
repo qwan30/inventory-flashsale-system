@@ -77,7 +77,14 @@ abstract class AbstractIntegrationTest {
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.task.scheduling.enabled", () -> "false");
+        // Push all scheduler delays to 1h so @Scheduled methods never fire
+        // during integration tests.  @EnableScheduling on FlashSaleApplication
+        // makes spring.task.scheduling.enabled ineffective.
+        registry.add("app.scheduler.expired-reservation-delay", () -> "1h");
+        registry.add("app.scheduler.outbox-delay", () -> "1h");
+        registry.add("app.scheduler.channel-sync-delay", () -> "1h");
+        registry.add("app.scheduler.reconciliation-delay", () -> "1h");
+        registry.add("app.scheduler.alert-delivery-delay", () -> "1h");
         registry.add("spring.kafka.listener.auto-startup", () -> "false");
         registry.add("spring.datasource.url", SharedContainers.MYSQL::getJdbcUrl);
         registry.add("spring.datasource.username", SharedContainers.MYSQL::getUsername);
