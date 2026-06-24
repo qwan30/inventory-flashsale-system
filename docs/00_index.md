@@ -113,7 +113,7 @@ Read in this order for broad project work:
 - `docs/03_implementation/2026-06-24-readme-refinement.md`
   Refined the main README.md for the inventory system in English to align with the premium, multi-diagram format of the chatbot-hospital-system README.
 - `docs/03_implementation/2026-06-24-codebase-cleanup-and-maintenance.md`
-  Cleaned unused duplicate frontend views and temporary files, and added comprehensive Javadoc/TSDoc comments across modules and admin-ui to optimize future maintainability.
+  Cleaned unused duplicate frontend views, added comprehensive Javadoc/TSDoc annotations, and overhauled the CI/CD pipeline with path filtering, concurrency gates, Dependabot, and a manual rollback workflow.
 - `docs/04_audit_remediation/`
   Risk audits, bug investigations, remediation plans, and postmortems.
 - `docs/04_audit_remediation/2026-03-15-docs-structure-audit.md`
@@ -162,6 +162,8 @@ Read in this order for broad project work:
   Reload note capturing the strongest current CV-safe benchmark claims and the guardrails against overstating unproven performance targets.
 - `docs/05_history/2026-05-30-gitnexus-codebase-function-scan.md`
   Reload note for the current GitNexus-backed whole-function discovery pass, including the live index baseline, main functional map, best next reads, and verification scope.
+- `docs/05_history/2026-06-24-cicd-pipeline-overhaul.md`
+  Reload note documenting the CI/CD optimizations, concurrency controls, automated rollback setup, and Dependabot configuration.
 
 ## Routing Heuristic
 
