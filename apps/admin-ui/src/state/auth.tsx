@@ -14,6 +14,11 @@ import {
   type Credentials,
 } from "../lib/api";
 
+/**
+ * Represents the authentication context value.
+ * Tracks user session details, loading/bootstrapping state,
+ * and exposes actions for logging in, refreshing sessions, or logging out.
+ */
 interface AuthContextValue {
   session: AdminSession | null;
   bootstrapping: boolean;
@@ -24,6 +29,14 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
+/**
+ * Provider component supplying auth context value to its children.
+ * Automatically triggers session bootstrapping on mount to check for refresh tokens in cookies.
+ * 
+ * @param children the nested React nodes
+ * @param initialSession optional pre-restored session (for tests or server-side renders)
+ * @param skipBootstrap if true, skips initial refresh request (bootstrapping)
+ */
 export function AuthProvider({
   children,
   initialSession = null,
@@ -46,6 +59,7 @@ export function AuthProvider({
       };
     }
 
+    // Try to silently restore session using cookie-based refresh token
     refreshRequest()
       .then((next) => {
         if (active) {
@@ -97,6 +111,10 @@ export function AuthProvider({
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
+/**
+ * Custom hook to access current authentication state and actions.
+ * Must be used within an AuthProvider.
+ */
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {

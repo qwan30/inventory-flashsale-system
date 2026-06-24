@@ -19,6 +19,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service implementing the Transactional Outbox Pattern.
+ * Writes event records to the outbox database table in the same database transaction
+ * as the domain state changes. An asynchronous scheduler subsequently publishes these events
+ * to Kafka to ensure at-least-once message delivery without locking business transactions.
+ */
 @Service
 public class OutboxService {
 
@@ -64,10 +70,17 @@ public class OutboxService {
                 .register(meterRegistry);
     }
 
+    /**
+     * Records a new outbox event using the default version.
+     */
     public OutboxEvent record(String aggregateType, String aggregateId, String eventType, Object payload) {
         return record(aggregateType, aggregateId, eventType, OutboxEvent.DEFAULT_EVENT_VERSION, payload);
     }
 
+    /**
+     * Serializes the event payload and saves the outbox record to the database.
+     * MUST run in the same active transaction as the primary aggregate update.
+     */
     public OutboxEvent record(
             String aggregateType,
             String aggregateId,
@@ -90,6 +103,12 @@ public class OutboxService {
         }
     }
 
+    /**
+     * Publishes pending outbox events to Kafka in sequential batches.
+     * Called periodically by the OutboxPublisherScheduler.
+     * 
+     * @return the number of published events
+     */
     public int publishPendingEvents() {
         List<OutboxEvent> pendingEvents = repository.findByStatusOrderByCreatedAtAsc(
                 OutboxStatus.PENDING,

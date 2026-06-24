@@ -10,6 +10,11 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+/**
+ * Represents the header/metadata of a customer order.
+ * Orders start in {@code PENDING} and transition to either {@code PAID} or {@code FAILED}
+ * based on checkout results, before potentially moving to {@code SHIPPED}.
+ */
 @Entity
 @Table(name = "order_header")
 public class OrderHeader extends AuditTimestamps {
@@ -17,13 +22,16 @@ public class OrderHeader extends AuditTimestamps {
     @Id
     private String id;
 
+    /** The ID of the stock reservation that guarantees the inventory for this order. */
     @Column(name = "reservation_id", nullable = false)
     private String reservationId;
 
+    /** The sales channel from which the order was placed. */
     @Enumerated(EnumType.STRING)
     @Column(name = "channel", nullable = false)
     private SalesChannel channel;
 
+    /** The current state of the order: {@code PENDING}, {@code PAID}, {@code SHIPPED}, {@code FAILED}. */
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private OrderStatus status;

@@ -10,6 +10,16 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
 
+/**
+ * Represents a specific flash sale campaign for a SKU.
+ * Flash sale campaigns run within a defined time window and have
+ * a dedicated inventory quota to prevent overloading general warehouse inventory.
+ * 
+ * Lifecycles:
+ * - DRAFT: Created, configurable, and inactive.
+ * - ACTIVE: Active and accepting orders if the current time falls inside the window.
+ * - ENDED: Manually or automatically concluded campaign. No further orders accepted.
+ */
 @Entity
 @Table(name = "flash_sale_campaign")
 public class FlashSaleCampaign extends AuditTimestamps {
@@ -20,18 +30,23 @@ public class FlashSaleCampaign extends AuditTimestamps {
     @Column(name = "sku", nullable = false)
     private String sku;
 
+    /** Timestamp when the campaign starts. */
     @Column(name = "starts_at", nullable = false)
     private Instant startsAt;
 
+    /** Timestamp when the campaign ends. */
     @Column(name = "ends_at", nullable = false)
     private Instant endsAt;
 
+    /** Maximum allowed quantity to be reserved or sold under this campaign. */
     @Column(name = "quota", nullable = false)
     private int quota;
 
+    /** Current quantity reserved under this campaign. */
     @Column(name = "reserved_quota", nullable = false)
     private int reservedQuota;
 
+    /** Current quantity confirmed sold under this campaign. */
     @Column(name = "sold_quota", nullable = false)
     private int soldQuota;
 
@@ -62,12 +77,21 @@ public class FlashSaleCampaign extends AuditTimestamps {
         this.status = status;
     }
 
+    /**
+     * Creates a new campaign in DRAFT status.
+     */
     public static FlashSaleCampaign draft(String id, String sku, Instant startsAt, Instant endsAt, int quota) {
         validateWindow(startsAt, endsAt);
         validateQuota(quota);
         return new FlashSaleCampaign(id, sku, startsAt, endsAt, quota, 0, 0, CampaignStatus.DRAFT);
     }
 
+    /**
+     * Asserts that the campaign is currently ACTIVE and within its start/end window.
+     * 
+     * @param now current time
+     * @throws ConflictException if not active or outside the timeframe window
+     */
     public void ensureActive(Instant now) {
         if (status != CampaignStatus.ACTIVE) {
             throw new ConflictException("FLASH_SALE_INACTIVE", "Flash sale campaign is not active");
@@ -77,6 +101,12 @@ public class FlashSaleCampaign extends AuditTimestamps {
         }
     }
 
+    /**
+     * Reserves campaign quota for a given quantity.
+     * 
+     * @param quantity amount to reserve
+     * @throws ConflictException if reservation exceeds remaining quota
+     */
     public void reserveQuota(int quantity) {
         int remaining = quota - reservedQuota - soldQuota;
         if (remaining < quantity) {
@@ -85,10 +115,19 @@ public class FlashSaleCampaign extends AuditTimestamps {
         reservedQuota += quantity;
     }
 
+    /**
+     * Releases a previously reserved campaign quota.
+     */
     public void releaseQuota(int quantity) {
         reservedQuota = Math.max(0, reservedQuota - quantity);
     }
 
+    /**
+     * Confirms campaign quota, moving it from reserved to sold.
+     * 
+     * @param quantity amount to confirm
+     * @throws ConflictException if reserved quota is insufficient
+     */
     public void confirmQuota(int quantity) {
         if (reservedQuota < quantity) {
             throw new ConflictException("FLASH_SALE_QUOTA_CONFLICT", "Reserved quota is insufficient to confirm");

@@ -1,6 +1,11 @@
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../state/auth";
 
+/**
+ * The main application shell/layout for authenticated routes.
+ * Renders a persistent sidebar navigation and a main content area where child views are injected.
+ * Adapts available navigation links dynamically based on the current user's role (e.g. Campaigns only for ADMIN).
+ */
 export function ShellLayout() {
   const { session, logout } = useAuth();
 

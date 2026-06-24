@@ -16,6 +16,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service coordinating inventory synchronization to external sales channels (Shopee, TikTok Shop, etc.).
+ * Listens to outbox events and pushes real-time stock updates to remote API ports.
+ * Maintains local inventory snapshots to reconcile drifts and verify correctness.
+ */
 @Service
 public class ChannelSyncService {
 
@@ -57,6 +62,10 @@ public class ChannelSyncService {
                 .register(meterRegistry);
     }
 
+    /**
+     * Schedules a synchronization attempt for the specified sales channels.
+     * Prevents duplicate scheduling for the same outbox event and channel.
+     */
     public void scheduleSync(
             String outboxEventId,
             String eventType,
@@ -87,6 +96,12 @@ public class ChannelSyncService {
         }
     }
 
+    /**
+     * Publishes pending channel synchronization attempts in batches.
+     * Called periodically by the ChannelSyncScheduler.
+     * 
+     * @return the number of sync attempts processed
+     */
     public int publishPendingAttempts() {
         List<ChannelSyncAttempt> attempts = attemptRepository.findByStatusOrderByCreatedAtAsc(
                 ChannelSyncStatus.PENDING,

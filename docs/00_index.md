@@ -110,6 +110,10 @@ Read in this order for broad project work:
   Delivered comprehensive CI/CD pipeline automation setup for all three projects (Inventory Flashsale, HMS, and Chatbot) including integration testing, API contract verification, Docker image push, and VPS deployment.
 - `docs/03_implementation/2026-06-07-readme-professionalization.md`
   Rewrote and professionalized README.md files for all four repositories in the workspace to optimize for job applications, integrating technology badges, Mermaid process diagrams, and verified performance metrics.
+- `docs/03_implementation/2026-06-24-readme-refinement.md`
+  Refined the main README.md for the inventory system in English to align with the premium, multi-diagram format of the chatbot-hospital-system README.
+- `docs/03_implementation/2026-06-24-codebase-cleanup-and-maintenance.md`
+  Cleaned unused duplicate frontend views and temporary files, and added comprehensive Javadoc/TSDoc comments across modules and admin-ui to optimize future maintainability.
 - `docs/04_audit_remediation/`
   Risk audits, bug investigations, remediation plans, and postmortems.
 - `docs/04_audit_remediation/2026-03-15-docs-structure-audit.md`

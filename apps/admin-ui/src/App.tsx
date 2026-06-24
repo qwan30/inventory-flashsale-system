@@ -11,6 +11,10 @@ import { ChannelHealthPage } from "./views/channels/ChannelHealthPage";
 import { OpsPage } from "./views/ops/OpsPage";
 import { OpsRemediationPage } from "./views/ops/OpsRemediationPage";
 
+/**
+ * Presentational screen shown while checking the refresh cookie
+ * to restore a previous user session on initial boot.
+ */
 function SessionBootstrappingPage() {
   return (
     <div className="login-screen">
@@ -23,6 +27,12 @@ function SessionBootstrappingPage() {
   );
 }
 
+/**
+ * Route protector component that checks if a user session is active.
+ * - Shows the bootstrapping state page if session is being restored.
+ * - Redirects to login with the original location state if no session exists.
+ * - Renders the main ShellLayout if authenticated.
+ */
 function ProtectedLayout() {
   const { bootstrapping, session } = useAuth();
   const location = useLocation();
