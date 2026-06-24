@@ -42,6 +42,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(properties = {
+        "spring.task.scheduling.enabled=false",
+        "spring.kafka.listener.auto-startup=false",
         "app.scheduler.expired-reservation-delay=1h",
         "app.scheduler.outbox-delay=1h",
         "app.scheduler.channel-sync-delay=1h",
