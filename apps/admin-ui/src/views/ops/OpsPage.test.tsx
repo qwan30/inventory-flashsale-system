@@ -175,7 +175,7 @@ describe("OpsPage", () => {
     );
 
     await screen.findByRole("heading", { name: "Ops Copilot" });
-    const runButton = screen.getByRole("button", { name: /run ops copilot/i });
+    const runButton = await screen.findByRole("button", { name: /run ops copilot/i });
     await act(async () => {
       runButton.click();
     });
@@ -197,7 +197,7 @@ describe("OpsPage", () => {
     );
 
     await screen.findByRole("heading", { name: "Ops Copilot" });
-    expect(screen.getByText(/API key missing/i)).toBeVisible();
+    expect(await screen.findByText(/API key missing/i)).toBeVisible();
     expect(screen.getByRole("button", { name: /run ops copilot/i })).toBeDisabled();
   });
 });

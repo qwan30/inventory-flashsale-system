@@ -320,6 +320,16 @@ class OpsAndChannelIntegrationTest extends AbstractIntegrationTest {
         failedOutbox.markFailed("connector down", Instant.now(), Duration.ofSeconds(5), 5);
         outboxService.save(failedOutbox);
 
+        OutboxEvent failedOutbox2 = new OutboxEvent(
+                "evt-tiktok-health-2",
+                "reservation",
+                "res-tiktok-health-2",
+                "inventory.reservation.created",
+                "{\"ok\":true}"
+        );
+        failedOutbox2.markFailed("connector down", Instant.now(), Duration.ofSeconds(5), 5);
+        outboxService.save(failedOutbox2);
+
         ChannelSyncAttempt pendingAttempt = new ChannelSyncAttempt(
                 "sync-tiktok-pending",
                 failedOutbox.getId(),
@@ -335,11 +345,11 @@ class OpsAndChannelIntegrationTest extends AbstractIntegrationTest {
 
         ChannelSyncAttempt failedAttempt = new ChannelSyncAttempt(
                 "sync-tiktok-failed",
-                failedOutbox.getId(),
+                failedOutbox2.getId(),
                 SalesChannel.TIKTOK_SHOP,
                 BASE_SKU,
                 "inventory.reservation.created",
-                failedOutbox.getPayload(),
+                failedOutbox2.getPayload(),
                 10,
                 0,
                 0
