@@ -40,6 +40,9 @@ Added JSDoc/TSDoc headers to key React components:
 *   [ShellLayout.tsx](file:///d:/projects/inventory-flashsale-system/apps/admin-ui/src/components/ShellLayout.tsx): Documented layout shell structure.
 *   [auth.tsx](file:///d:/projects/inventory-flashsale-system/apps/admin-ui/src/state/auth.tsx): Documented AuthContext, AuthProvider, and useAuth hook.
 
+### 4. CI/CD Target Branch Correction
+*   Modified [.github/workflows/ci.yml](file:///d:/projects/inventory-flashsale-system/.github/workflows/ci.yml) and [.github/workflows/cd.yml](file:///d:/projects/inventory-flashsale-system/.github/workflows/cd.yml) to change target branches from `main` to `master`, ensuring push and pull request activities trigger the pipelines on the repository's default branch.
+
 ---
 
 ## Verification & Validation
