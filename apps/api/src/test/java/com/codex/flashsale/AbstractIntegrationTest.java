@@ -18,9 +18,12 @@ import com.codex.flashsale.inventory.StockReservationRepository;
 import com.codex.flashsale.order.OrderHeaderRepository;
 import com.codex.flashsale.outbox.OutboxEventRepository;
 import java.time.Instant;
+import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.transaction.annotation.Transactional;
 
 abstract class AbstractIntegrationTest {
 
@@ -69,6 +72,9 @@ abstract class AbstractIntegrationTest {
     @Autowired
     protected TikTokIngressReceiptRepository tikTokIngressReceiptRepository;
 
+    @Autowired
+    private DataSource dataSource;
+
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", SharedContainers.MYSQL::getJdbcUrl);
@@ -79,21 +85,29 @@ abstract class AbstractIntegrationTest {
         registry.add("spring.kafka.bootstrap-servers", SharedContainers.KAFKA::getBootstrapServers);
     }
 
+    @Transactional
     protected void resetDatabase(int availableQty, int quota, Instant startsAt, Instant endsAt, CampaignStatus status) {
-        alertDeliveryStateRepository.deleteAll();
-        adminActivityAuditRepository.deleteAll();
-        adminRefreshTokenRepository.deleteAll();
-        tikTokIngressReceiptRepository.deleteAll();
-        inventoryReconciliationDriftRepository.deleteAll();
-        inventoryReconciliationRunRepository.deleteAll();
-        channelInventorySnapshotRepository.deleteAll();
-        channelSyncAttemptRepository.deleteAll();
-        operationIdempotencyRepository.deleteAll();
-        orderHeaderRepository.deleteAll();
-        stockReservationRepository.deleteAll();
-        flashSaleCampaignRepository.deleteAll();
-        inventoryItemRepository.deleteAll();
-        outboxEventRepository.deleteAll();
+        JdbcTemplate jdbc = new JdbcTemplate(dataSource);
+
+        // Disable FK checks so DELETE order doesn't matter.
+        jdbc.execute("SET FOREIGN_KEY_CHECKS = 0");
+
+        jdbc.execute("DELETE FROM alert_delivery_state");
+        jdbc.execute("DELETE FROM admin_activity_audit");
+        jdbc.execute("DELETE FROM admin_refresh_token");
+        jdbc.execute("DELETE FROM channel_ingress_receipt");
+        jdbc.execute("DELETE FROM inventory_reconciliation_drift");
+        jdbc.execute("DELETE FROM inventory_reconciliation_run");
+        jdbc.execute("DELETE FROM channel_inventory_snapshot");
+        jdbc.execute("DELETE FROM channel_sync_attempt");
+        jdbc.execute("DELETE FROM operation_idempotency");
+        jdbc.execute("DELETE FROM order_header");
+        jdbc.execute("DELETE FROM stock_reservation");
+        jdbc.execute("DELETE FROM flash_sale_campaign");
+        jdbc.execute("DELETE FROM inventory_item");
+        jdbc.execute("DELETE FROM outbox_event");
+
+        jdbc.execute("SET FOREIGN_KEY_CHECKS = 1");
 
         inventoryItemRepository.saveAndFlush(new InventoryItem(BASE_SKU, availableQty, 0, 0));
         flashSaleCampaignRepository.saveAndFlush(new FlashSaleCampaign(
