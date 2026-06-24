@@ -40,8 +40,13 @@ Added JSDoc/TSDoc headers to key React components:
 *   [ShellLayout.tsx](file:///d:/projects/inventory-flashsale-system/apps/admin-ui/src/components/ShellLayout.tsx): Documented layout shell structure.
 *   [auth.tsx](file:///d:/projects/inventory-flashsale-system/apps/admin-ui/src/state/auth.tsx): Documented AuthContext, AuthProvider, and useAuth hook.
 
-### 4. CI/CD Target Branch Correction
-*   Modified [.github/workflows/ci.yml](file:///d:/projects/inventory-flashsale-system/.github/workflows/ci.yml) and [.github/workflows/cd.yml](file:///d:/projects/inventory-flashsale-system/.github/workflows/cd.yml) to change target branches from `main` to `master`, ensuring push and pull request activities trigger the pipelines on the repository's default branch.
+### 4. CI/CD Pipeline Optimizations and Enhancements
+We overhauled the repository's CI/CD workflows and automated maintenance:
+*   **Target Branch Alignment**: Changed target branches from `main` to `master` in [.github/workflows/ci.yml](file:///d:/projects/inventory-flashsale-system/.github/workflows/ci.yml) and [.github/workflows/cd.yml](file:///d:/projects/inventory-flashsale-system/.github/workflows/cd.yml) to match the default branch.
+*   **Path-based Skipping & Parallelization**: Integrated `dorny/paths-filter@v3` in `ci.yml` to split backend and frontend CI tasks into parallel jobs (`backend-ci`, `frontend-ci`), skipping runs for unrelated changes (like markdown documentation).
+*   **Concurrency Control**: Added concurrency gates to both `ci.yml` and `cd.yml` to cancel redundant runs (for PRs) and prevent race conditions or overlapping server deployments.
+*   **Automated Rollback Workflow**: Introduced [.github/workflows/rollback.yml](file:///d:/projects/inventory-flashsale-system/.github/workflows/rollback.yml) to enable quick, manual rollbacks to a specific container tag on the target server. The workflow implements confirmation validation and a 120-second backend health poll.
+*   **Automated Dependency Management**: Configured weekly Dependabot updates via [.github/dependabot.yml](file:///d:/projects/inventory-flashsale-system/.github/dependabot.yml) to check for and group npm, Maven, and GitHub Actions updates.
 
 ---
 
