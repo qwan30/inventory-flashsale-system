@@ -78,6 +78,7 @@ abstract class AbstractIntegrationTest {
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.task.scheduling.enabled", () -> "false");
+        registry.add("spring.kafka.listener.auto-startup", () -> "false");
         registry.add("spring.datasource.url", SharedContainers.MYSQL::getJdbcUrl);
         registry.add("spring.datasource.username", SharedContainers.MYSQL::getUsername);
         registry.add("spring.datasource.password", SharedContainers.MYSQL::getPassword);
