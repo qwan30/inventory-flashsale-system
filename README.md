@@ -150,27 +150,27 @@ The repository integrates a comprehensive 2-stage workflow using GitHub Actions 
 ```mermaid
 graph TD
     subgraph "CI Pipeline (GitHub Actions)"
-        Trigger[Push / PR to main]
-        Checkout[actions/checkout@v5]
-        SetupJava[actions/setup-java@v4]
+        Trigger["Push / PR to main"]
+        Checkout["actions/checkout@v5"]
+        SetupJava["actions/setup-java@v4"]
         MvnVerify[mvn clean verify]
-        SetupNode[actions/setup-node@v4]
-        NpmCi[npm ci apps/admin-ui]
-        Vitest[npm test admin-ui]
-        BuildUI[npm run build admin-ui]
-        Playwright[npm run test:e2e admin-ui]
-        DockerLogin[docker/login-action@v3]
-        BuildBackend[Build & Push Backend Image]
-        BuildFrontend[Build & Push Frontend Image]
+        SetupNode["actions/setup-node@v4"]
+        NpmCi["npm ci apps/admin-ui"]
+        Vitest["npm test admin-ui"]
+        BuildUI["npm run build admin-ui"]
+        Playwright["npm run test:e2e admin-ui"]
+        DockerLogin["docker/login-action@v3"]
+        BuildBackend["Build & Push Backend Image"]
+        BuildFrontend["Build & Push Frontend Image"]
     end
 
     subgraph "CD Pipeline (Auto-deploy on Success)"
-        CDTrigger[CI completed successfully]
-        SCPCompose[SCP docker-compose.yml to server]
-        SSHDeploy[SSH to deployment VPS]
-        PullImages[docker compose pull]
-        UpContainers[docker compose up -d]
-        PruneDangling[docker image prune -f]
+        CDTrigger["CI completed successfully"]
+        SCPCompose["SCP docker-compose.yml to server"]
+        SSHDeploy["SSH to deployment VPS"]
+        PullImages["docker compose pull"]
+        UpContainers["docker compose up -d"]
+        PruneDangling["docker image prune -f"]
     end
 
     Trigger --> Checkout
