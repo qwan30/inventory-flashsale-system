@@ -9,12 +9,12 @@
 [![Apache Kafka 3.9](https://img.shields.io/badge/Apache_Kafka-3.9-231F20?style=for-the-badge&logo=apachekafka&logoColor=white)](https://kafka.apache.org/)
 [![React 18](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
 [![Docker](https://img.shields.io/badge/Docker-✓-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
-[![CI/CD](https://img.shields.io/badge/CI%2FCD-Active-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/thanhquan3010/inventory-flashsale-system/actions)
+[![CI Build](https://github.com/thanhquan3010/inventory-flashsale-system/actions/workflows/ci.yml/badge.svg)](https://github.com/thanhquan3010/inventory-flashsale-system/actions)
 [![Tests](https://img.shields.io/badge/Tests-100%2B_Passing-22C55E?style=for-the-badge)](https://github.com/thanhquan3010/inventory-flashsale-system/actions)
 [![Benchmarks](https://img.shields.io/badge/K6_Benchmarks-Passed-22C55E?style=for-the-badge)](https://github.com/thanhquan3010/inventory-flashsale-system)
 [![Release](https://img.shields.io/badge/Release-v1.0-0d7c4b?style=for-the-badge)](https://github.com/thanhquan3010/inventory-flashsale-system)
 
-**An enterprise-grade omnichannel inventory reservation and flash sale concurrency engine** built as a high-performance Modular Monolith using Java 21 and Spring Boot 3. It utilizes Redis distributed locking, JPA optimistic locking, and the Transactional Outbox pattern with Apache Kafka to guarantee strict stock correctness, eliminate overselling (bán quá số lượng), and maintain multi-channel synchronization under heavy traffic contention. Featuring a clean React admin dashboard for campaign management, operational drift reconciliation, and real-time load test analytics.
+**An enterprise-grade omnichannel inventory reservation and flash sale concurrency engine** built as a high-performance Modular Monolith using Java 21 and Spring Boot 3. It utilizes Redis distributed locking, JPA optimistic locking, and the Transactional Outbox pattern with Apache Kafka to guarantee strict stock correctness, eliminate overselling, and maintain multi-channel synchronization under heavy traffic contention. Featuring a clean React admin dashboard for campaign management, operational drift reconciliation, and real-time load test analytics.
 
 > **🟢 Production Status: v1.0 — June 2026**
 > 100+ backend/frontend assertions passing. 8/8 K6 load benchmark suites passed. 2 CI/CD automation workflows active via GitHub Actions with image builds pushed to GitHub Container Registry (GHCR) and automated VPS deployment.
@@ -501,7 +501,7 @@ cd apps/admin-ui
 npm install
 npm run dev
 ```
-*Giao diện dashboard open at:* `http://localhost:3000`
+*Admin Dashboard available at:* `http://localhost:3000`
 
 ### 4. Run Load Benchmarks (K6)
 Verify system performance under simulated load:

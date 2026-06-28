@@ -114,6 +114,8 @@ Read in this order for broad project work:
   Refined the main README.md for the inventory system in English to align with the premium, multi-diagram format of the chatbot-hospital-system README.
 - `docs/03_implementation/2026-06-24-codebase-cleanup-and-maintenance.md`
   Cleaned unused duplicate frontend views, added comprehensive Javadoc/TSDoc annotations, and overhauled the CI/CD pipeline with path filtering, concurrency gates, Dependabot, and a manual rollback workflow.
+- `docs/03_implementation/2026-06-28-codebase-refactoring-and-quality-hardening.md`
+  Delivered comprehensive architecture decoupling, FlashSaleCampaign @Version concurrency protection, HexUtils/RestClientUtils refactoring, repo hygiene cleanup, and CI/CD quality gate enhancements.
 - `docs/04_audit_remediation/`
   Risk audits, bug investigations, remediation plans, and postmortems.
 - `docs/04_audit_remediation/2026-03-15-docs-structure-audit.md`
@@ -158,6 +160,14 @@ Read in this order for broad project work:
   Reload note that advisory AI ops analysis, channel drill-down, and simple-cloud packaging/CI are now part of the repo baseline, while full Docker-backed backend proof remains open.
 - `docs/05_history/2026-03-21-gitnexus-baseline.md`
   Reload note that GitNexus is now part of the repo-local agent workflow baseline and that future sessions can use the indexed code graph after reloading workspace MCP config.
+- `docs/05_history/2026-03-15-discovery-and-doc-bootstrap.md`
+  History note covering early discovery and document bootstrapping.
+- `docs/05_history/2026-03-15-monolith-foundation-wave-1-3.md`
+  History record of the monolith foundation delivery wave.
+- `docs/05_history/2026-03-15-ops-closure-slice.md`
+  History record covering operational closure and scheduled reconciliation.
+- `docs/05_history/2026-03-15-pre-implementation-doc-set.md`
+  History record establishing pre-implementation documentation taxonomy.
 - `docs/05_history/2026-03-21-cv-safe-benchmark-claims.md`
   Reload note capturing the strongest current CV-safe benchmark claims and the guardrails against overstating unproven performance targets.
 - `docs/05_history/2026-05-30-gitnexus-codebase-function-scan.md`
