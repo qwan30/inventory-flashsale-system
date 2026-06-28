@@ -1,14 +1,68 @@
+# ==========================================
+# Java / Maven Build Artifacts
+# ==========================================
 target/
+*.class
+*.jar
+*.war
+*.ear
+/.mvn/wrapper/maven-wrapper.jar
+hs_err_pid*
+replay_pid*
+
+# ==========================================
+# Node / Frontend / Vite Build & Dependencies
+# ==========================================
+node_modules/
+dist/
+build/
+*.tsbuildinfo
+
+# ==========================================
+# Logs, Stack Dumps & Temp Files
+# ==========================================
+*.log
+*.stackdump
+.DS_Store
+Thumbs.db
+
+# ==========================================
+# E2E & Browser Testing Output
+# ==========================================
+test-results/
+playwright-report/
+blob-report/
+.playwright-mcp/
+
+# ==========================================
+# IDE & Local Tooling Configuration
+# ==========================================
 .idea/
 .vscode/
 *.iml
-*.log
-.DS_Store
-/.mvn/wrapper/maven-wrapper.jar
+.project
+.classpath
+.settings/
+.gitnexus
+
+# ==========================================
+# Environment & Secrets
+# ==========================================
+.env
+.env.local
+.env.*.local
+
+# ==========================================
+# Side Repositories & Local AI State
+# ==========================================
 /everything-claude-code/
 /skills/
+/history/
+.claude/
+.codex/
+
+# ==========================================
+# Performance & Benchmark Artifacts
+# ==========================================
 /testing/k6/artifacts/**
 !/testing/k6/artifacts/.gitkeep
-node_modules/
-apps/admin-ui/dist/
-.gitnexus
