@@ -52,6 +52,7 @@ class OutboxServiceTest {
                 50,
                 Duration.ofSeconds(10),
                 3,
+                Duration.ofSeconds(5),
                 new SimpleMeterRegistry()
         );
     }

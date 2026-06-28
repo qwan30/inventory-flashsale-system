@@ -36,6 +36,7 @@ public class OutboxService {
     private final int publishBatchSize;
     private final Duration retryDelay;
     private final int maxAttempts;
+    private final Duration sendTimeout;
     private final Counter publishSuccessCounter;
     private final Counter publishFailureCounter;
     private final Counter retryScheduledCounter;
@@ -50,6 +51,7 @@ public class OutboxService {
             @Value("${app.outbox.publish-batch-size:50}") int publishBatchSize,
             @Value("${app.outbox.retry-delay:10s}") Duration retryDelay,
             @Value("${app.outbox.max-attempts:5}") int maxAttempts,
+            @Value("${app.outbox.send-timeout:5s}") Duration sendTimeout,
             MeterRegistry meterRegistry
     ) {
         this.repository = repository;
@@ -60,6 +62,7 @@ public class OutboxService {
         this.publishBatchSize = publishBatchSize;
         this.retryDelay = retryDelay;
         this.maxAttempts = maxAttempts;
+        this.sendTimeout = sendTimeout;
         this.publishSuccessCounter = meterRegistry.counter("outbox.publish.success");
         this.publishFailureCounter = meterRegistry.counter("outbox.publish.failure");
         this.retryScheduledCounter = meterRegistry.counter("outbox.retry.scheduled");
@@ -179,7 +182,7 @@ public class OutboxService {
                     objectMapper.readTree(event.getPayload())
             );
             String message = objectMapper.writeValueAsString(envelope);
-            kafkaTemplate.send(topic, event.getAggregateId(), message).get(5, TimeUnit.SECONDS);
+            kafkaTemplate.send(topic, event.getAggregateId(), message).get(sendTimeout.toMillis(), TimeUnit.MILLISECONDS);
             event.markPublished(timeProvider.now());
             publishSuccessCounter.increment();
         } catch (Exception exception) {
