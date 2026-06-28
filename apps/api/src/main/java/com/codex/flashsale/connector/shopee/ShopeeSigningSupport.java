@@ -1,5 +1,6 @@
 package com.codex.flashsale.connector.shopee;
 
+import com.codex.flashsale.common.util.HexUtils;
 import java.nio.charset.StandardCharsets;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -23,18 +24,9 @@ final class ShopeeSigningSupport {
             SecretKeySpec secretKey = new SecretKeySpec(partnerKey.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
             mac.init(secretKey);
             byte[] digest = mac.doFinal(baseString.getBytes(StandardCharsets.UTF_8));
-            return toLowerHex(digest);
+            return HexUtils.toHexString(digest);
         } catch (Exception exception) {
             throw new IllegalStateException("Unable to generate Shopee request signature", exception);
         }
-    }
-
-    private static String toLowerHex(byte[] bytes) {
-        StringBuilder builder = new StringBuilder(bytes.length * 2);
-        for (byte value : bytes) {
-            builder.append(Character.forDigit((value >>> 4) & 0x0F, 16));
-            builder.append(Character.forDigit(value & 0x0F, 16));
-        }
-        return builder.toString();
     }
 }

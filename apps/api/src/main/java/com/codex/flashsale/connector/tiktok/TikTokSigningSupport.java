@@ -1,5 +1,6 @@
 package com.codex.flashsale.connector.tiktok;
 
+import com.codex.flashsale.common.util.HexUtils;
 import java.nio.charset.StandardCharsets;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -14,7 +15,7 @@ public final class TikTokSigningSupport {
         try {
             Mac mac = Mac.getInstance("HmacSHA256");
             mac.init(new SecretKeySpec(appSecret.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
-            return toLowerHex(mac.doFinal(baseString.getBytes(StandardCharsets.UTF_8)));
+            return HexUtils.toHexString(mac.doFinal(baseString.getBytes(StandardCharsets.UTF_8)));
         } catch (Exception exception) {
             throw new IllegalStateException("Unable to generate TikTok request signature", exception);
         }
@@ -25,18 +26,9 @@ public final class TikTokSigningSupport {
         try {
             Mac mac = Mac.getInstance("HmacSHA256");
             mac.init(new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
-            return toLowerHex(mac.doFinal(baseString.getBytes(StandardCharsets.UTF_8)));
+            return HexUtils.toHexString(mac.doFinal(baseString.getBytes(StandardCharsets.UTF_8)));
         } catch (Exception exception) {
             throw new IllegalStateException("Unable to generate TikTok ingress signature", exception);
         }
-    }
-
-    private static String toLowerHex(byte[] bytes) {
-        StringBuilder builder = new StringBuilder(bytes.length * 2);
-        for (byte value : bytes) {
-            builder.append(Character.forDigit((value >>> 4) & 0x0F, 16));
-            builder.append(Character.forDigit(value & 0x0F, 16));
-        }
-        return builder.toString();
     }
 }
