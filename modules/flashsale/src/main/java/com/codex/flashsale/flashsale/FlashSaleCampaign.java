@@ -8,6 +8,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import java.time.Instant;
 
 /**
@@ -53,6 +54,9 @@ public class FlashSaleCampaign extends AuditTimestamps {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private CampaignStatus status;
+
+    @Version
+    private Long version;
 
     protected FlashSaleCampaign() {
     }
@@ -194,6 +198,10 @@ public class FlashSaleCampaign extends AuditTimestamps {
 
     public CampaignStatus getStatus() {
         return status;
+    }
+
+    public Long getVersion() {
+        return version;
     }
 
     private static void validateWindow(Instant startsAt, Instant endsAt) {
