@@ -1,6 +1,6 @@
 package com.codex.flashsale.api;
 
-import com.codex.flashsale.channel.SalesChannel;
+import com.codex.flashsale.common.domain.SalesChannel;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

@@ -11,7 +11,7 @@ import com.codex.flashsale.application.ChannelHealthStatus;
 import com.codex.flashsale.application.ChannelHealthSummary;
 import com.codex.flashsale.application.OpsApplicationService;
 import com.codex.flashsale.application.ReservationApplicationService;
-import com.codex.flashsale.channel.SalesChannel;
+import com.codex.flashsale.common.domain.SalesChannel;
 import com.codex.flashsale.channel.ingress.TikTokIngressReceipt;
 import com.codex.flashsale.channel.reconciliation.ChannelReconciliationService;
 import com.codex.flashsale.channel.sync.ChannelInventorySnapshot;

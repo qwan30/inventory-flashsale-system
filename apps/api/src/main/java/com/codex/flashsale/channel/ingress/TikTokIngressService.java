@@ -4,7 +4,7 @@ import com.codex.flashsale.api.AdminTikTokIngressReplayRequest;
 import com.codex.flashsale.api.TikTokIngressReceiptResponse;
 import com.codex.flashsale.api.TikTokInventoryIngressRequest;
 import com.codex.flashsale.api.TikTokOrderStatusIngressRequest;
-import com.codex.flashsale.channel.SalesChannel;
+import com.codex.flashsale.common.domain.SalesChannel;
 import com.codex.flashsale.channel.sync.ChannelInventorySnapshot;
 import com.codex.flashsale.channel.sync.ChannelInventorySnapshotRepository;
 import com.codex.flashsale.common.exception.BadRequestException;

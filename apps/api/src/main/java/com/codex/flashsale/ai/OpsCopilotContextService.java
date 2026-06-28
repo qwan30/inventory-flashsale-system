@@ -10,7 +10,7 @@ import com.codex.flashsale.application.AdminCampaignApplicationService;
 import com.codex.flashsale.application.ChannelHealthSummary;
 import com.codex.flashsale.application.OpsApplicationService;
 import com.codex.flashsale.benchmark.BenchmarkEvidenceService;
-import com.codex.flashsale.channel.SalesChannel;
+import com.codex.flashsale.common.domain.SalesChannel;
 import com.codex.flashsale.common.exception.BadRequestException;
 import com.codex.flashsale.common.exception.NotFoundException;
 import com.codex.flashsale.outbox.OutboxStatus;

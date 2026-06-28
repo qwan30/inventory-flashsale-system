@@ -1,6 +1,6 @@
 package com.codex.flashsale.application;
 
-import com.codex.flashsale.channel.SalesChannel;
+import com.codex.flashsale.common.domain.SalesChannel;
 import java.util.Optional;
 
 public interface ChannelReplaySummaryProvider {

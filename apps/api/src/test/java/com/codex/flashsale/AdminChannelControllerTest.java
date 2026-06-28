@@ -12,7 +12,7 @@ import com.codex.flashsale.api.ChannelHealthReplayResponse;
 import com.codex.flashsale.api.ChannelSyncFailureDetailResponse;
 import com.codex.flashsale.api.ReconciliationRunResponse;
 import com.codex.flashsale.application.OpsApplicationService;
-import com.codex.flashsale.channel.SalesChannel;
+import com.codex.flashsale.common.domain.SalesChannel;
 import com.codex.flashsale.controller.AdminChannelController;
 import com.codex.flashsale.security.ApiAccessDeniedHandler;
 import com.codex.flashsale.security.ApiAuthenticationEntryPoint;

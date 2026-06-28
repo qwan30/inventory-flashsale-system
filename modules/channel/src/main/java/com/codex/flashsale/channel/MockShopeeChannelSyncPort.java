@@ -1,5 +1,7 @@
 package com.codex.flashsale.channel;
 
+import com.codex.flashsale.common.domain.SalesChannel;
+
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 

@@ -2,7 +2,7 @@ package com.codex.flashsale.application;
 
 import com.codex.flashsale.admin.AdminActivityAction;
 import com.codex.flashsale.admin.AdminActivityAuditRepository;
-import com.codex.flashsale.channel.SalesChannel;
+import com.codex.flashsale.common.domain.SalesChannel;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
 

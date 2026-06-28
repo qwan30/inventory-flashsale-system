@@ -1,6 +1,6 @@
 package com.codex.flashsale.order;
 
-import com.codex.flashsale.channel.SalesChannel;
+import com.codex.flashsale.common.domain.SalesChannel;
 import com.codex.flashsale.common.exception.ConflictException;
 import com.codex.flashsale.common.persistence.AuditTimestamps;
 import jakarta.persistence.Column;

@@ -7,7 +7,7 @@ import com.codex.flashsale.api.CreateReservationRequest;
 import com.codex.flashsale.api.ReleaseReservationResponse;
 import com.codex.flashsale.api.ReservationResponse;
 import com.codex.flashsale.application.ReservationApplicationService;
-import com.codex.flashsale.channel.SalesChannel;
+import com.codex.flashsale.common.domain.SalesChannel;
 import com.codex.flashsale.common.exception.ConflictException;
 import com.codex.flashsale.flashsale.CampaignStatus;
 import com.codex.flashsale.inventory.InventoryItem;

@@ -1,6 +1,6 @@
 package com.codex.flashsale.channel.sync;
 
-import com.codex.flashsale.channel.SalesChannel;
+import com.codex.flashsale.common.domain.SalesChannel;
 import com.codex.flashsale.common.time.TimeProvider;
 import com.codex.flashsale.connector.shopee.ShopeeChannelClient;
 import java.util.Optional;

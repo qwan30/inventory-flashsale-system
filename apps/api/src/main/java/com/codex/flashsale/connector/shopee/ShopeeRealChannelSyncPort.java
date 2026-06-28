@@ -1,6 +1,6 @@
 package com.codex.flashsale.connector.shopee;
 
-import com.codex.flashsale.channel.SalesChannel;
+import com.codex.flashsale.common.domain.SalesChannel;
 import com.codex.flashsale.channel.sync.ChannelSyncCommand;
 import com.codex.flashsale.channel.sync.ChannelSyncPort;
 import com.codex.flashsale.channel.sync.PermanentChannelSyncException;

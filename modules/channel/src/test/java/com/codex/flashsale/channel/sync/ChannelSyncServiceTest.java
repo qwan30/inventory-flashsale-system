@@ -1,12 +1,14 @@
 package com.codex.flashsale.channel.sync;
 
+import com.codex.flashsale.common.domain.SalesChannel;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.codex.flashsale.channel.SalesChannel;
+import com.codex.flashsale.common.domain.SalesChannel;
 import com.codex.flashsale.common.time.TimeProvider;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.time.Duration;

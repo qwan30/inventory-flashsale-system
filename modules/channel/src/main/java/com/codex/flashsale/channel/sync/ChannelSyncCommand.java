@@ -1,6 +1,8 @@
 package com.codex.flashsale.channel.sync;
 
-import com.codex.flashsale.channel.SalesChannel;
+import com.codex.flashsale.common.domain.SalesChannel;
+
+import com.codex.flashsale.common.domain.SalesChannel;
 import java.time.Instant;
 
 public record ChannelSyncCommand(

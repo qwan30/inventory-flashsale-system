@@ -1,6 +1,6 @@
 package com.codex.flashsale.inventory;
 
-import com.codex.flashsale.channel.SalesChannel;
+import com.codex.flashsale.common.domain.SalesChannel;
 import com.codex.flashsale.common.exception.NotFoundException;
 import java.time.Instant;
 import java.util.List;

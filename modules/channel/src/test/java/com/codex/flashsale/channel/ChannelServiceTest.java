@@ -1,5 +1,7 @@
 package com.codex.flashsale.channel;
 
+import com.codex.flashsale.common.domain.SalesChannel;
+
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

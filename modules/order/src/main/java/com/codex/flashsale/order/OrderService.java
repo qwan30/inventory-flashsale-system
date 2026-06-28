@@ -1,6 +1,6 @@
 package com.codex.flashsale.order;
 
-import com.codex.flashsale.channel.SalesChannel;
+import com.codex.flashsale.common.domain.SalesChannel;
 import com.codex.flashsale.common.exception.NotFoundException;
 import java.util.Optional;
 import org.springframework.stereotype.Service;

@@ -1,6 +1,6 @@
 package com.codex.flashsale.channel.ingress;
 
-import com.codex.flashsale.channel.SalesChannel;
+import com.codex.flashsale.common.domain.SalesChannel;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 

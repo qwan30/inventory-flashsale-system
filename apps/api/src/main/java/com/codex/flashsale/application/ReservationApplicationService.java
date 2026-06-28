@@ -6,7 +6,7 @@ import com.codex.flashsale.api.InventoryResponse;
 import com.codex.flashsale.api.ReleaseReservationResponse;
 import com.codex.flashsale.api.ReservationResponse;
 import com.codex.flashsale.channel.ChannelService;
-import com.codex.flashsale.channel.SalesChannel;
+import com.codex.flashsale.common.domain.SalesChannel;
 import com.codex.flashsale.channel.ReservationValidationRequest;
 import com.codex.flashsale.channel.sync.ChannelSyncService;
 import com.codex.flashsale.common.exception.ConflictException;

@@ -6,7 +6,7 @@ import com.codex.flashsale.api.ChannelHealthReplayResponse;
 import com.codex.flashsale.api.ChannelHealthResponse;
 import com.codex.flashsale.application.ChannelHealthSummary;
 import com.codex.flashsale.application.OpsApplicationService;
-import com.codex.flashsale.channel.SalesChannel;
+import com.codex.flashsale.common.domain.SalesChannel;
 import com.codex.flashsale.common.exception.BadRequestException;
 import java.util.List;
 import java.util.Locale;

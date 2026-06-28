@@ -1,6 +1,6 @@
 package com.codex.flashsale.api;
 
-import com.codex.flashsale.channel.SalesChannel;
+import com.codex.flashsale.common.domain.SalesChannel;
 import java.time.Instant;
 
 public record ReconciliationDriftResponse(

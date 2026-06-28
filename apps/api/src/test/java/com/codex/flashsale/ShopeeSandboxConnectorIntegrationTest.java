@@ -8,7 +8,7 @@ import com.codex.flashsale.api.ReconciliationDriftResponse;
 import com.codex.flashsale.api.ReconciliationRunResponse;
 import com.codex.flashsale.application.OpsApplicationService;
 import com.codex.flashsale.application.ReservationApplicationService;
-import com.codex.flashsale.channel.SalesChannel;
+import com.codex.flashsale.common.domain.SalesChannel;
 import com.codex.flashsale.channel.sync.ChannelSyncService;
 import com.codex.flashsale.flashsale.CampaignStatus;
 import com.fasterxml.jackson.databind.JsonNode;

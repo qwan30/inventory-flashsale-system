@@ -3,7 +3,7 @@ package com.codex.flashsale.order;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.codex.flashsale.channel.SalesChannel;
+import com.codex.flashsale.common.domain.SalesChannel;
 import com.codex.flashsale.common.exception.ConflictException;
 import org.junit.jupiter.api.Test;
 

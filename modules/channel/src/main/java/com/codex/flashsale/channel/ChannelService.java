@@ -1,5 +1,7 @@
 package com.codex.flashsale.channel;
 
+import com.codex.flashsale.common.domain.SalesChannel;
+
 import com.codex.flashsale.common.exception.BadRequestException;
 import java.util.EnumMap;
 import java.util.List;

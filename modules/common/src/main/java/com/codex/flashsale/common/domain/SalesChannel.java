@@ -1,4 +1,4 @@
-package com.codex.flashsale.channel;
+package com.codex.flashsale.common.domain;
 
 public enum SalesChannel {
     WEB,

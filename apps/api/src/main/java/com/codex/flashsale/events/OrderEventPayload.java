@@ -1,6 +1,6 @@
 package com.codex.flashsale.events;
 
-import com.codex.flashsale.channel.SalesChannel;
+import com.codex.flashsale.common.domain.SalesChannel;
 import com.codex.flashsale.order.OrderStatus;
 
 public record OrderEventPayload(

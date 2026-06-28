@@ -10,7 +10,7 @@ import com.codex.flashsale.api.CreateReservationRequest;
 import com.codex.flashsale.api.TikTokIngressReceiptResponse;
 import com.codex.flashsale.application.OpsApplicationService;
 import com.codex.flashsale.application.ReservationApplicationService;
-import com.codex.flashsale.channel.SalesChannel;
+import com.codex.flashsale.common.domain.SalesChannel;
 import com.codex.flashsale.channel.sync.ChannelSyncService;
 import com.codex.flashsale.connector.tiktok.TikTokSigningSupport;
 import com.codex.flashsale.flashsale.CampaignStatus;

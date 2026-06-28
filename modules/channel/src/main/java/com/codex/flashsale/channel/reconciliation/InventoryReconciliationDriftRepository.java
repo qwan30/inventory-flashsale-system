@@ -1,9 +1,11 @@
 package com.codex.flashsale.channel.reconciliation;
 
+import com.codex.flashsale.common.domain.SalesChannel;
+
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
-import com.codex.flashsale.channel.SalesChannel;
+import com.codex.flashsale.common.domain.SalesChannel;
 
 public interface InventoryReconciliationDriftRepository extends JpaRepository<InventoryReconciliationDrift, String> {
 

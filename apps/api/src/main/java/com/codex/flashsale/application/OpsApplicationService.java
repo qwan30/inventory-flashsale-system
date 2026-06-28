@@ -11,7 +11,7 @@ import com.codex.flashsale.api.OutboxEventSummaryResponse;
 import com.codex.flashsale.api.OutboxRetryResponse;
 import com.codex.flashsale.api.ReconciliationDriftResponse;
 import com.codex.flashsale.api.ReconciliationRunResponse;
-import com.codex.flashsale.channel.SalesChannel;
+import com.codex.flashsale.common.domain.SalesChannel;
 import com.codex.flashsale.channel.ingress.TikTokIngressReceiptRepository;
 import com.codex.flashsale.channel.reconciliation.ChannelReconciliationService;
 import com.codex.flashsale.channel.reconciliation.InventoryReconciliationDrift;
