@@ -130,6 +130,8 @@ Read in this order for broad project work:
   GitNexus plus BMAD-style full source review documenting implemented capabilities, verification evidence, and current follow-ups for TikTok ingress hardening, Docker-backed backend proof, and stale durable docs.
 - `docs/04_audit_remediation/2026-06-07-project-evidence-sheet.md`
   Backend-focused project evidence sheet for resume preparation, classifying verified claims, unsafe claims, measurable scope, ownership evidence, benchmark evidence, and missing proof that future resume-writing work must respect.
+- `docs/04_audit_remediation/2026-08-17-full-codebase-review.md`
+  Full-codebase review for the portfolio entry upgrade: suspect verification (CI lint, README discrepancies, junit-platform "duplicate", demo secrets), Fowler smell baseline on core services, and a correctness-risk remediation backlog. Includes the traceable numbers and promoted k6 evidence used in the portfolio rewrite.
 - `docs/05_history/`
   Concise dated records of important completed work or important discoveries worth reloading next session.
 - `docs/05_history/2026-03-15-docs-structure-normalization.md`
@@ -174,6 +176,8 @@ Read in this order for broad project work:
   Reload note for the current GitNexus-backed whole-function discovery pass, including the live index baseline, main functional map, best next reads, and verification scope.
 - `docs/05_history/2026-06-24-cicd-pipeline-overhaul.md`
   Reload note documenting the CI/CD optimizations, concurrency controls, automated rollback setup, and Dependabot configuration.
+- `docs/05_history/2026-08-17-portfolio-review-milestone.md`
+  Reload note for the portfolio entry upgrade: full review completed, CI lint fixed, README corrected, and a remediation backlog recorded. Repositions the project as correctness-first (complementary to the featured Flash Sale Concurrency Engine).
 
 ## Routing Heuristic
 

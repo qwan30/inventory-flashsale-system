@@ -60,6 +60,7 @@ blob-report/
 /history/
 .claude/
 .codex/
+.zcode/
 
 # ==========================================
 # Performance & Benchmark Artifacts

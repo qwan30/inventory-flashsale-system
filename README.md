@@ -7,7 +7,7 @@
 [![MySQL 8.4](https://img.shields.io/badge/MySQL-8.4-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
 [![Redis 7.4](https://img.shields.io/badge/Redis-7.4-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
 [![Apache Kafka 3.9](https://img.shields.io/badge/Apache_Kafka-3.9-231F20?style=for-the-badge&logo=apachekafka&logoColor=white)](https://kafka.apache.org/)
-[![React 18](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![React 19](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
 [![Docker](https://img.shields.io/badge/Docker-✓-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 [![CI Build](https://github.com/thanhquan3010/inventory-flashsale-system/actions/workflows/ci.yml/badge.svg)](https://github.com/thanhquan3010/inventory-flashsale-system/actions)
 [![Tests](https://img.shields.io/badge/Tests-100%2B_Passing-22C55E?style=for-the-badge)](https://github.com/thanhquan3010/inventory-flashsale-system/actions)
@@ -400,11 +400,11 @@ xychart-beta
 
 | Metric | Value | Status |
 |--------|-------|--------|
-| **Backend JUnit Test Files** | 27 (covering 75+ unit/integration assertions) | ✅ Verified |
+| **Backend Test Files** | 27 (covering 75 unit/integration test methods) | ✅ Verified |
 | **Database Migrations** | 10 Flyway migration files | ✅ Up-to-date |
 | **Relational Schema** | 15 tables (MySQL 8.4) | ✅ Validated |
 | **REST API Endpoints** | 39 distinct endpoints | ✅ Implemented |
-| **Frontend Test Files** | 20 unit/Playwright specification files | ✅ Verified |
+| **Frontend Test Files** | 7 unit/Playwright specification files (32 cases) | ✅ Verified |
 | **K6 Benchmark Scenarios** | 8 load simulation scripts | ✅ Active |
 
 ---
@@ -437,7 +437,6 @@ graph TD
     inventory --> common
     order --> common
     outbox --> common
-    flashsale --> inventory
 ```
 
 > ⬆️ **Dependency Flow: common ← modules ← apps/api** (Inner common utilities never depend on business modules).
