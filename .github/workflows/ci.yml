@@ -89,7 +89,7 @@ jobs:
 
       - name: Build and push Backend image
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: apps/api/Dockerfile
@@ -159,7 +159,7 @@ jobs:
 
       - name: Build and push Frontend image
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: ./apps/admin-ui
           file: apps/admin-ui/Dockerfile
